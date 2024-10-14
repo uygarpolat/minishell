@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/14 15:56:31 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/14 17:30:04 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,21 @@ void    handle_sigquit()
     rl_redisplay();
 }
 
+int	is_space(char c)
+{
+	if (c = ' ')
+		return (1);
+	return (0);
+}
+
+int	is_seperator(char c)
+{
+	if (c == '<' || c == '>' || c == '&' || c == '|' ||
+			c == '(' || c == ')')
+		return (1);
+	return (0);
+}
+
 t_tokens	*ft_tokenizer(char *input)
 {
 	int			i;
@@ -50,7 +65,7 @@ t_tokens	*ft_tokenizer(char *input)
 	{
 		if (state = DEFAULT)
 		{
-			if (*temp == ' ')
+			if (*temp)
 			{
 				if (ft_strlen(temp) > 0)
 				{
