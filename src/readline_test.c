@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/09/30 11:16:15 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/12 20:27:55 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include <readline/history.h>
+#include "../../library/libft/libft.h"
 
 
 void    handle_sigint()
@@ -33,10 +34,16 @@ void    handle_sigquit()
     rl_replace_line("", 0);
     rl_redisplay();
 }
-
+/*
+char	**ft_tokenizer(char *input)
+{
+	char	**tokens;
+}
+*/
 int    main(void)
 {
     char    *input;
+	//char	**tokens;
 
     signal(SIGINT, handle_sigint);
     signal(SIGQUIT, handle_sigquit);
@@ -45,11 +52,12 @@ int    main(void)
         input = readline("minishell> ");
         if (!input)
             break ;
-        if (!strncmp(input, "exit", 5))
+        if (!ft_strncmp(input, "exit", 5))
             break ;
         if (*input)
             add_history(input);
         printf("%s\n", input);
+		//tokens = ft_tokenizer(input);
         free(input);
     }
     return (0);
