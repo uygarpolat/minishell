@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 22:44:36 by upolat            #+#    #+#             */
-/*   Updated: 2024/05/24 08:50:36 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/14 12:57:05 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,14 @@
 # include <stdlib.h>
 # include <limits.h>
 # include <stdarg.h>
+# include <stdint.h>
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 101
+# endif
+
+# ifndef OPEN_MAX
+#  define OPEN_MAX 1024
 # endif
 
 typedef struct s_list

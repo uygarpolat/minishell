@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   readline_test.c                                    :+:      :+:    :+:   */
+/*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/12 20:27:55 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/14 15:36:38 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <readline/history.h>
 #include <readline/history.h>
 #include "../../library/libft/libft.h"
+#include "../includes/tokenizer.h"
 
 
 void    handle_sigint()
@@ -34,16 +35,28 @@ void    handle_sigquit()
     rl_replace_line("", 0);
     rl_redisplay();
 }
-/*
-char	**ft_tokenizer(char *input)
+
+t_tokens	*ft_tokenizer(char *input)
 {
-	char	**tokens;
+	int			i;
+	char		*temp;
+	t_tokens	*tokens = NULL;
+
+	temp = input;
+	i = 0;
+
+	while (input[i])
+	{
+		i++;	
+	}
+
+	return (tokens);
 }
-*/
+
 int    main(void)
 {
-    char    *input;
-	//char	**tokens;
+    char    	*input;
+	t_tokens	*tokens;
 
     signal(SIGINT, handle_sigint);
     signal(SIGQUIT, handle_sigquit);
@@ -57,7 +70,7 @@ int    main(void)
         if (*input)
             add_history(input);
         printf("%s\n", input);
-		//tokens = ft_tokenizer(input);
+		tokens = ft_tokenizer(input);
         free(input);
     }
     return (0);

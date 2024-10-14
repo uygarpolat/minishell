@@ -1,35 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strchr.c                                        :+:      :+:    :+:   */
+/*   tokenizer.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/08 02:00:24 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/14 14:04:28 by upolat           ###   ########.fr       */
+/*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
+/*   Updated: 2024/10/14 15:34:59 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-char	*ft_strchr(const char *str, int c)
+typedef enum	e_token_type
 {
-	while (*str)
-	{
-		if (*str == (char)c)
-			return ((char *)str);
-		str++;
-	}
-	if ((char)c == '\0')
-		return ((char *)str);
-	return (0);
-}
+	TOKEN_WORD,
+	TOKEN_REDIR_IN,
+	TOKEN_REDIR_OUT,
+	TOKEN_APPEND,
+	TOKEN_HEREDOC,
+	TOKEN_AND,
+	TOKEN_OR,
+	TOKEN_OPEN_PAREN,
+	TOKEN_CLOSE_PAREN,
+	TOKEN_PIPE,
+	NUM_TYPES,
+}	t_token_type;
 
-char	*ft_strchrnul(const char *str, int c)
+typedef struct	s_tokens
 {
-	while (*str)
-	{
-		if (*str == (char)c)
-			return ((char *)str);
-		str++;
-	}
-	return ((char *)str);
-}
+	enum e_token_type	type;
+	char				*value;
+}	t_tokens;
+
+typedef enum 	e_state
+{
+	DEFAULT_STATE,
+	SINGLE_Q_STATE,
+	DOUBLE_Q_STATE,
+}	t_state;
