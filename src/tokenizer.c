@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/14 15:36:38 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/14 15:56:31 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,13 +41,30 @@ t_tokens	*ft_tokenizer(char *input)
 	int			i;
 	char		*temp;
 	t_tokens	*tokens = NULL;
+	int			state ;
 
 	temp = input;
 	i = 0;
 
-	while (input[i])
+	while (*temp)
 	{
-		i++;	
+		if (state = DEFAULT)
+		{
+			if (*temp == ' ')
+			{
+				if (ft_strlen(temp) > 0)
+				{
+					
+				}
+			}
+			else if (*temp == '\'')
+				state = SINGLE_Q_STATE;
+			else if (*temp == '"')
+				state = DOUBLE_Q_STATE;
+			else
+				ft_append_word
+		}
+		temp++;	
 	}
 
 	return (tokens);
