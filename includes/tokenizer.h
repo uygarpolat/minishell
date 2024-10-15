@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/15 17:11:16 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/15 20:01:10 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,6 @@ typedef enum 	e_state
 
 typedef struct	s_capacity
 {
-	int			capacity;
+	int			max_size;
 	int			current_size;
 }	t_capacity;
