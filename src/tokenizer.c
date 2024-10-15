@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/15 10:31:33 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/15 15:30:44 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,12 +68,32 @@ ft_realloc_tokens_when_full(t_tokens **tokens)
 
 void	handle_seperator(char **input, t_tokens **tokens)
 {
-	
+	char	*temp;
+
+	temp = *input;
 }
 
 void	handle_word(char **input, t_tokens **tokens)
 {
-	
+	char	*temp;
+
+	temp = *input;
+	if (*temp == '\'')
+	{
+		while (ft_strchr(temp, '\''))
+			temp++;
+	}
+	else if (*temp == '"')
+	{
+		while (ft_strchr(temp, '\''))
+			temp++;
+	}
+	else
+	{
+		while (ft_strchr(temp, ' '))
+			temp++;
+	}
+
 }
 
 t_tokens	*ft_tokenizer(char *input)
