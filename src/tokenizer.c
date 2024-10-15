@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/14 17:30:04 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/15 10:31:33 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void    handle_sigquit()
 
 int	is_space(char c)
 {
-	if (c = ' ')
+	if (c == ' ')
 		return (1);
 	return (0);
 }
@@ -51,37 +51,49 @@ int	is_seperator(char c)
 	return (0);
 }
 
+ft_realloc_tokens_when_full(t_tokens **tokens)
+{
+	int	i;
+	int	size;
+
+	size = 10;
+	i = 0;
+	while (tokens[i])
+		i++;
+	if (i = 0 || i = size)
+	{
+		tokens = 
+	}
+}
+
+void	handle_seperator(char **input, t_tokens **tokens)
+{
+	
+}
+
+void	handle_word(char **input, t_tokens **tokens)
+{
+	
+}
+
 t_tokens	*ft_tokenizer(char *input)
 {
-	int			i;
-	char		*temp;
+	int			initial_capacity;
+	int			current_capacity;
 	t_tokens	*tokens = NULL;
-	int			state ;
 
-	temp = input;
-	i = 0;
-
-	while (*temp)
+	initial_capacity = 10;
+	current_capacity = 0;
+	while (*input)
 	{
-		if (state = DEFAULT)
-		{
-			if (*temp)
-			{
-				if (ft_strlen(temp) > 0)
-				{
-					
-				}
-			}
-			else if (*temp == '\'')
-				state = SINGLE_Q_STATE;
-			else if (*temp == '"')
-				state = DOUBLE_Q_STATE;
-			else
-				ft_append_word
-		}
-		temp++;	
+		while (ft_strchr(" \t\n", *input) && *input)
+			input++;
+		if (is_seperator(*input))
+			handle_seperator(&input, &tokens);
+		else
+			handle_word(&input, &tokens);
+		current_capacity++;
 	}
-
 	return (tokens);
 }
 
