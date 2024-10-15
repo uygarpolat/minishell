@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/15 15:30:44 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/15 17:30:35 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,19 +51,17 @@ int	is_seperator(char c)
 	return (0);
 }
 
-ft_realloc_tokens_when_full(t_tokens **tokens)
+t_tokens	*ft_realloc_tokens_when_full(t_tokens **tokens, t_capacity *capacity)
 {
-	int	i;
-	int	size;
+	t_tokens	*new_tokens;
 
-	size = 10;
-	i = 0;
-	while (tokens[i])
-		i++;
-	if (i = 0 || i = size)
+	new_tokens = malloc(sizeof(t_tokens) * (capacity->capacity * 2));
+	if (new_tokens == NULL)
 	{
-		tokens = 
+		free(tokens); // Also free the string stored in array of struct
+		return (NULL);
 	}
+
 }
 
 void	handle_seperator(char **input, t_tokens **tokens)
@@ -98,21 +96,25 @@ void	handle_word(char **input, t_tokens **tokens)
 
 t_tokens	*ft_tokenizer(char *input)
 {
-	int			initial_capacity;
-	int			current_capacity;
+	t_capacity	capacity;
 	t_tokens	*tokens = NULL;
 
-	initial_capacity = 10;
-	current_capacity = 0;
+	capacity.capacity = 10;
+	capacity.current_size = 0;
+	tokens = malloc(sizeof(t_tokens) * capacity.capacity);
+	if (tokens == NULL)
+		return (NULL);
 	while (*input)
 	{
 		while (ft_strchr(" \t\n", *input) && *input)
 			input++;
+		if (capacity.capacity <= capacity.current_size)
+			ft_realloc_when_tokens_full(&tokens, &capacity)
 		if (is_seperator(*input))
 			handle_seperator(&input, &tokens);
 		else
 			handle_word(&input, &tokens);
-		current_capacity++;
+		capacity.current_size++;
 	}
 	return (tokens);
 }
