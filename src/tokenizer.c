@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/15 23:57:58 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/16 17:08:49 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,23 +87,29 @@ void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 	temp = *input;
 	if (*temp == '\'')
 	{
-		while (*temp && ft_strchr(temp, '\''))
+		++temp;
+		while (*temp && ft_strncmp(temp, "'", 1))
 			temp++;
+		++temp;
 	}
 	else if (*temp == '"')
 	{
-		while (*temp && ft_strchr(temp, '"'))
+		++temp;
+		while (*temp && ft_strncmp(temp, "\"", 1))
 			temp++;
+		++temp;
 	}
 	else
 	{
-		while (*temp && !ft_strchr(" \t\n<>|&()", *temp))
+		//++temp;
+		while (*temp && !ft_strchr(" \n\t<>|&()\"'", *temp))
 			temp++;
 	}
 	tokens[capacity->current_size].value = malloc(sizeof(char) * (temp - *input + 1));
 	if (tokens[capacity->current_size].value == NULL)
 		return ;
 	ft_strlcpy(tokens[capacity->current_size].value, *input, temp - *input + 1);
+	tokens[capacity->current_size].type = TOKEN_WORD;
 	*input = temp;
 }
 
