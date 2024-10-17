@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/15 20:01:10 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/17 10:29:38 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ typedef enum	e_token_type
 	TOKEN_OPEN_PAREN,
 	TOKEN_CLOSE_PAREN,
 	TOKEN_PIPE,
+	TOKEN_UNKNOWN,
 	NUM_TYPES,
 }	t_token_type;
 
