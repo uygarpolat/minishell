@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/17 20:29:52 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/17 22:29:20 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,6 @@ void	print_tokens(t_tokens *tokens, t_capacity capacity)
 		char formatted_token[100];
 		snprintf(formatted_token, sizeof(formatted_token), "token %d: %s", i, tokens[i].value);
 		printf("%-30s type: %s\n", formatted_token, token_type_str[tokens[i].type]);
-
-		//printf("token %d: %s                   type: %s\n", i, tokens[i].value, token_type_str[tokens[i].type]);
 	}
 }
 
@@ -161,7 +159,7 @@ void	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 		type = TOKEN_UNKNOWN;
 	}
 	tokens[capacity->current_size].value = malloc(sizeof(char) * (temp - *input + 1));
-	if (!tokens[capacity->current_size].value)
+	if (tokens[capacity->current_size].value == NULL)
 		return ;
 	ft_strlcpy(tokens[capacity->current_size].value, *input, temp - *input + 1);
 	tokens[capacity->current_size].type = type;
@@ -213,20 +211,6 @@ void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 	temp = *input;
 	if (!*temp)
 		return ;
-/*	if (*temp == '\'')
-	{
-		++temp;
-		while (*temp && *temp != '\'')
-			temp++;
-		++temp;
-	}
-	else if (*temp == '"')
-	{
-		++temp;
-		while (*temp && *temp != '"')
-			temp++;
-		++temp;
-	}*/
 	if (*temp == '\'')
 		temp = skip_a_char(temp, '\'');
 	else if (*temp == '"')
