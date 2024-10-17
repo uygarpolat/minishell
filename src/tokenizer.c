@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/17 10:32:51 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/17 14:46:27 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	print_tokens(t_tokens *tokens, t_capacity capacity)
 	};
 
 	for (int i = 0; i < capacity.current_size; i++)
-		printf("token %d: %s –---- type: %s\n", i, tokens[i].value, token_type_str[tokens[i].type]);
+		printf("token %d: %s~~~ type: %s\n", i, tokens[i].value, token_type_str[tokens[i].type]);
 }
 
 
@@ -168,6 +168,7 @@ void	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 		return ;
 	ft_strlcpy(tokens[capacity->current_size].value, *input, temp - *input + 1);
 	tokens[capacity->current_size].type = type;
+	capacity->current_size++;
 	*input = temp;
 }
 
@@ -176,6 +177,8 @@ void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 	char	*temp;
 
 	temp = *input;
+	if (!*temp)
+		return ;
 	if (*temp == '\'')
 	{
 		++temp;
@@ -192,7 +195,6 @@ void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 	}
 	else
 	{
-		//++temp;
 		while (*temp && !ft_strchr(" \n\t<>|&()\"'", *temp))
 			temp++;
 	}
@@ -201,6 +203,7 @@ void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 		return ;
 	ft_strlcpy(tokens[capacity->current_size].value, *input, temp - *input + 1);
 	tokens[capacity->current_size].type = TOKEN_WORD;
+	capacity->current_size++;
 	*input = temp;
 }
 
@@ -209,7 +212,7 @@ t_tokens	*ft_tokenizer(char *input)
 	t_capacity	capacity;
 	t_tokens	*tokens;
 
-	capacity.max_size = 10;
+	capacity.max_size = 20;
 	capacity.current_size = 0;
 	tokens = malloc(sizeof(t_tokens) * capacity.max_size);
 	if (tokens == NULL)
@@ -227,7 +230,7 @@ t_tokens	*ft_tokenizer(char *input)
 			handle_seperator(&input, tokens, &capacity);
 		else
 			handle_word(&input, tokens, &capacity);
-		capacity.current_size++;
+		//capacity.current_size++;
 	}
 	print_tokens(tokens, capacity);
 	return (tokens);
@@ -249,7 +252,6 @@ int    main(void)
             break ;
         if (*input)
             add_history(input);
-        //printf("%s\n", input);
 		tokens = ft_tokenizer(input);
 		(void)tokens;
         free(input);
