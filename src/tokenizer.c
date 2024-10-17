@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/17 17:32:14 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/17 20:29:52 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,16 +35,7 @@ void    handle_sigquit()
     rl_replace_line("", 0);
     rl_redisplay();
 }
-/*
-void	print_tokens(t_tokens *tokens, t_capacity capacity)
-{
-	int	i;
 
-	i = -1;
-	while (++i < capacity.current_size)
-		printf("token %d is: %s\n", i, tokens[i].value);
-}
-*/
 void	print_tokens(t_tokens *tokens, t_capacity capacity)
 {
 	char *token_type_str[] = {
@@ -63,7 +54,13 @@ void	print_tokens(t_tokens *tokens, t_capacity capacity)
 	};
 
 	for (int i = 0; i < capacity.current_size; i++)
-		printf("token %d: %s~~~ type: %s\n", i, tokens[i].value, token_type_str[tokens[i].type]);
+	{
+		char formatted_token[100];
+		snprintf(formatted_token, sizeof(formatted_token), "token %d: %s", i, tokens[i].value);
+		printf("%-30s type: %s\n", formatted_token, token_type_str[tokens[i].type]);
+
+		//printf("token %d: %s                   type: %s\n", i, tokens[i].value, token_type_str[tokens[i].type]);
+	}
 }
 
 
@@ -172,34 +169,35 @@ void	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 	*input = temp;
 }
 
-void	skip_a_char(char *str, char c)
+char	*skip_a_char(char *str, char c)
 {
 	str++;
 	while (*str && *str != c)
 		str++;
 	if (*str)
 		str++;
+	return (str);
 }
 
-int	skip_quotes_and_ampersand(char *temp)
+int	skip_quotes_and_ampersand(char **temp)
 {
-	if (ft_strchr(" \n\t<>|&()\"'", *temp))
+	if (ft_strchr(" \n\t<>|&()\"'", **temp))
 	{
-		if (*temp == '&')
+		if (**temp == '&')
 		{
-			if (*(temp + 1) == '&')
+			if (**(temp + 1) == '&')
 				return (0);
 			else
 				return (1);
 		}
-		else if (*temp == '"')
+		else if (**temp == '"')
 		{
-			skip_a_char(temp, '"');
+			*temp = skip_a_char(*temp, '"');
 			return (0);
 		}
-		else if (*temp == '\'')
+		else if (**temp == '\'')
 		{
-			skip_a_char(temp, '\'');
+			*temp = skip_a_char(*temp, '\'');
 			return (0);
 		}
 		else
@@ -230,12 +228,12 @@ void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 		++temp;
 	}*/
 	if (*temp == '\'')
-		skip_a_char(temp, '\'');
+		temp = skip_a_char(temp, '\'');
 	else if (*temp == '"')
-		skip_a_char(temp, '"');
+		temp = skip_a_char(temp, '"');
 	else
 	{
-		while (*temp && skip_quotes_and_ampersand(temp))
+		while (*temp && skip_quotes_and_ampersand(&temp))
 		{
 			// & ' and "
 			temp++;
