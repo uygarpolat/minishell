@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/17 14:46:27 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/17 17:27:29 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,6 +172,40 @@ void	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 	*input = temp;
 }
 
+void	skip_a_char(char *str, char c)
+{
+	str++;
+	while (*str && *str != c)
+		str++;
+	if (*str)
+		str++;
+}
+
+int	skip_quotes_and_ampersand(char *temp)
+{
+	if (ft_strchr(" \n\t<>|&()\"'", *temp))
+	{
+		if (*temp == '&')
+		{
+			if (*(temp + 1) == '&')
+				return (0);
+			else
+				return (1);
+		}
+		else if (*temp == '"')
+		{
+			skip_a_char(temp, '"');
+			return (0);
+		}
+		else if (*temp == '\'')
+		{
+			skip_a_char(temp, '\'');
+			return (0);
+		}
+	}
+	return (1);
+}
+
 void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 {
 	char	*temp;
@@ -179,24 +213,31 @@ void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 	temp = *input;
 	if (!*temp)
 		return ;
-	if (*temp == '\'')
+/*	if (*temp == '\'')
 	{
 		++temp;
-		while (*temp && ft_strncmp(temp, "'", 1))
+		while (*temp && *temp != '\'')
 			temp++;
 		++temp;
 	}
 	else if (*temp == '"')
 	{
 		++temp;
-		while (*temp && ft_strncmp(temp, "\"", 1))
+		while (*temp && *temp != '"')
 			temp++;
 		++temp;
-	}
+	}*/
+	if (*temp == '\'')
+		skip_a_char(temp, '\'');
+	else if (*temp == '"')
+		skip_a_char(temp, '"');
 	else
 	{
-		while (*temp && !ft_strchr(" \n\t<>|&()\"'", *temp))
+		while (*temp && skip_quotes_and_ampersand(temp))
+		{
+			// & ' and "
 			temp++;
+		}
 	}
 	tokens[capacity->current_size].value = malloc(sizeof(char) * (temp - *input + 1));
 	if (tokens[capacity->current_size].value == NULL)
