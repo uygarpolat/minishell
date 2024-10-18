@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/18 10:35:19 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/18 16:25:58 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 #include "../../library/libft/libft.h"
 #include "../includes/tokenizer.h"
 
-void	handle_sigint(void)
+void	handle_sigint()
 {
 	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
@@ -28,7 +28,7 @@ void	handle_sigint(void)
 	rl_redisplay();
 }
 
-void	handle_sigquit(void)
+void	handle_sigquit()
 {
 	rl_on_new_line();
 	rl_replace_line("", 0);
@@ -113,6 +113,18 @@ t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens, t_capacity *capacity)
 	return (new_tokens);
 }
 
+int	malloc_individual_tokens(t_tokens *tokens, char **input, char *temp, t_capacity *capacity, t_token_type type)
+{
+	tokens[capacity->current_size].value = malloc(sizeof(char) * (temp - *input + 1));
+	if (tokens[capacity->current_size].value == NULL)
+		return (1);
+	ft_strlcpy(tokens[capacity->current_size].value, *input, temp - *input + 1);
+	tokens[capacity->current_size].type = type;
+	capacity->current_size++;
+	*input = temp;
+	return (0);
+}
+
 void	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 {
 	char			*temp;
@@ -178,13 +190,8 @@ void	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 		temp++;
 		type = TOKEN_UNKNOWN;
 	}
-	tokens[capacity->current_size].value = malloc(sizeof(char) * (temp - *input + 1));
-	if (tokens[capacity->current_size].value == NULL)
+	if (malloc_individual_tokens(tokens, input, temp, capacity, type))
 		return ;
-	ft_strlcpy(tokens[capacity->current_size].value, *input, temp - *input + 1);
-	tokens[capacity->current_size].type = type;
-	capacity->current_size++;
-	*input = temp;
 }
 
 char	*skip_a_char(char *str, char c)
@@ -238,18 +245,10 @@ void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 	else
 	{
 		while (*temp && skip_quotes_and_ampersand(&temp))
-		{
-			// & ' and "
 			temp++;
-		}
 	}
-	tokens[capacity->current_size].value = malloc(sizeof(char) * (temp - *input + 1));
-	if (tokens[capacity->current_size].value == NULL)
+	if (malloc_individual_tokens(tokens, input, temp, capacity, TOKEN_WORD))
 		return ;
-	ft_strlcpy(tokens[capacity->current_size].value, *input, temp - *input + 1);
-	tokens[capacity->current_size].type = TOKEN_WORD;
-	capacity->current_size++;
-	*input = temp;
 }
 
 t_tokens	*ft_tokenizer(char *input, t_capacity *capacity)
@@ -276,26 +275,26 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity)
 	return (tokens);
 }
 
-int    main(void)
+int	main(void)
 {
-    char    	*input;
+	char		*input;
 	t_tokens	*tokens;
 	t_capacity	capacity;
 
-    //signal(SIGINT, handle_sigint);
-    signal(SIGQUIT, handle_sigquit);
-    while (1)
-    {
-        input = readline("minishell> ");
-        if (!input)
-            break ;
-        if (!ft_strncmp(input, "exit", 5))
-            break ;
-        if (*input)
-            add_history(input);
+	signal(SIGINT, handle_sigint);
+	signal(SIGQUIT, handle_sigquit);
+	while (1)
+	{
+		input = readline("minishell> ");
+		if (!input)
+			break ;
+		if (!ft_strncmp(input, "exit", 5))
+			break ;
+		if (*input)
+			add_history(input);
 		tokens = ft_tokenizer(input, &capacity);
 		free_tokens(tokens, &capacity);
-        free(input);
-    }
-    return (0);
+		free(input);
+	}
+	return (0);
 }
