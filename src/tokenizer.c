@@ -6,17 +6,10 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/18 16:25:58 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/20 14:40:23 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <unistd.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-#include <readline/history.h>
 #include "../../library/libft/libft.h"
 #include "../includes/tokenizer.h"
 
@@ -37,7 +30,8 @@ void	handle_sigquit()
 
 void	print_tokens(t_tokens *tokens, t_capacity *capacity)
 {
-	char *token_type_str[] = {
+	int		i;
+	char	*token_type_str[] = {
 		"TOKEN_WORD",
 		"TOKEN_REDIR_IN",
 		"TOKEN_REDIR_OUT",
@@ -52,7 +46,8 @@ void	print_tokens(t_tokens *tokens, t_capacity *capacity)
 		"NUM_TYPES"
 	};
 
-	for (int i = 0; i < capacity->current_size; i++)
+	i = -1;
+	while (++i < capacity->current_size)
 	{
 		char formatted_token[100];
 		snprintf(formatted_token, sizeof(formatted_token), "token %d: %s", i, tokens[i].value);
@@ -247,7 +242,7 @@ void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 		while (*temp && skip_quotes_and_ampersand(&temp))
 			temp++;
 	}
-	if (malloc_individual_tokens(tokens, input, temp, capacity, TOKEN_WORD))
+	if(malloc_individual_tokens(tokens, input, temp, capacity, TOKEN_WORD))
 		return ;
 }
 
