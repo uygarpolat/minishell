@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2024/10/14 12:59:40 by upolat           ###   ########.fr        #
+#    Updated: 2024/10/20 15:41:21 by upolat           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ NAME = minishell
 SRC_DIR = src
 SRC_BONUS_DIR = src
 
-SOURCES = $(SRC_DIR)/tokenizer.c
+SOURCES = $(SRC_DIR)/tokenizer.c $(SRC_DIR)/parser.c \
 
 SOURCES_BONUS = $(SRC_DIR)/readline_test.c
 

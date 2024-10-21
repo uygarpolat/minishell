@@ -6,12 +6,13 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/20 14:40:23 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/21 10:06:08 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../library/libft/libft.h"
 #include "../includes/tokenizer.h"
+#include "../includes/parser.h"
 
 void	handle_sigint()
 {
@@ -31,6 +32,7 @@ void	handle_sigquit()
 void	print_tokens(t_tokens *tokens, t_capacity *capacity)
 {
 	int		i;
+	char	*formatted_tokens[100];
 	char	*token_type_str[] = {
 		"TOKEN_WORD",
 		"TOKEN_REDIR_IN",
@@ -45,11 +47,9 @@ void	print_tokens(t_tokens *tokens, t_capacity *capacity)
 		"TOKEN_UNKNOWN",
 		"NUM_TYPES"
 	};
-
 	i = -1;
 	while (++i < capacity->current_size)
 	{
-		char formatted_token[100];
 		snprintf(formatted_token, sizeof(formatted_token), "token %d: %s", i, tokens[i].value);
 		printf("%-30s type: %s\n", formatted_token, token_type_str[tokens[i].type]);
 	}
@@ -242,7 +242,7 @@ void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 		while (*temp && skip_quotes_and_ampersand(&temp))
 			temp++;
 	}
-	if(malloc_individual_tokens(tokens, input, temp, capacity, TOKEN_WORD))
+	if (malloc_individual_tokens(tokens, input, temp, capacity, TOKEN_WORD))
 		return ;
 }
 
@@ -270,11 +270,52 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity)
 	return (tokens);
 }
 
+void	print_ast(t_ast_node *node, int level)
+{
+	int	indent_level;
+
+	if (node == NULL)
+		return ;
+	indent_level = -1;
+	while (++indent_level < level)
+		printf("  ");
+	if (node->type == AST_COMMAND)
+		printf("AST_COMMAND [TOKEN: %s]\n", node->token->value);
+	else if (node->type == AST_PIPE)
+		printf("AST_PIPE [TOKEN: |]\n");
+	else if (node->type == AST_REDIR_OUT)
+		printf("AST_REDIR_OUT [TOKEN: >]\n");
+	else if (node->type == AST_REDIR_APPEND)
+		printf("AST_REDIR_APPEND [TOKEN: >>]\n");
+	else if (node->type == AST_REDIR_IN)
+		printf("AST_REDIR_IN [TOKEN: <]\n");
+	else if (node->type == AST_HEREDOC)
+		printf("AST_HEREDOC [TOKEN: <<]\n");
+	else if (node->type == AST_AND)
+		printf("AST_AND [TOKEN: &&]\n");
+	else if (node->type == AST_OR)
+		printf("AST_OR [TOKEN: ||]\n");
+	else
+		printf("Unknown node type\n");
+	if (node->left != NULL)
+		print_ast(node->left, level + 1);
+	if (node->right != NULL)
+		print_ast(node->right, level + 1);
+	indent_level = -1;
+	if (node->redir_target != NULL)
+	{
+		while (++indent_level < level + 1)
+			printf("  ");
+		printf("REDIR_TARGET [TOKEN: %s]\n", node->redir_target->token->value);
+	}
+}
+
 int	main(void)
 {
 	char		*input;
 	t_tokens	*tokens;
 	t_capacity	capacity;
+	t_ast_node	*ast;
 
 	signal(SIGINT, handle_sigint);
 	signal(SIGQUIT, handle_sigquit);
@@ -288,6 +329,8 @@ int	main(void)
 		if (*input)
 			add_history(input);
 		tokens = ft_tokenizer(input, &capacity);
+		ast = build_ast(tokens, 0, capacity.current_size - 1);
+		print_ast(ast, 0);
 		free_tokens(tokens, &capacity);
 		free(input);
 	}

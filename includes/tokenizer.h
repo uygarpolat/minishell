@@ -6,21 +6,21 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/20 12:13:42 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/20 15:38:31 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef TOKENIZER_H
 # define TOKENIZER_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <unistd.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-#include <readline/history.h>
-#include <string.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <signal.h>
+# include <unistd.h>
+# include <readline/readline.h>
+# include <readline/history.h>
+# include <readline/history.h>
+# include <string.h>
 
 typedef enum	e_token_type
 {
