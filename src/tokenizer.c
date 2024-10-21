@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/21 10:06:08 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/21 10:15:10 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	handle_sigquit()
 void	print_tokens(t_tokens *tokens, t_capacity *capacity)
 {
 	int		i;
-	char	*formatted_tokens[100];
+	char	formatted_token[100];
 	char	*token_type_str[] = {
 		"TOKEN_WORD",
 		"TOKEN_REDIR_IN",
