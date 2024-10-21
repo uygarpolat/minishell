@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/20 11:30:33 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/21 11:26:50 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/21 15:55:12 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ t_ast_node	*create_operator_node(t_tokens token)
 	node->redir_target = NULL;
 	return (node);
 }
-
+/*
 // Build the AST based on operator precedence, including handling arguments for commands
 t_ast_node	*build_ast(t_tokens *tokens, int start, int end)
 {
@@ -155,4 +155,87 @@ t_ast_node	*build_ast(t_tokens *tokens, int start, int end)
 		root->redir_target = create_command_node(tokens, lowest_prec_pos + 1, &end); // Redirection target
 	}
 	return (root);
+} */
+
+t_ast_node *build_ast(t_tokens *tokens, int start, int end)
+{
+	int			lowest_prec;
+	int			lowest_prec_pos;
+	int			i;
+	int			prec;
+	t_ast_node	*root;
+
+	// Handle parentheses: If the first token is '(', find the matching ')'
+	if (tokens[start].type == TOKEN_OPEN_PAREN)
+	{
+		int paren_count = 1;
+		i = start + 1;
+		while (i <= end && paren_count > 0)
+		{
+			if (tokens[i].type == TOKEN_OPEN_PAREN)
+				paren_count++;
+			else if (tokens[i].type == TOKEN_CLOSE_PAREN)
+				paren_count--;
+			i++;
+		}
+		if (paren_count != 0)
+		{
+			fprintf(stderr, "Syntax error: unmatched parentheses\n");
+			return (NULL);
+		}
+		// Recursively build AST for the expression inside parentheses
+		return (build_ast(tokens, start + 1, i - 2));  // Exclude the parentheses themselves
+	}
+
+	// Find the operator with the lowest precedence
+	lowest_prec = 1000;
+	lowest_prec_pos = -1;
+	i = start;
+	while (i <= end)
+	{
+		// Skip over any expressions inside parentheses
+		if (tokens[i].type == TOKEN_OPEN_PAREN)
+		{
+			int paren_count = 1;
+			i++;
+			while (i <= end && paren_count > 0)
+			{
+				if (tokens[i].type == TOKEN_OPEN_PAREN)
+					paren_count++;
+				else if (tokens[i].type == TOKEN_CLOSE_PAREN)
+					paren_count--;
+				i++;
+			}
+			continue; // Skip the parentheses
+		}
+
+		prec = get_precedence(tokens[i].type);
+		if (prec != -1 && prec < lowest_prec)
+		{
+			lowest_prec = prec;
+			lowest_prec_pos = i;
+		}
+		i++;
+	}
+
+	// If no operators are found, this is a simple command
+	if (lowest_prec_pos == -1)
+		return create_command_node(tokens, start, &end);  // Create command node with arguments
+
+	// Create an operator node (logical operator, pipe, redirection, etc.)
+	root = create_operator_node(tokens[lowest_prec_pos]);
+
+	// Recursively build left and right subtrees for binary operators
+	if (lowest_prec <= 3)  // Pipes and logical operators
+	{
+		root->left = build_ast(tokens, start, lowest_prec_pos - 1);
+		root->right = build_ast(tokens, lowest_prec_pos + 1, end);
+	}
+	else  // Redirections
+	{
+		root->left = build_ast(tokens, start, lowest_prec_pos - 1);
+		root->redir_target = create_command_node(tokens, lowest_prec_pos + 1, &end);  // Redirection target
+	}
+
+	return root;
 }
