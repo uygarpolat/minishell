@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/20 11:30:33 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/21 10:32:39 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/21 11:26:50 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,6 @@ t_ast_node	*create_operator_node(t_tokens token)
 	t_ast_node	*node;
 
 	node = malloc(sizeof(t_ast_node)); // Do malloc check
-	// Set the AST node type based on the token type
 	if (token.type == TOKEN_PIPE)
 		node->type = AST_PIPE;
 	else if (token.type == TOKEN_AND)
@@ -110,54 +109,9 @@ t_ast_node	*create_operator_node(t_tokens token)
 	node->token = &token; // Store the operator's token
 	node->left = NULL;
 	node->right = NULL;
-	node->redir_target = NULL; // Redirection targets will be handled separately
+	node->redir_target = NULL;
 	return (node);
 }
-/*
-// Build the AST based on operator precedence
-t_ast_node	*build_ast(t_tokens *tokens, int start, int end)
-{
-	int			lowest_prec;
-	int			lowest_prec_pos;
-	int			i;
-	int			prec;
-	t_ast_node	*root;
-
-	lowest_prec = 1000;
-	lowest_prec_pos = -1;
-	i = start;
-	// Scan through the tokens to find the lowest precedence operator
-	while (i <= end)
-	{
-		prec = get_precedence(tokens[i].type);
-		if (prec != -1 && prec < lowest_prec)
-		{
-			lowest_prec = prec;
-			lowest_prec_pos = i;
-		}
-		i++;
-	}
-	// If no operators are found, this is a simple command
-	if (lowest_prec_pos == -1)
-		return (create_command_node(tokens, start)); // Create command node
-	// Create an operator node (logical operator, pipe, redirection, etc.)
-	root = create_operator_node(tokens[lowest_prec_pos]);
-	// Recursively build left and right subtrees for binary operators
-	if (lowest_prec <= 3)
-	{
-		// Pipes, logical operators
-		root->left = build_ast(tokens, start, lowest_prec_pos - 1);
-		root->right = build_ast(tokens, lowest_prec_pos + 1, end);
-	}
-	else
-	{
-		// Redirections (one side only)
-		root->left = build_ast(tokens, start, lowest_prec_pos - 1);
-		root->redir_target = create_command_node(tokens, lowest_prec_pos + 1); // Redirection target
-	}
-	return (root);
-}
-*/
 
 // Build the AST based on operator precedence, including handling arguments for commands
 t_ast_node	*build_ast(t_tokens *tokens, int start, int end)
