@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/20 11:30:33 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/21 09:50:28 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/21 10:32:39 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,7 +184,7 @@ t_ast_node	*build_ast(t_tokens *tokens, int start, int end)
 	}
 	// If no operators are found, this is a simple command
 	if (lowest_prec_pos == -1)
-		return (create_command_node(tokens, start, &end)); // Create command node with arguments
+		return (create_command_node(tokens, start, &end)); // Create command node with arguments, also the base case
 	// Create an operator node (logical operator, pipe, redirection, etc.)
 	root = create_operator_node(tokens[lowest_prec_pos]);
 	// Recursively build left and right subtrees for binary operators
