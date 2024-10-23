@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/23 15:49:42 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/23 17:26:33 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,34 +53,9 @@ int	find_matching_paren(t_tokens *tokens, int start, int end)
 	return (-1);
 }
 
-// Function to create an AST node for a command (with arguments)
-void	populate_command_node(t_tokens *tokens, t_ast_node *root, int start, int *end)
-{
-	int	i;
-
-	i = start;
-	root->type = AST_COMMAND;
-	while (i < end)
-	{
-		if 	((tokens[start].type == TOKEN_REDIR_OUT) || (tokens[start].type == TOKEN_APPEND) || (tokens[start].type == TOKEN_REDIR_IN) || (tokens[start].type == TOKEN_HEREDOC))
-		{
-			if (root->redir_target != NULL)
-				root->redir_target = root->redir_target->redir_target;
-			root->redir_target = create_node(tokens);
-i			root->redir_target->tokens->value = ft_strdup(tokens[i + 1].value); // Don't seg fault!!
-		}
-		else
-		{
-			root->token->value = ft_strjoin(root->token->value, tokens[i].value); // Is this leaking?
-			root->left = NULL;
-			root->right = NULL;
-		}
-		i++;
-}
-
 // Function to create an AST node for an operator
 // (pipe, logical operators, redirections)
-t_ast_node	*create_node(t_tokens *token)
+t_ast_node	*create_node(t_tokens token)
 {
 	t_ast_node	*node;
 
@@ -106,6 +81,32 @@ t_ast_node	*create_node(t_tokens *token)
 	node->right = NULL;
 	node->redir_target = NULL;
 	return (node);
+}
+
+// Function to create an AST node for a command (with arguments)
+void	populate_command_node(t_tokens *tokens, t_ast_node *root, int start, int *end)
+{
+	int	i;
+
+	i = start;
+	root->type = AST_COMMAND;
+	while (i < *end)
+	{
+		if 	((tokens[start].type == TOKEN_REDIR_OUT) || (tokens[start].type == TOKEN_APPEND) || (tokens[start].type == TOKEN_REDIR_IN) || (tokens[start].type == TOKEN_HEREDOC))
+		{
+			if (root->redir_target != NULL)
+				root->redir_target = root->redir_target->redir_target;
+			root->redir_target = create_node(tokens[i]);
+			root->redir_target->token->value = ft_strdup(tokens[i + 1].value); // Don't seg fault!!
+		}
+		else
+		{
+			root->token->value = ft_strjoin(root->token->value, tokens[i].value); // Is this leaking?
+			root->left = NULL;
+			root->right = NULL;
+		}
+		i++;
+	}
 }
 
 // Build the AST based on operator precedence, including handling arguments for commands
@@ -143,18 +144,22 @@ t_ast_node	*build_ast(t_tokens *tokens, int start, int end)
 		}
 		i++;
 	}
-
+	
 	if (lowest_prec_pos == -1)
-		return (populate_command_node(tokens, root, start, &end));
-	else if (lowest_prec <= 3)
 	{
-		root = create_node(tokens, start, &end);
+		root = create_node(tokens[start]);
+		populate_command_node(tokens, root, start, &end);
+		return (root);
+	}
+	if (lowest_prec <= 3 && lowest_prec >= 0)
+	{
+		root = create_node(tokens[lowest_prec_pos]);
 		root->left = build_ast(tokens, start, lowest_prec_pos - 1);
 		root->right = build_ast(tokens, lowest_prec_pos + 1, end);
 	}
 	else
 	{
-		root = create_node(tokens, start, &end);
+		root = create_node(tokens[lowest_prec_pos]);
 		populate_command_node(tokens, root, start, &end);
 	}
 	return (root);
