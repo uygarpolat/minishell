@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/20 11:30:33 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/21 15:55:12 by upolat           ###   ########.fr       */
+/*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
+/*   Updated: 2024/10/23 11:42:59 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,25 +25,157 @@ int	get_precedence(t_token_type type)
 	else if (type == TOKEN_REDIR_OUT || type == TOKEN_APPEND
 		|| type == TOKEN_REDIR_IN || type == TOKEN_HEREDOC)
 		return (4);
-	return (-1); // Commands and other tokens have no precedence
+	return (-1);
 }
-/*
-// Function to create an AST node for a command
-t_ast_node	*create_command_node(t_tokens *tokens, int start)
+
+int	find_matching_paren(t_tokens *tokens, int start, int end)
+{
+	int paren_count;
+	int i;
+
+	paren_count = 0;
+	i = start;
+
+	while (i <= end)
+	{
+		if (tokens[i].type == TOKEN_OPEN_PAREN)
+			paren_count++;
+		else if (tokens[i].type == TOKEN_CLOSE_PAREN)
+		{
+			paren_count--;
+			if (paren_count < 0)
+				return (-1);
+			if (paren_count == 0)
+				return (i);
+		}
+		i++;
+	}
+	return (-1);
+}
+
+// Function to create an AST node for a command (with arguments)
+t_ast_node	*create_command_node(t_tokens *tokens, int start, int *end)
+{
+	t_ast_node	*arg_node;
+	t_ast_node	*node;
+	t_ast_node	*temp;
+	int			i;
+
+	node = malloc(sizeof(t_ast_node)); // Do a malloc check
+	node->type = AST_COMMAND;
+	node->token = &tokens[start]; // Store the command's token (e.g., "echo", "ls")
+	node->left = NULL;
+	node->right = NULL;
+	node->redir_target = NULL;
+	return (node);
+}
+
+// Function to create an AST node for an operator
+// (pipe, logical operators, redirections)
+t_ast_node	*create_node(t_tokens *token, int start, int *end)
 {
 	t_ast_node	*node;
 
 	node = malloc(sizeof(t_ast_node)); // Do malloc check
-	node->type = AST_COMMAND;
-	node->token = &tokens[start]; // Store the command's token
+	if (token.type == TOKEN_PIPE)
+		node->type = AST_PIPE;
+	else if (token.type == TOKEN_AND)
+		node->type = AST_AND;
+	else if (token.type == TOKEN_OR)
+		node->type = AST_OR;
+	else if (token.type == TOKEN_REDIR_OUT)
+		node->type = AST_REDIR_OUT;
+	else if (token.type == TOKEN_APPEND)
+		node->type = AST_REDIR_APPEND;
+	else if (token.type == TOKEN_REDIR_IN)
+		node->type = AST_REDIR_IN;
+	else if (token.type == TOKEN_HEREDOC)
+		node->type = AST_HEREDOC;
+	else if (token.type == TOKEN_WORD)
+		node->type = AST_COMMAND;
+	node->token = &token; // Store the operator's token
 	node->left = NULL;
 	node->right = NULL;
-	node->redir_target = NULL; // Not applicable for a command node
+	node->redir_target = NULL;
 	return (node);
 }
-*/
 
-// Function to create an AST node for a command (with arguments)
+// Build the AST based on operator precedence, including handling arguments for commands
+t_ast_node	*build_ast(t_tokens *tokens, int start, int end)
+{
+	int			lowest_prec;
+	int			lowest_prec_pos;
+	int			i;
+	int			prec;
+	t_ast_node	*root;
+
+	lowest_prec = 1000;
+	lowest_prec_pos = -1;
+	i = start;
+	while (i <= end)
+	{
+		if ((i == start) && (tokens[start].type == TOKEN_OPEN_PAREN) && (end == find_matching_paren(tokens, start, end)))
+		{
+			i++;
+			start++;
+			end--;
+		}
+		if (tokens[i].type == TOKEN_OPEN_PAREN)
+			i = find_matching_paren(tokens, i, end);
+		if (i < 0)
+		{
+			ft_putstr_fd("Error: parenthesis mismatch.\n", 2);
+			return (NULL);
+		}
+		prec = get_precedence(tokens[i].type);
+		if (prec != -1 && prec < lowest_prec)
+		{
+			lowest_prec = prec;
+			lowest_prec_pos = i;
+		}
+		i++;
+	}
+
+	if (lowest_prec_pos == -1)
+		return (populate_command_node(token, root, start, &end));
+	else if (lowest_prec <= 3)
+	{
+		root = create_node(tokens, start, &end);
+		root->left = build_ast(tokens, start, lowest_prec_pos - 1);
+		root->right = build_ast(tokens, lowest_prec_pos + 1, end);
+	}
+	else
+	{
+		
+		root = create_node(tokens, start, &end);
+		populate_command_node(token, root, start, &end);
+	}
+	return (root);
+}
+
+/*
+
+	// If no operators are found, this is a simple command
+	if (lowest_prec_pos == -1)
+		return (create_command_node(tokens, start, &end)); // Create command node with arguments, also the base case
+	// Create an operator node (logical operator, pipe, redirection, etc.)
+	root = create_operator_node(tokens[lowest_prec_pos]);
+	// Recursively build left and right subtrees for binary operators
+	if (lowest_prec <= 3)
+	{
+		// Pipes, logical operators
+		root->left = build_ast(tokens, start, lowest_prec_pos - 1);
+		root->right = build_ast(tokens, lowest_prec_pos + 1, end);
+	}
+	else
+	{
+		// Redirections (one side only)
+		root->left = build_ast(tokens, start, lowest_prec_pos - 1);
+		root->redir_target = create_command_node(tokens, lowest_prec_pos + 1, &end); // Redirection target
+	}
+	return (root);
+
+	// Function to create an AST node for a command (with arguments)
 t_ast_node	*create_command_node(t_tokens *tokens, int start, int *end)
 {
 	t_ast_node	*arg_node;
@@ -112,130 +244,5 @@ t_ast_node	*create_operator_node(t_tokens token)
 	node->redir_target = NULL;
 	return (node);
 }
-/*
-// Build the AST based on operator precedence, including handling arguments for commands
-t_ast_node	*build_ast(t_tokens *tokens, int start, int end)
-{
-	int			lowest_prec;
-	int			lowest_prec_pos;
-	int			i;
-	int			prec;
-	t_ast_node	*root;
 
-	lowest_prec = 1000;
-	lowest_prec_pos = -1;
-	i = start;
-	// Scan through the tokens to find the lowest precedence operator
-	while (i <= end)
-	{
-		prec = get_precedence(tokens[i].type);
-		if (prec != -1 && prec < lowest_prec)
-		{
-			lowest_prec = prec;
-			lowest_prec_pos = i;
-		}
-		i++;
-	}
-	// If no operators are found, this is a simple command
-	if (lowest_prec_pos == -1)
-		return (create_command_node(tokens, start, &end)); // Create command node with arguments, also the base case
-	// Create an operator node (logical operator, pipe, redirection, etc.)
-	root = create_operator_node(tokens[lowest_prec_pos]);
-	// Recursively build left and right subtrees for binary operators
-	if (lowest_prec <= 3)
-	{
-		// Pipes, logical operators
-		root->left = build_ast(tokens, start, lowest_prec_pos - 1);
-		root->right = build_ast(tokens, lowest_prec_pos + 1, end);
-	}
-	else
-	{
-		// Redirections (one side only)
-		root->left = build_ast(tokens, start, lowest_prec_pos - 1);
-		root->redir_target = create_command_node(tokens, lowest_prec_pos + 1, &end); // Redirection target
-	}
-	return (root);
-} */
-
-t_ast_node *build_ast(t_tokens *tokens, int start, int end)
-{
-	int			lowest_prec;
-	int			lowest_prec_pos;
-	int			i;
-	int			prec;
-	t_ast_node	*root;
-
-	// Handle parentheses: If the first token is '(', find the matching ')'
-	if (tokens[start].type == TOKEN_OPEN_PAREN)
-	{
-		int paren_count = 1;
-		i = start + 1;
-		while (i <= end && paren_count > 0)
-		{
-			if (tokens[i].type == TOKEN_OPEN_PAREN)
-				paren_count++;
-			else if (tokens[i].type == TOKEN_CLOSE_PAREN)
-				paren_count--;
-			i++;
-		}
-		if (paren_count != 0)
-		{
-			fprintf(stderr, "Syntax error: unmatched parentheses\n");
-			return (NULL);
-		}
-		// Recursively build AST for the expression inside parentheses
-		return (build_ast(tokens, start + 1, i - 2));  // Exclude the parentheses themselves
-	}
-
-	// Find the operator with the lowest precedence
-	lowest_prec = 1000;
-	lowest_prec_pos = -1;
-	i = start;
-	while (i <= end)
-	{
-		// Skip over any expressions inside parentheses
-		if (tokens[i].type == TOKEN_OPEN_PAREN)
-		{
-			int paren_count = 1;
-			i++;
-			while (i <= end && paren_count > 0)
-			{
-				if (tokens[i].type == TOKEN_OPEN_PAREN)
-					paren_count++;
-				else if (tokens[i].type == TOKEN_CLOSE_PAREN)
-					paren_count--;
-				i++;
-			}
-			continue; // Skip the parentheses
-		}
-
-		prec = get_precedence(tokens[i].type);
-		if (prec != -1 && prec < lowest_prec)
-		{
-			lowest_prec = prec;
-			lowest_prec_pos = i;
-		}
-		i++;
-	}
-
-	// If no operators are found, this is a simple command
-	if (lowest_prec_pos == -1)
-		return create_command_node(tokens, start, &end);  // Create command node with arguments
-
-	// Create an operator node (logical operator, pipe, redirection, etc.)
-	root = create_operator_node(tokens[lowest_prec_pos]);
-
-	// Recursively build left and right subtrees for binary operators
-	if (lowest_prec <= 3)  // Pipes and logical operators
-	{
-		root->left = build_ast(tokens, start, lowest_prec_pos - 1);
-		root->right = build_ast(tokens, lowest_prec_pos + 1, end);
-	}
-	else  // Redirections
-	{
-		root->left = build_ast(tokens, start, lowest_prec_pos - 1);
-		root->redir_target = create_command_node(tokens, lowest_prec_pos + 1, &end);  // Redirection target
-	}
-
-	return root;
-}
+   */
