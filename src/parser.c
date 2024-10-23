@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/23 17:26:33 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/23 20:58:31 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,28 +55,28 @@ int	find_matching_paren(t_tokens *tokens, int start, int end)
 
 // Function to create an AST node for an operator
 // (pipe, logical operators, redirections)
-t_ast_node	*create_node(t_tokens token)
+t_ast_node	*create_node(t_tokens *token)
 {
 	t_ast_node	*node;
 
 	node = malloc(sizeof(t_ast_node)); // Do malloc check
-	if (token.type == TOKEN_PIPE)
+	if (token->type == TOKEN_PIPE)
 		node->type = AST_PIPE;
-	else if (token.type == TOKEN_AND)
+	else if (token->type == TOKEN_AND)
 		node->type = AST_AND;
-	else if (token.type == TOKEN_OR)
+	else if (token->type == TOKEN_OR)
 		node->type = AST_OR;
-	else if (token.type == TOKEN_REDIR_OUT)
+	else if (token->type == TOKEN_REDIR_OUT)
 		node->type = AST_REDIR_OUT;
-	else if (token.type == TOKEN_APPEND)
+	else if (token->type == TOKEN_APPEND)
 		node->type = AST_REDIR_APPEND;
-	else if (token.type == TOKEN_REDIR_IN)
+	else if (token->type == TOKEN_REDIR_IN)
 		node->type = AST_REDIR_IN;
-	else if (token.type == TOKEN_HEREDOC)
+	else if (token->type == TOKEN_HEREDOC)
 		node->type = AST_HEREDOC;
-	else if (token.type == TOKEN_WORD)
+	else if (token->type == TOKEN_WORD)
 		node->type = AST_COMMAND;
-	node->token = &token;
+	node->token = token;
 	node->left = NULL;
 	node->right = NULL;
 	node->redir_target = NULL;
@@ -86,27 +86,37 @@ t_ast_node	*create_node(t_tokens token)
 // Function to create an AST node for a command (with arguments)
 void	populate_command_node(t_tokens *tokens, t_ast_node *root, int start, int *end)
 {
-	int	i;
+	int		i;
+	char	*str;
 
+	str = NULL;
 	i = start;
 	root->type = AST_COMMAND;
-	while (i < *end)
+	while (i <= *end)
 	{
-		if 	((tokens[start].type == TOKEN_REDIR_OUT) || (tokens[start].type == TOKEN_APPEND) || (tokens[start].type == TOKEN_REDIR_IN) || (tokens[start].type == TOKEN_HEREDOC))
+		if 	((tokens[i].type == TOKEN_REDIR_OUT) || (tokens[i].type == TOKEN_APPEND) || (tokens[i].type == TOKEN_REDIR_IN) || (tokens[i].type == TOKEN_HEREDOC))
 		{
 			if (root->redir_target != NULL)
 				root->redir_target = root->redir_target->redir_target;
-			root->redir_target = create_node(tokens[i]);
-			root->redir_target->token->value = ft_strdup(tokens[i + 1].value); // Don't seg fault!!
+			root->redir_target = create_node(&tokens[i]);
+			root->redir_target->token->value = ft_strdup(tokens[++i].value); // Don't seg fault.
 		}
 		else
 		{
-			root->token->value = ft_strjoin(root->token->value, tokens[i].value); // Is this leaking?
-			root->left = NULL;
-			root->right = NULL;
+			if (str != NULL)
+			{
+				str = ft_strjoin(str, " "); // Is this leaking?
+				str = ft_strjoin(str, tokens[i].value); // Is this leaking?
+			}
+			else
+				str = ft_strdup(tokens[i].value);
 		}
+		root->left = NULL;
+		root->right = NULL;
 		i++;
 	}
+	root->token->value = ft_strdup(str);
+	free(str);
 }
 
 // Build the AST based on operator precedence, including handling arguments for commands
@@ -144,22 +154,21 @@ t_ast_node	*build_ast(t_tokens *tokens, int start, int end)
 		}
 		i++;
 	}
-	
 	if (lowest_prec_pos == -1)
 	{
-		root = create_node(tokens[start]);
+		root = create_node(&tokens[start]);
 		populate_command_node(tokens, root, start, &end);
 		return (root);
 	}
 	if (lowest_prec <= 3 && lowest_prec >= 0)
 	{
-		root = create_node(tokens[lowest_prec_pos]);
+		root = create_node(&tokens[lowest_prec_pos]);
 		root->left = build_ast(tokens, start, lowest_prec_pos - 1);
 		root->right = build_ast(tokens, lowest_prec_pos + 1, end);
 	}
 	else
 	{
-		root = create_node(tokens[lowest_prec_pos]);
+		root = create_node(&tokens[lowest_prec_pos]);
 		populate_command_node(tokens, root, start, &end);
 	}
 	return (root);
