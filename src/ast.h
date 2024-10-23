@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/21 16:32:26 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/23 14:40:12 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ typedef struct s_pipe
 	int	*pipes;
 	int	*pids;
 	int	count;
+	int	i;
+	int	o;
 }	t_pipes;
 
 typedef struct s_command

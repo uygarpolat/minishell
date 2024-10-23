@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:52:03 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/21 15:53:00 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/23 15:22:40 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ char	*get_path(char **cmd, char **envp)
 	char	*full_path;
 	char	*result;
 
+	i = 0;
 	all_paths = paths(envp);
 	while (all_paths && all_paths[i])
 	{
