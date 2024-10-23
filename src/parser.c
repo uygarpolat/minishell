@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/23 11:42:59 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/23 15:49:42 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,9 @@ int	get_precedence(t_token_type type)
 		return (2);
 	else if (type == TOKEN_PIPE)
 		return (3);
-	else if (type == TOKEN_REDIR_OUT || type == TOKEN_APPEND
-		|| type == TOKEN_REDIR_IN || type == TOKEN_HEREDOC)
-		return (4);
+	//else if (type == TOKEN_REDIR_OUT || type == TOKEN_APPEND
+	//	|| type == TOKEN_REDIR_IN || type == TOKEN_HEREDOC)
+	//	return (4);
 	return (-1);
 }
 
@@ -54,25 +54,33 @@ int	find_matching_paren(t_tokens *tokens, int start, int end)
 }
 
 // Function to create an AST node for a command (with arguments)
-t_ast_node	*create_command_node(t_tokens *tokens, int start, int *end)
+void	populate_command_node(t_tokens *tokens, t_ast_node *root, int start, int *end)
 {
-	t_ast_node	*arg_node;
-	t_ast_node	*node;
-	t_ast_node	*temp;
-	int			i;
+	int	i;
 
-	node = malloc(sizeof(t_ast_node)); // Do a malloc check
-	node->type = AST_COMMAND;
-	node->token = &tokens[start]; // Store the command's token (e.g., "echo", "ls")
-	node->left = NULL;
-	node->right = NULL;
-	node->redir_target = NULL;
-	return (node);
+	i = start;
+	root->type = AST_COMMAND;
+	while (i < end)
+	{
+		if 	((tokens[start].type == TOKEN_REDIR_OUT) || (tokens[start].type == TOKEN_APPEND) || (tokens[start].type == TOKEN_REDIR_IN) || (tokens[start].type == TOKEN_HEREDOC))
+		{
+			if (root->redir_target != NULL)
+				root->redir_target = root->redir_target->redir_target;
+			root->redir_target = create_node(tokens);
+i			root->redir_target->tokens->value = ft_strdup(tokens[i + 1].value); // Don't seg fault!!
+		}
+		else
+		{
+			root->token->value = ft_strjoin(root->token->value, tokens[i].value); // Is this leaking?
+			root->left = NULL;
+			root->right = NULL;
+		}
+		i++;
 }
 
 // Function to create an AST node for an operator
 // (pipe, logical operators, redirections)
-t_ast_node	*create_node(t_tokens *token, int start, int *end)
+t_ast_node	*create_node(t_tokens *token)
 {
 	t_ast_node	*node;
 
@@ -93,7 +101,7 @@ t_ast_node	*create_node(t_tokens *token, int start, int *end)
 		node->type = AST_HEREDOC;
 	else if (token.type == TOKEN_WORD)
 		node->type = AST_COMMAND;
-	node->token = &token; // Store the operator's token
+	node->token = &token;
 	node->left = NULL;
 	node->right = NULL;
 	node->redir_target = NULL;
@@ -137,7 +145,7 @@ t_ast_node	*build_ast(t_tokens *tokens, int start, int end)
 	}
 
 	if (lowest_prec_pos == -1)
-		return (populate_command_node(token, root, start, &end));
+		return (populate_command_node(tokens, root, start, &end));
 	else if (lowest_prec <= 3)
 	{
 		root = create_node(tokens, start, &end);
@@ -146,9 +154,8 @@ t_ast_node	*build_ast(t_tokens *tokens, int start, int end)
 	}
 	else
 	{
-		
 		root = create_node(tokens, start, &end);
-		populate_command_node(token, root, start, &end);
+		populate_command_node(tokens, root, start, &end);
 	}
 	return (root);
 }
