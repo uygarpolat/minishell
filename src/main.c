@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/24 13:42:17 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/24 14:29:42 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,9 @@ int	main(int argc, char **argv, char **envp)
 			add_history(input);
 		tokens = ft_tokenizer(input, &capacity);
 		ast = build_ast(tokens, 0, capacity.current_size - 1);
-		//print_ast(ast, 0);
-		execution(ast, envp);
+		print_ast(ast, 0);
+		(void)envp;
+		//execution(ast, envp);
 		free_tokens(tokens, &capacity);
 		free(input);
 	}

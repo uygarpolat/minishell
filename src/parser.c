@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/24 13:36:05 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/24 15:31:36 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,10 +77,21 @@ t_ast	*create_node(t_tokens *token)
 	return (node);
 }
 
+char	*beautify_token(char *str)
+{
+	char	*result;
+
+	if (ft_strchr(str, '\'') <= ft_strchr(str, '"')) // If single quote comes first
+		// do something
+	else // If double quotes comes first
+		// do something else
+}
+
 void	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 {
 	int		i;
 	char	*str;
+	char	*str_modified;
 
 	str = NULL;
 	i = start;
@@ -104,13 +115,19 @@ void	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 		}
 		else
 		{
+			char	*str_modified;
+
+			str_modified = beautify_token(tokens[i].value);
+			if (str_modified == NULL)
+				return ; // Do a proper malloc check
 			if (str != NULL)
 			{
 				str = ft_strjoin(str, " "); // Is this leaking?
-				str = ft_strjoin(str, tokens[i].value); // Is this leaking?
+				str = ft_strjoin(str, str_modified); // Is this leaking?
 			}
 			else
-				str = ft_strdup(tokens[i].value);
+				str = ft_strdup(str_modified);
+			free(str_modified);
 		}
 		root->left = NULL;
 		root->right = NULL;

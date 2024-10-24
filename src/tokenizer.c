@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/24 13:39:41 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/24 14:26:09 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -320,6 +320,6 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity)
 		else
 			handle_word(&input, tokens, capacity);
 	}
-	//print_tokens(tokens, capacity);
+	print_tokens(tokens, capacity);
 	return (tokens);
 }
