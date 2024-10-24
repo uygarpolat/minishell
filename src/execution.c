@@ -6,35 +6,38 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/23 15:37:21 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/24 12:54:06 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ast.h"
 #include <stdio.h>
 
-void	dupping(t_pipes *p, int *in, int *out, int n)
+void	dupping(t_pipes *p, int in, int out, int n)
 {
 	if (p->pipes)
 	{
 		if (n == 0)
 		{
-			if (dup2(*out, STDOUT_FILENO) == -1)
+			if (dup2(out, STDOUT_FILENO) == -1)
 				printf("dup2 error\n");
 		}
 		else if (n == p->count)
 		{
-			if (dup2(*in, STDIN_FILENO) == -1)
+			//printf("%d\n", p->i);
+			//printf("%d\n", p->o);
+			if (dup2(in, STDIN_FILENO) == -1)
 				printf("dup2 error\n");
 		}
 		else
 		{
-			printf("hei\n");
-			if (dup2(*in, STDIN_FILENO) == -1 || dup2(*out, STDOUT_FILENO) == -1)
+			//printf("%d\n", p->i);
+			//printf("%d\n", p->o);
+			if (dup2(in, STDIN_FILENO) == -1 || dup2(out, STDOUT_FILENO) == -1)
 				printf("dup2 error\n");
 		}
-		close(*in);
-		close(*out);
+		close(in);
+		close(out);
 	}
 }
 
@@ -51,14 +54,15 @@ void	execute(t_ast *s, char **envp, t_pipes *p, int n)
 		{
 			if (n == p->count)
 				p->o = 1;
-			dupping(p, &p->pipes[p->i], &p->pipes[p->o], n);
-			if (n > 0)
-				p->i += 2;
-			p->o += 2;
+			dupping(p, p->pipes[p->i][0], p->pipes[p->o][1], n);
 		}
 		i = 0;
-		while (i < p->count * 2)
-			close(p->pipes[i++]);
+		while (i < p->count)
+		{
+			close(p->pipes[i][0]);
+			close(p->pipes[i][1]);
+			i++;
+		}
 		cmd.args = ft_split(s->token.value, ' ');
 		cmd.path = get_path(cmd.args, envp);
 		execve(cmd.path, cmd.args, envp);
@@ -79,7 +83,6 @@ int	count_pipes(t_ast *s)
 			count++;
 		i = i->right;
 	}
-	printf("pipe count: %d\n", count);
 	return (count);
 }
 
@@ -89,15 +92,19 @@ void	pipeing(t_pipes *p)
 	int	j;
 
 	p->i = 0;
-	p->o = 1;
+	p->o = 0;
 	i = -1;
 	while (++i < p->count)
 	{
-		if (pipe(p->pipes + (2 * i)) < 0)
+		if (pipe(p->pipes[i]) < 0)
 		{
 			j = 0;
-			while (j < i * 2)
-				close(p->pipes[j++]);
+			while (j < i)
+			{
+				close(p->pipes[i][0]);
+				close(p->pipes[i][1]);
+				j++;
+			}
 			//error function here
 		}
 	}
@@ -105,14 +112,18 @@ void	pipeing(t_pipes *p)
 
 void	mallocing(t_pipes *p)
 {
+	int	i;
 	//HANDLe MALLOC ERROR
 	p->pipes = NULL;
 	p->pids = NULL;
 	if (p->count > 0)
 	{
-		p->pipes = malloc(sizeof(int *) * p->count * 2);
+		p->pipes = malloc(sizeof(int *) * p->count);
 		if (!p->pipes)
 			return ;
+		i = -1;
+		while (++i < p->count)
+			p->pipes[i] = malloc(sizeof(int) * 2);
 		p->pids = malloc(sizeof(int) * (p->count + 1));
 		if (!p->pids)
 			return ;
@@ -132,8 +143,13 @@ void	close_and_free(t_pipes *p)
 	i = 0;
 	if (p->pipes)
 	{
-		while (i < p->count * 2)
-			close(p->pipes[i++]);
+		while (i < p->count)
+		{
+			close(p->pipes[i][0]);
+			close(p->pipes[i][1]);
+			free(p->pipes[i]);
+			i++;
+		}
 		free(p->pipes);
 	}
 }
@@ -183,9 +199,13 @@ int	execution(t_ast *s, char **envp)
 	while (i)
 	{
 		if (i->token.type == TOKEN_PIPE)
-			execute(i->left, envp, &p, n++);
+			execute(i->left, envp, &p, n);
 		else if (i->token.type == TOKEN_WORD)
-			execute(i, envp, &p, n++);
+			execute(i, envp, &p, n);
+		if (n > 0)
+			p.i++;
+		p.o++;
+		n++;
 		i = i->right;
 	}
 	close_and_free(&p);

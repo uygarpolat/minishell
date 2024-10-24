@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/23 14:40:12 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/24 13:01:22 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,29 +23,7 @@
 # include <string.h>
 # include <sys/wait.h>
 # include "libft/libft.h"
-//# include "tokenizer.h"
-
-typedef enum    e_token_type
-{
-    TOKEN_WORD,
-    TOKEN_REDIR_IN,
-    TOKEN_REDIR_OUT,
-    TOKEN_APPEND,
-    TOKEN_HEREDOC,
-    TOKEN_AND,
-    TOKEN_OR,
-    TOKEN_OPEN_PAREN,
-    TOKEN_CLOSE_PAREN,
-    TOKEN_PIPE,
-    TOKEN_UNKNOWN,
-    NUM_TYPES,
-}    t_token_type;
-
-typedef struct    s_tokens
-{
-    enum e_token_type    type;
-    char                *value;
-}    t_tokens;
+# include "tokenizer.h"
 
 typedef enum    e_ast_node_type {
     AST_COMMAND,
@@ -60,6 +38,7 @@ typedef enum    e_ast_node_type {
 
 typedef struct    s_ast
 {
+	t_ast_node_type	type;
 	t_tokens	token;
 	struct s_ast    *left;
 	struct s_ast    *right;
@@ -69,7 +48,7 @@ typedef struct    s_ast
 
 typedef struct s_pipe
 {
-	int	*pipes;
+	int	**pipes;
 	int	*pids;
 	int	count;
 	int	i;
@@ -81,6 +60,9 @@ typedef struct s_command
 	char **args;
 	char	*path;
 }	t_command;
+
+t_ast_node	*build_ast(t_tokens *tokens, int start, int end);
+
 //execution.c
 int	execution(t_ast *s, char **envp);
 
