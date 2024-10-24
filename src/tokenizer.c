@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/21 10:15:10 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/24 10:27:37 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,60 @@ void	print_tokens(t_tokens *tokens, t_capacity *capacity)
 	{
 		snprintf(formatted_token, sizeof(formatted_token), "token %d: %s", i, tokens[i].value);
 		printf("%-30s type: %s\n", formatted_token, token_type_str[tokens[i].type]);
+	}
+}
+
+void	print_ast(t_ast_node *node, int level)
+{
+	int	indent_level;
+
+	if (node == NULL)
+		return ;
+	indent_level = -1;
+	while (++indent_level < level)
+		printf("  ");
+	if (node->type == AST_COMMAND)
+		printf("AST_COMMAND [TOKEN: %s]\n", node->token->value);
+	else if (node->type == AST_PIPE)
+		printf("AST_PIPE [TOKEN: |]\n");
+	else if (node->type == AST_REDIR_OUT)
+		printf("AST_REDIR_OUT [TOKEN: >]\n");
+	else if (node->type == AST_REDIR_APPEND)
+		printf("AST_REDIR_APPEND [TOKEN: >>]\n");
+	else if (node->type == AST_REDIR_IN)
+		printf("AST_REDIR_IN [TOKEN: <]\n");
+	else if (node->type == AST_HEREDOC)
+		printf("AST_HEREDOC [TOKEN: <<]\n");
+	else if (node->type == AST_AND)
+		printf("AST_AND [TOKEN: &&]\n");
+	else if (node->type == AST_OR)
+		printf("AST_OR [TOKEN: ||]\n");
+	else
+		printf("Unknown node type\n");
+	if (node->left != NULL)
+		print_ast(node->left, level + 1);
+	if (node->right != NULL)
+		print_ast(node->right, level + 1);
+	indent_level = -1;
+	t_ast_node	*redir_node = node->redir_target;
+	while (redir_node != NULL)
+	{
+		indent_level = -1;
+		while (++indent_level < level + 1)
+			printf("  ");
+		char	*redir_symbol;
+		if (redir_node->type == AST_REDIR_OUT)
+			redir_symbol = ">";
+		else if (redir_node->type == AST_REDIR_APPEND)
+			redir_symbol = ">>";
+		else if (redir_node->type == AST_REDIR_IN)
+			redir_symbol = "<";
+		else if (redir_node->type == AST_HEREDOC)
+			redir_symbol = "<<";
+		else
+			redir_symbol = "?";
+		printf("REDIR: %s [TOKEN: %s]\n", redir_symbol, redir_node->token->value);
+		redir_node = redir_node->redir_target;
 	}
 }
 
@@ -268,46 +322,6 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity)
 	}
 	print_tokens(tokens, capacity);
 	return (tokens);
-}
-
-void	print_ast(t_ast_node *node, int level)
-{
-	int	indent_level;
-
-	if (node == NULL)
-		return ;
-	indent_level = -1;
-	while (++indent_level < level)
-		printf("  ");
-	if (node->type == AST_COMMAND)
-		printf("AST_COMMAND [TOKEN: %s]\n", node->token->value);
-	else if (node->type == AST_PIPE)
-		printf("AST_PIPE [TOKEN: |]\n");
-	else if (node->type == AST_REDIR_OUT)
-		printf("AST_REDIR_OUT [TOKEN: >]\n");
-	else if (node->type == AST_REDIR_APPEND)
-		printf("AST_REDIR_APPEND [TOKEN: >>]\n");
-	else if (node->type == AST_REDIR_IN)
-		printf("AST_REDIR_IN [TOKEN: <]\n");
-	else if (node->type == AST_HEREDOC)
-		printf("AST_HEREDOC [TOKEN: <<]\n");
-	else if (node->type == AST_AND)
-		printf("AST_AND [TOKEN: &&]\n");
-	else if (node->type == AST_OR)
-		printf("AST_OR [TOKEN: ||]\n");
-	else
-		printf("Unknown node type\n");
-	if (node->left != NULL)
-		print_ast(node->left, level + 1);
-	if (node->right != NULL)
-		print_ast(node->right, level + 1);
-	indent_level = -1;
-	if (node->redir_target != NULL)
-	{
-		while (++indent_level < level + 1)
-			printf("  ");
-		printf("REDIR_TARGET [TOKEN: %s]\n", node->redir_target->token->value);
-	}
 }
 
 int	main(void)
