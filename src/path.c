@@ -6,11 +6,11 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:52:03 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/24 11:45:05 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/24 13:36:45 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ast.h"
+#include "../includes/ast.h"
 
 char	**paths(char **envp)
 {

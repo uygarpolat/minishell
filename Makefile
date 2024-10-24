@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2024/10/24 11:25:02 by upolat           ###   ########.fr        #
+#    Updated: 2024/10/24 13:25:01 by hpirkola         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,7 @@ SRC_DIR = src
 SRC_BONUS_DIR = src
 
 SOURCES = $(SRC_DIR)/main.c $(SRC_DIR)/tokenizer.c $(SRC_DIR)/parser.c \
+		$(SRC_DIR)/execution.c $(SRC_DIR)/path.c \
 
 SOURCES_BONUS = $(SRC_DIR)/readline_test.c
 

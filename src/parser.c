@@ -6,13 +6,13 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/24 10:20:57 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/24 13:36:05 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../library/libft/libft.h"
 #include "../includes/tokenizer.h"
-#include "../includes/parser.h"
+#include "../includes/ast.h"
 
 int	get_precedence(t_token_type type)
 {
@@ -49,11 +49,11 @@ int	find_matching_paren(t_tokens *tokens, int start, int end)
 	return (-1);
 }
 
-t_ast_node	*create_node(t_tokens *token)
+t_ast	*create_node(t_tokens *token)
 {
-	t_ast_node	*node;
+	t_ast	*node;
 
-	node = malloc(sizeof(t_ast_node)); // Do malloc check
+	node = malloc(sizeof(t_ast)); // Do malloc check
 	if (token->type == TOKEN_PIPE)
 		node->type = AST_PIPE;
 	else if (token->type == TOKEN_AND)
@@ -77,7 +77,7 @@ t_ast_node	*create_node(t_tokens *token)
 	return (node);
 }
 
-void	populate_command_node(t_tokens *tokens, t_ast_node *root, int start, int *end)
+void	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 {
 	int		i;
 	char	*str;
@@ -90,13 +90,13 @@ void	populate_command_node(t_tokens *tokens, t_ast_node *root, int start, int *e
 		if ((tokens[i].type == TOKEN_REDIR_OUT) || (tokens[i].type == TOKEN_APPEND)
 			|| (tokens[i].type == TOKEN_REDIR_IN) || (tokens[i].type == TOKEN_HEREDOC))
 		{
-			t_ast_node	*new_redir_node = create_node(&tokens[i]); // Refactor this, hence the incorrect decleration placement
+			t_ast	*new_redir_node = create_node(&tokens[i]); // Refactor this, hence the incorrect decleration placement
 			new_redir_node->token->value = ft_strdup(tokens[++i].value);
 			if (root->redir_target == NULL)
 				root->redir_target = new_redir_node;
 			else
 			{
-				t_ast_node	*temp = root->redir_target; // Refactor this, hence the incorrect decleration placement
+				t_ast	*temp = root->redir_target; // Refactor this, hence the incorrect decleration placement
 				while (temp->redir_target != NULL)
 					temp = temp->redir_target;
 				temp->redir_target = new_redir_node;
@@ -120,13 +120,13 @@ void	populate_command_node(t_tokens *tokens, t_ast_node *root, int start, int *e
 	free(str);
 }
 
-t_ast_node	*build_ast(t_tokens *tokens, int start, int end)
+t_ast	*build_ast(t_tokens *tokens, int start, int end)
 {
 	int			lowest_prec;
 	int			lowest_prec_pos;
 	int			i;
 	int			prec;
-	t_ast_node	*root;
+	t_ast	*root;
 
 	lowest_prec = 1000;
 	lowest_prec_pos = -1;

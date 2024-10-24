@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/24 13:01:22 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/24 13:31:32 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 # include <readline/history.h>
 # include <string.h>
 # include <sys/wait.h>
-# include "libft/libft.h"
+# include "../library/libft/libft.h"
 # include "tokenizer.h"
 
 typedef enum    e_ast_node_type {
@@ -39,7 +39,7 @@ typedef enum    e_ast_node_type {
 typedef struct    s_ast
 {
 	t_ast_node_type	type;
-	t_tokens	token;
+	t_tokens	*token;
 	struct s_ast    *left;
 	struct s_ast    *right;
 	struct s_ast    *redir_target;
@@ -61,7 +61,7 @@ typedef struct s_command
 	char	*path;
 }	t_command;
 
-t_ast_node	*build_ast(t_tokens *tokens, int start, int end);
+t_ast	*build_ast(t_tokens *tokens, int start, int end);
 
 //execution.c
 int	execution(t_ast *s, char **envp);
