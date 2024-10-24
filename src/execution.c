@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/24 13:37:39 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/24 13:51:16 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	execute(t_ast *s, char **envp, t_pipes *p, int n)
 		if (p->pipes)
 		{
 			if (n == p->count)
-				p->o = 1;
+				p->o = p->count - 1;
 			dupping(p, p->pipes[p->i][0], p->pipes[p->o][1], n);
 		}
 		i = 0;
