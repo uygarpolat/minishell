@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/24 11:30:22 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/24 11:32:39 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -323,31 +323,3 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity)
 	print_tokens(tokens, capacity);
 	return (tokens);
 }
-/*
-int	main(void)
-{
-	char		*input;
-	t_tokens	*tokens;
-	t_capacity	capacity;
-	t_ast_node	*ast;
-
-	signal(SIGINT, handle_sigint);
-	signal(SIGQUIT, handle_sigquit);
-	while (1)
-	{
-		input = readline("minishell> ");
-		if (!input)
-			break ;
-		if (!ft_strncmp(input, "exit", 5))
-			break ;
-		if (*input)
-			add_history(input);
-		tokens = ft_tokenizer(input, &capacity);
-		ast = build_ast(tokens, 0, capacity.current_size - 1);
-		print_ast(ast, 0);
-		free_tokens(tokens, &capacity);
-		free(input);
-	}
-	return (0);
-}
-*/
