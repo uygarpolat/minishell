@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/24 11:29:32 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/24 12:10:22 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,13 +43,6 @@ typedef struct	s_tokens
 	enum e_token_type	type;
 	char				*value;
 }	t_tokens;
-
-typedef enum 	e_state
-{
-	DEFAULT_STATE,
-	SINGLE_Q_STATE,
-	DOUBLE_Q_STATE,
-}	t_state;
 
 typedef struct	s_capacity
 {
