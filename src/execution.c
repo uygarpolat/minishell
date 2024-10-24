@@ -6,12 +6,11 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/24 12:54:06 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/24 13:37:39 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ast.h"
-#include <stdio.h>
+#include "../includes/ast.h"
 
 void	dupping(t_pipes *p, int in, int out, int n)
 {
@@ -24,15 +23,11 @@ void	dupping(t_pipes *p, int in, int out, int n)
 		}
 		else if (n == p->count)
 		{
-			//printf("%d\n", p->i);
-			//printf("%d\n", p->o);
 			if (dup2(in, STDIN_FILENO) == -1)
 				printf("dup2 error\n");
 		}
 		else
 		{
-			//printf("%d\n", p->i);
-			//printf("%d\n", p->o);
 			if (dup2(in, STDIN_FILENO) == -1 || dup2(out, STDOUT_FILENO) == -1)
 				printf("dup2 error\n");
 		}
@@ -63,7 +58,7 @@ void	execute(t_ast *s, char **envp, t_pipes *p, int n)
 			close(p->pipes[i][1]);
 			i++;
 		}
-		cmd.args = ft_split(s->token.value, ' ');
+		cmd.args = ft_split(s->token->value, ' ');
 		cmd.path = get_path(cmd.args, envp);
 		execve(cmd.path, cmd.args, envp);
 		printf("error with execve\n");
@@ -79,7 +74,7 @@ int	count_pipes(t_ast *s)
 	count = 0;
 	while (i)
 	{
-		if (i->token.type == TOKEN_PIPE)
+		if (i->token->type == TOKEN_PIPE)
 			count++;
 		i = i->right;
 	}
@@ -198,9 +193,9 @@ int	execution(t_ast *s, char **envp)
 	n = 0;
 	while (i)
 	{
-		if (i->token.type == TOKEN_PIPE)
+		if (i->token->type == TOKEN_PIPE)
 			execute(i->left, envp, &p, n);
-		else if (i->token.type == TOKEN_WORD)
+		else if (i->token->type == TOKEN_WORD)
 			execute(i, envp, &p, n);
 		if (n > 0)
 			p.i++;

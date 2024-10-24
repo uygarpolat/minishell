@@ -6,13 +6,13 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/24 11:32:39 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/24 13:39:41 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../library/libft/libft.h"
 #include "../includes/tokenizer.h"
-#include "../includes/parser.h"
+#include "../includes/ast.h"
 
 void	handle_sigint()
 {
@@ -55,7 +55,7 @@ void	print_tokens(t_tokens *tokens, t_capacity *capacity)
 	}
 }
 
-void	print_ast(t_ast_node *node, int level)
+void	print_ast(t_ast *node, int level)
 {
 	int	indent_level;
 
@@ -87,7 +87,7 @@ void	print_ast(t_ast_node *node, int level)
 	if (node->right != NULL)
 		print_ast(node->right, level + 1);
 	indent_level = -1;
-	t_ast_node	*redir_node = node->redir_target;
+	t_ast	*redir_node = node->redir_target;
 	while (redir_node != NULL)
 	{
 		indent_level = -1;
@@ -320,6 +320,6 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity)
 		else
 			handle_word(&input, tokens, capacity);
 	}
-	print_tokens(tokens, capacity);
+	//print_tokens(tokens, capacity);
 	return (tokens);
 }
