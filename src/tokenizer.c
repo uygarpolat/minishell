@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/24 14:26:09 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/25 13:34:08 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,12 +267,12 @@ int	skip_quotes_and_ampersand(char **temp)
 		else if (**temp == '"')
 		{
 			*temp = skip_a_char(*temp, '"');
-			return (0);
+			//return (0); //-------------------------------> Comment this back in if it breaks stuff
 		}
 		else if (**temp == '\'')
 		{
 			*temp = skip_a_char(*temp, '\'');
-			return (0);
+			//return (0); //-------------------------------> Comment this back in if it breaks stuff
 		}
 		else
 			return (0);
@@ -287,7 +287,7 @@ void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 	temp = *input;
 	if (!*temp)
 		return ;
-	if (*temp == '\'')
+	/*if (*temp == '\'')
 		temp = skip_a_char(temp, '\'');
 	else if (*temp == '"')
 		temp = skip_a_char(temp, '"');
@@ -295,11 +295,50 @@ void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 	{
 		while (*temp && skip_quotes_and_ampersand(&temp))
 			temp++;
-	}
+	} */
+	while (*temp && skip_quotes_and_ampersand(&temp))
+		temp++;
+
 	if (malloc_individual_tokens(tokens, input, temp, capacity, TOKEN_WORD))
 		return ;
 }
+/*
+int	which_quote_mode(t_tokens *tokens, t_capacity *capacity)
+{
+	int	i;
+	int	j;
+	int	single_q_count;
+	int	double_q_count;
+	int	flag;
 
+	single_q_count = 0;
+	double_q_count = 0;
+	flag = 0;
+
+	i = 0;
+	while (i < capacity->current_size)
+	{
+		single_q_count = 0;
+		double_q_count = 0;
+		flag = 0;
+		j = 0;
+		while (tokens[i].value[j])
+		{
+			if (tokens[i].value[j] == '"')
+				double_q_count++;
+			else if (tokens[i].value[j] == '\'')
+				double_q_count++;
+			if (single_q_count > double_q_count && !flag)
+				flag = 1;
+			else if (double_q_count > single_q_count && !flag)
+				flag = 2;
+			j++;
+		}
+		if ()
+	}
+
+}
+*/
 t_tokens	*ft_tokenizer(char *input, t_capacity *capacity)
 {
 	t_tokens	*tokens;
