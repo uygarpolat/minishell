@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/24 14:29:42 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/26 19:00:03 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int	main(int argc, char **argv, char **envp)
 	char		*input;
 	t_tokens	*tokens;
 	t_capacity	capacity;
-	t_ast	*ast;
+	t_ast		*ast;
 
 	(void) argc;
 	(void) argv;
@@ -38,9 +38,12 @@ int	main(int argc, char **argv, char **envp)
 			break ;
 		if (*input)
 			add_history(input);
-		tokens = ft_tokenizer(input, &capacity);
-		ast = build_ast(tokens, 0, capacity.current_size - 1);
-		print_ast(ast, 0);
+		tokens = ft_tokenizer(input, &capacity, envp);
+		if (tokens)
+		{
+			ast = build_ast(tokens, 0, capacity.current_size - 1);
+			print_ast(ast, 0);
+		}
 		(void)envp;
 		//execution(ast, envp);
 		free_tokens(tokens, &capacity);

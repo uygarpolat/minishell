@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/24 12:10:22 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/26 19:00:30 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ typedef struct	s_capacity
 	int			current_size;
 }	t_capacity;
 
-t_tokens	*ft_tokenizer(char *input, t_capacity *capacity);
+t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp);
 void		free_tokens(t_tokens *tokens, t_capacity *capacity);
 
 #endif
