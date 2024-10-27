@@ -6,13 +6,15 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/27 12:20:01 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/27 15:38:09 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../library/libft/libft.h"
 #include "../includes/tokenizer.h"
 #include "../includes/ast.h"
+
+char	*expand_wildcard(int *int_array);
 
 void	handle_sigint()
 {
@@ -267,15 +269,9 @@ int	skip_quotes_and_ampersand(char **temp)
 				return (1);
 		}
 		else if (**temp == '"')
-		{
 			*temp = skip_a_char(*temp, '"');
-			//return (0); //-------------------------------> Comment this back in if it breaks stuff
-		}
 		else if (**temp == '\'')
-		{
 			*temp = skip_a_char(*temp, '\'');
-			//return (0); //-------------------------------> Comment this back in if it breaks stuff
-		}
 		else
 			return (0);
 	}
@@ -289,15 +285,6 @@ void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 	temp = *input;
 	if (!*temp)
 		return ;
-	/*if (*temp == '\'')
-		temp = skip_a_char(temp, '\'');
-	else if (*temp == '"')
-		temp = skip_a_char(temp, '"');
-	else
-	{
-		while (*temp && skip_quotes_and_ampersand(&temp))
-			temp++;
-	} */
 	while (*temp && skip_quotes_and_ampersand(&temp))
 		temp++;
 
@@ -351,7 +338,7 @@ char	*get_var(char *str, char **envp)
 	while (*envp)
 	{
 		if (ft_strncmp(*envp, str, ft_strlen(str)) == 0
-			&& *(*envp + ft_strlen(str))  == '=')
+			&& *(*envp + ft_strlen(str)) == '=')
 			return (*envp + ft_strlen(str) + 1);
 		envp++;
 	}
@@ -395,7 +382,6 @@ int	str_of_var(int **int_array_old, int **int_array_new, char **envp)
 
 	i = 0;
 	n = -1;
-
 	while (ft_isalnum((*int_array_old)[i]) || (*int_array_old)[i] == '_')
 		i++;
 	str = malloc(sizeof(char) * (i + 1));
@@ -420,7 +406,7 @@ int	finalize_dollar_expansion(int *int_array_old, int **int_array_new, char **en
 	int	*temp;
 
 	temp = *int_array_new;
-	while(*int_array_old)
+	while (*int_array_old)
 	{
 		if (((*int_array_old & 0xFF) == '$') && ((*int_array_old >> 8) & 1))
 		{
@@ -446,8 +432,7 @@ int	*expand_dollar(int *int_array, char **envp)
 
 	len = 0;
 	num = 0;
-
-	while(*int_array)
+	while (*int_array)
 	{
 		if (((*int_array & 0xFF) == '$') && ((*int_array >> 8) & 1))
 		{
@@ -478,14 +463,14 @@ int	which_quote_mode(t_tokens *tokens, t_capacity *capacity, char **envp)
 	int		single_q_count;
 	int		double_q_count;
 	int		flag;
-	//char	*new_str = NULL;
-	int		*int_array = NULL;
-	int		*int_array_new = NULL;
+	int		*int_array;
+	int		*int_array_new;
 
 	single_q_count = 0;
 	double_q_count = 0;
 	flag = 0;
-
+	int_array = NULL;
+	int_array_new = NULL;
 	i = 0;
 	while (i < capacity->current_size)
 	{
@@ -498,7 +483,6 @@ int	which_quote_mode(t_tokens *tokens, t_capacity *capacity, char **envp)
 		if (int_array == NULL)
 			return (0);
 		int_array[ft_strlen(tokens[i].value)] = 0;
-
 		while (tokens[i].value[j])
 		{
 			if (tokens[i].value[j] == '"' && single_q_count % 2 == 0)
@@ -513,7 +497,7 @@ int	which_quote_mode(t_tokens *tokens, t_capacity *capacity, char **envp)
 					int_array[m++] = tokens[i].value[j];
 			}
 			else if (tokens[i].value[j] == '*')
-			{	
+			{
 				if (single_q_count % 2 == 0 && double_q_count % 2 == 0)
 					int_array[m++] = encode_char_with_flag(tokens[i].value[j]);
 				else
@@ -524,15 +508,17 @@ int	which_quote_mode(t_tokens *tokens, t_capacity *capacity, char **envp)
 			j++;
 		}
 		int_array[m] = '\0';
-
-
 		int_array_new = expand_dollar(int_array, envp);
 		finalize_dollar_expansion(int_array, &int_array_new, envp);
-
-
-
-		int k = 0;
+		if (tokens[i].value)
+		{
+			free(tokens[i].value);
+			tokens[i].value = NULL;
+		}
+		tokens[i].value = expand_wildcard(int_array_new);
 /*
+		int k = 0;
+
 		while (int_array[k])
 		{
 			printf("%c", int_array[k]);
@@ -541,39 +527,29 @@ int	which_quote_mode(t_tokens *tokens, t_capacity *capacity, char **envp)
 			k++;
 		}
 		printf("\n");
-*/
+
 		k = 0;
 		while (int_array_new[k])
 		{
 			printf("%c", int_array_new[k]);
-			//if ((int_array[k] >> 8) & 1)
-			//	printf("!");
+			if ((int_array_new[k] >> 8) & 1)
+				printf("!");
 			k++;
 		}
 		printf("\n");
-
+*/
 		if (int_array)
 		{
-			//printf("int_array freed!\n");
 			free(int_array);
 			int_array = NULL;
 		}
 		if (int_array_new)
 		{
-			//printf("int_array_new freed!\n");
 			free(int_array_new);
 			int_array_new = NULL;
 		}
 		if (single_q_count % 2 != 0 || double_q_count % 2 != 0)
 			flag = -1;
-		/*if (tokens[i].value && new_str)
-		{
-			free(tokens[i].value);
-			tokens[i].value = NULL;
-			tokens[i].value = ft_strdup(new_str);
-			free(new_str);
-			new_str = NULL;
-		}*/
 		if (flag == -1)
 			return (printf("Unmatched quotes error!\n"), -1);
 		i++;
@@ -581,7 +557,7 @@ int	which_quote_mode(t_tokens *tokens, t_capacity *capacity, char **envp)
 	return (flag);
 }
 
-t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char** envp)
+t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp)
 {
 	t_tokens	*tokens;
 
