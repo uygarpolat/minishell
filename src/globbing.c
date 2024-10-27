@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/26 00:45:16 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/27 15:31:14 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/27 18:51:19 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,8 +82,8 @@ char	*expand_wildcard(int *int_array)
 				result = ft_strdup(entry->d_name);
 			else
 			{
-				result = ft_strjoin(result, " "); // Is this leaking?
-				result = ft_strjoin(result, entry->d_name); // Is this leaking?
+				result = ft_strjoin_free(result, " "); // Is this leaking?
+				result = ft_strjoin_free(result, entry->d_name); // Is this leaking?
 			}
 		}
 		entry = readdir(dir);

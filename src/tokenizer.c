@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/27 15:38:09 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/27 19:12:00 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ int	is_seperator(char c)
 		return (1);
 	return (0);
 }
-
+/*
 void	free_tokens(t_tokens *tokens, t_capacity *capacity)
 {
 	int	i;
@@ -143,7 +143,58 @@ void	free_tokens(t_tokens *tokens, t_capacity *capacity)
 	free(tokens);
 	tokens = NULL;
 }
+*/
+void	free_tokens(t_tokens *tokens, t_capacity *capacity)
+{
+	int	i;
 
+	i = 0;
+	if (!tokens)
+		return ;
+	while (i < capacity->max_size)
+	{
+		if (tokens[i].value)
+			free(tokens[i].value);
+		tokens[i].value = NULL;
+		i++;
+	}
+	if (tokens)
+	{
+		free(tokens);
+		tokens = NULL;
+	}
+}
+
+t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens, t_capacity *capacity)
+{
+	int			i;
+	t_tokens	*new_tokens;
+
+	new_tokens = malloc(sizeof(t_tokens) * (capacity->max_size * 2));
+	if (new_tokens == NULL)
+	{
+		free_tokens(tokens, capacity);
+		return (NULL);
+	}
+	i = -1;
+	while (++i < capacity->max_size * 2)
+	{
+		if (i < capacity->current_size)
+		{
+			new_tokens[i].value = ft_strdup(tokens[i].value);
+			new_tokens[i].type = tokens[i].type;
+		}
+		else
+		{
+			new_tokens[i].value = NULL;
+			// new_tokens[i].type = NULL; // Is this necessary?
+		}
+	}
+	free_tokens(tokens, capacity);
+	capacity->max_size *= 2;
+	return (new_tokens);
+}
+/*
 t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens, t_capacity *capacity)
 {
 	int			i;
@@ -165,7 +216,7 @@ t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens, t_capacity *capacity)
 	capacity->max_size *= 2;
 	return (new_tokens);
 }
-
+*/
 int	malloc_individual_tokens(t_tokens *tokens, char **input, char *temp, t_capacity *capacity, t_token_type type)
 {
 	tokens[capacity->current_size].value = malloc(sizeof(char) * (temp - *input + 1));
@@ -392,6 +443,7 @@ int	str_of_var(int **int_array_old, int **int_array_new, char **envp)
 	str[n] = '\0';
 	*int_array_old = *int_array_old + i;
 	var = get_var(str, envp);
+	free(str);
 	while (*var)
 	{
 		**int_array_new = *var;
