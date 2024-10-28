@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 22:44:36 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/14 12:57:05 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/24 16:47:18 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ size_t			ft_strlcat(char *dst, const char *src, size_t dstsize);
 int				ft_toupper(int c);
 int				ft_tolower(int c);
 char			*ft_strchr(const char *str, int c);
+char			*ft_strchrnul(const char *str, int c);
 char			*ft_strrchr(const char *str, int c);
 int				ft_strncmp(const char *s1, const char *s2, size_t n);
 void			*ft_memchr(const void *s, int c, size_t n);

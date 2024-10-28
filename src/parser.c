@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/24 13:36:05 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/28 11:51:58 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,33 @@ int	find_matching_paren(t_tokens *tokens, int start, int end)
 	return (-1);
 }
 
+void	free_ast(t_ast *node)
+{
+	if (!node)
+		return ;
+	if (node->left)
+	{
+		free_ast(node->left);
+		node->left = NULL;
+	}
+	if (node->right)
+	{
+		free_ast(node->right);
+		node->right = NULL;
+	}
+	if (node->redir_target)
+	{
+		if (node->redir_target->token->value)
+		{
+			free(node->redir_target->token->value);
+			node->redir_target->token->value = NULL;
+		}
+		free_ast(node->redir_target);
+		node->redir_target = NULL;
+	}
+	free(node);
+}
+
 t_ast	*create_node(t_tokens *token)
 {
 	t_ast	*node;
@@ -77,6 +104,17 @@ t_ast	*create_node(t_tokens *token)
 	return (node);
 }
 
+char	*beautify_token(char *str)
+{
+	char	*result;
+
+	(void)result;
+	if (ft_strchrnul(str, '\'') <= ft_strchrnul(str, '"'))
+		return (str);
+	else
+		return (str);
+}
+
 void	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 {
 	int		i;
@@ -90,6 +128,11 @@ void	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 		if ((tokens[i].type == TOKEN_REDIR_OUT) || (tokens[i].type == TOKEN_APPEND)
 			|| (tokens[i].type == TOKEN_REDIR_IN) || (tokens[i].type == TOKEN_HEREDOC))
 		{
+			/*if (root->token->value)
+			{
+				free(root->token->value);
+				root->token->value = NULL;
+			}*/
 			t_ast	*new_redir_node = create_node(&tokens[i]); // Refactor this, hence the incorrect decleration placement
 			new_redir_node->token->value = ft_strdup(tokens[++i].value);
 			if (root->redir_target == NULL)
@@ -106,18 +149,37 @@ void	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 		{
 			if (str != NULL)
 			{
-				str = ft_strjoin(str, " "); // Is this leaking?
-				str = ft_strjoin(str, tokens[i].value); // Is this leaking?
+				str = ft_strjoin_free(str, " ");
+				str = ft_strjoin_free(str, tokens[i].value);
 			}
 			else
 				str = ft_strdup(tokens[i].value);
 		}
-		root->left = NULL;
-		root->right = NULL;
+		//root->left = NULL;
+		//root->right = NULL;
 		i++;
 	}
-	root->token->value = ft_strdup(str);
-	free(str);
+	printf("root->token->value is %s\n", root->token->value);
+	if (str)
+	{
+		if (root->token->value)
+		{
+			free(root->token->value);
+			root->token->value = NULL;
+		}
+		root->token->value = ft_strdup(str);
+		free(str);
+		str = NULL;
+	}
+	/*else
+	{
+		if (root->token->value)
+		{
+			free(root->token->value);
+			root->token->value = NULL;
+		}
+		root->token->value = ft_strdup("NOTHING");
+	}*/
 }
 
 t_ast	*build_ast(t_tokens *tokens, int start, int end)

@@ -6,6 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
+/*   Updated: 2024/10/27 19:46:54 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/24 14:52:52 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -62,6 +63,7 @@ typedef struct s_command
 }	t_command;
 
 t_ast	*build_ast(t_tokens *tokens, int start, int end);
+void	free_ast(t_ast *node);
 
 //execution.c
 int	execution(t_ast *s, char **envp);

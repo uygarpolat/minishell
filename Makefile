@@ -6,6 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
+#    Updated: 2024/10/27 22:35:33 by upolat           ###   ########.fr        #
 #    Updated: 2024/10/24 14:53:22 by hpirkola         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
@@ -15,9 +16,10 @@ NAME = minishell
 SRC_DIR = src
 SRC_BONUS_DIR = src
 
-SOURCES = $(SRC_DIR)/main.c $(SRC_DIR)/tokenizer.c $(SRC_DIR)/parser.c \
-		$(SRC_DIR)/execution.c $(SRC_DIR)/path.c $(SRC_DIR)/builtins.c \
-		$(SRC_DIR)/ft_strdup2.c \
+SOURCES = 	$(SRC_DIR)/main.c $(SRC_DIR)/tokenizer.c $(SRC_DIR)/parser.c \
+			$(SRC_DIR)/execution.c $(SRC_DIR)/path.c $(SRC_DIR)/globbing.c \
+			$(SRC_DIR)/tokenization_utils.c $(SRC_DIR)/builtins.c \
+		  $(SRC_DIR)/ft_strdup2.c \
 
 SOURCES_BONUS = $(SRC_DIR)/readline_test.c
 
