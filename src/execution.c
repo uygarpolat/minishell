@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/24 13:51:16 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/24 14:14:29 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,11 @@ void	execute(t_ast *s, char **envp, t_pipes *p, int n)
 		}
 		cmd.args = ft_split(s->token->value, ' ');
 		cmd.path = get_path(cmd.args, envp);
+		if (is_builtin(s->token))
+		{
+			execute_builtin(cmd.args);
+			exit(0);
+		}
 		execve(cmd.path, cmd.args, envp);
 		printf("error with execve\n");
 	}

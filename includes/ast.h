@@ -7,6 +7,7 @@
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
 /*   Updated: 2024/10/27 19:46:54 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/24 14:52:52 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,4 +72,10 @@ int	execution(t_ast *s, char **envp);
 char	*get_path(char **cmd, char **envp);
 char	**paths(char **envp);
 
+//builtins.c
+int	execute_builtin(char **cmd);
+int	is_builtin(t_tokens *token);
+
+//ft_strdup2.c
+char	**ft_strdup2(char **str);
 #endif
