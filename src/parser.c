@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/28 09:32:12 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/28 11:51:58 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,11 +128,11 @@ void	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 		if ((tokens[i].type == TOKEN_REDIR_OUT) || (tokens[i].type == TOKEN_APPEND)
 			|| (tokens[i].type == TOKEN_REDIR_IN) || (tokens[i].type == TOKEN_HEREDOC))
 		{
-			if (root->token->value)
+			/*if (root->token->value)
 			{
 				free(root->token->value);
 				root->token->value = NULL;
-			}
+			}*/
 			t_ast	*new_redir_node = create_node(&tokens[i]); // Refactor this, hence the incorrect decleration placement
 			new_redir_node->token->value = ft_strdup(tokens[++i].value);
 			if (root->redir_target == NULL)
