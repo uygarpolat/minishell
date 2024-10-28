@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/28 15:49:39 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/28 17:34:03 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,13 @@ void	free_ast(t_ast *node)
 		return ;
 	if (node->token)
 	{
+		if (node->token->value)
+		{
+			free(node->token->value);
+			node->token->value =  NULL;
+		}
 		free(node->token);
-		node->token =  NULL;
+		node->token = NULL;
 	}
 	if (node->left)
 		free_ast(node->left);
@@ -76,7 +81,7 @@ t_tokens *copy_token(t_tokens *token)
 	if (!new_token)
 		return (NULL);
 	new_token->value = ft_strdup(token->value);
-	if (!(new_token->value))
+	if (new_token->value == NULL)
 	{
 		free(new_token);
 		new_token = NULL;
@@ -125,7 +130,57 @@ char	*beautify_token(char *str)
 		return (str);
 }
 
-void	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
+int	redirection_node_creator(t_tokens *tokens, t_ast *root, int *i)
+{
+	t_ast	*temp;
+	t_ast	*new_redir_node;
+	
+ 	if (root->token->value)
+	{	
+		free(root->token->value);
+		root->token->value = NULL;
+	}
+	new_redir_node = create_node(&tokens[*i]);
+	if (new_redir_node == NULL)
+		return (-1);
+	free(new_redir_node->token->value);
+	new_redir_node->token->value = ft_strdup(tokens[++(*i)].value);
+	if (new_redir_node->token->value == NULL)
+		return (free(new_redir_node), -1);
+	if (root->redir_target == NULL)
+		root->redir_target = new_redir_node;
+	else
+	{
+		temp = root->redir_target;
+		while (temp->redir_target != NULL)
+			temp = temp->redir_target;
+		temp->redir_target = new_redir_node;
+	}
+	return (0);
+}
+
+int	concatenate_commands(char **str, t_tokens *tokens, int *i)
+{
+	if (*str != NULL)
+	{
+		*str = ft_strjoin_free(*str, " ");
+		if (*str == NULL)
+			return (-1);
+		*str = ft_strjoin_free(*str, tokens[*i].value);
+		if (*str == NULL)
+			return (-1);
+	}
+	else
+	{
+		*str = ft_strdup(tokens[*i].value);
+		if (*str == NULL)
+			return (-1);
+	}
+	(*i)++;
+	return (0);
+}
+
+int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 {
 	int		i;
 	char	*str;
@@ -137,45 +192,9 @@ void	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 	{
 		if ((tokens[i].type == TOKEN_REDIR_OUT) || (tokens[i].type == TOKEN_APPEND)
 			|| (tokens[i].type == TOKEN_REDIR_IN) || (tokens[i].type == TOKEN_HEREDOC))
-		{
-			if (root->token->value)
-			{
-				free(root->token->value);
-				root->token->value = NULL;
-			}
-			t_ast	*new_redir_node = create_node(&tokens[i]); // Refactor this, hence the incorrect decleration placement
-			new_redir_node->token->value = ft_strdup(tokens[++i].value);
-			if (root->redir_target == NULL)
-				root->redir_target = new_redir_node;
-			else
-			{
-				t_ast	*temp = root->redir_target; // Refactor this, hence the incorrect decleration placement
-				while (temp->redir_target != NULL)
-					temp = temp->redir_target;
-				temp->redir_target = new_redir_node;
-			}
-
-			//printf("              root->token->value is %s\n", root->token->value);
-			//printf("root->redir_target->token->value is %s\n", root->redir_target->token->value);
-			/*if (root->token->value)
-			{
-				free(root->token->value);
-				root->token->value = NULL;
-			}*/
-			//printf("              root->token->value is %s\n", root->token->value);
-			//printf("root->redir_target->token->value is %s\n", root->redir_target->token->value);
-		}
-		else
-		{
-			if (str != NULL)
-			{
-				str = ft_strjoin_free(str, " ");
-				str = ft_strjoin_free(str, tokens[i].value);
-			}
-			else
-				str = ft_strdup(tokens[i].value);
-		}
-		i++;
+			redirection_node_creator(tokens, root, &i);
+		else if (concatenate_commands(&str, tokens, &i) == -1)
+			return (-1);
 	}
 	if (str)
 	{
@@ -188,15 +207,7 @@ void	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 		free(str);
 		str = NULL;
 	}
-	/*else
-	{
-		if (root->token->value)
-		{
-			free(root->token->value);
-			root->token->value = NULL;
-		}
-		root->token->value = ft_strdup("NOTHING");
-	}*/
+	return (0);
 }
 
 t_ast	*build_ast(t_tokens *tokens, int start, int end)
