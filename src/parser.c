@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/27 21:23:35 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/28 09:32:12 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,11 @@ void	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 		if ((tokens[i].type == TOKEN_REDIR_OUT) || (tokens[i].type == TOKEN_APPEND)
 			|| (tokens[i].type == TOKEN_REDIR_IN) || (tokens[i].type == TOKEN_HEREDOC))
 		{
+			if (root->token->value)
+			{
+				free(root->token->value);
+				root->token->value = NULL;
+			}
 			t_ast	*new_redir_node = create_node(&tokens[i]); // Refactor this, hence the incorrect decleration placement
 			new_redir_node->token->value = ft_strdup(tokens[++i].value);
 			if (root->redir_target == NULL)
@@ -150,17 +155,31 @@ void	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 			else
 				str = ft_strdup(tokens[i].value);
 		}
-		root->left = NULL;
-		root->right = NULL;
+		//root->left = NULL;
+		//root->right = NULL;
 		i++;
 	}
-	if (root->token->value)
+	printf("root->token->value is %s\n", root->token->value);
+	if (str)
 	{
-		free(root->token->value);
-		root->token->value = NULL;
+		if (root->token->value)
+		{
+			free(root->token->value);
+			root->token->value = NULL;
+		}
+		root->token->value = ft_strdup(str);
+		free(str);
+		str = NULL;
 	}
-	root->token->value = ft_strdup(str);
-	free(str);
+	/*else
+	{
+		if (root->token->value)
+		{
+			free(root->token->value);
+			root->token->value = NULL;
+		}
+		root->token->value = ft_strdup("NOTHING");
+	}*/
 }
 
 t_ast	*build_ast(t_tokens *tokens, int start, int end)
