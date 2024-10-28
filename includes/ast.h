@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/27 19:46:54 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/28 16:40:46 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/24 14:52:52 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -23,6 +23,7 @@
 # include <readline/history.h>
 # include <string.h>
 # include <sys/wait.h>
+# include <limits.h>
 # include "../library/libft/libft.h"
 # include "tokenizer.h"
 
@@ -62,6 +63,13 @@ typedef struct s_command
 	char	*path;
 }	t_command;
 
+typedef struct s_minishell
+{
+	t_ast	*ast;
+	t_pipes	p;
+	char	*pwd;
+}	t_minishell;
+
 t_ast	*build_ast(t_tokens *tokens, int start, int end);
 void	free_ast(t_ast *node);
 
@@ -73,9 +81,10 @@ char	*get_path(char **cmd, char **envp);
 char	**paths(char **envp);
 
 //builtins.c
-int	execute_builtin(char **cmd);
+int	execute_builtin(char **cmd, char **envp, t_minishell *minishell);
 int	is_builtin(t_tokens *token);
 
 //ft_strdup2.c
 char	**ft_strdup2(char **str);
+char	**ft_strdup3(char **str, char *dir);
 #endif
