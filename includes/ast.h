@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/29 10:10:20 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/29 22:01:53 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 16:40:46 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -41,12 +41,22 @@ typedef enum    e_ast_node_type {
 typedef struct    s_ast
 {
 	t_ast_node_type	type;
-	t_tokens	*token;
+	t_tokens		*token;
 	struct s_ast    *left;
 	struct s_ast    *right;
 	struct s_ast    *redir_target;
-	int	code;
+	int				code;
 }    t_ast;
+
+typedef struct	s_precedence
+{
+	int	i;
+	int	start;
+	int	end;
+	int	prec;
+	int	lowest_prec;
+	int	lowest_prec_pos;
+}	t_precedence;
 
 typedef struct s_pipe
 {
@@ -57,13 +67,13 @@ typedef struct s_pipe
 	int	o;
 }	t_pipes;
 
-typedef struct s_command
+typedef struct	s_command
 {
-	char **args;
+	char	**args;
 	char	*path;
 }	t_command;
 
-typedef struct s_minishell
+typedef struct	s_minishell
 {
 	t_ast	*ast;
 	t_pipes	p;
