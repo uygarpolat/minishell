@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/28 17:43:34 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 char	**ch_envp(char **envp, char *new_dir)
 {
-	int	i;
+	//int	i;
 	char	*dir;
 	char	**new_envp;
 	//char	**all_dir;
@@ -32,7 +32,7 @@ char	**ch_envp(char **envp, char *new_dir)
 	dir = ft_strjoin(dir, "/");
 	dir = ft_strjoin(dir, new_dir);
 	new_envp = ft_strdup3(envp, dir);
-	i = -1;
+	//i = -1;
 	//while (envp[++i])
 		//free(envp[i]);
 	//free (envp);
