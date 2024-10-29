@@ -6,15 +6,26 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/29 11:08:06 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/29 14:28:29 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../library/libft/libft.h"
 #include "../includes/tokenizer.h"
 #include "../includes/ast.h"
+#include "termios.h"
 
 char	*expand_wildcard(int *int_array);
+
+void	init_signal()
+{
+	struct termios	term;
+
+	// Is error handling necessary in any of this?
+	tcgetattr(STDIN_FILENO, &term); // Gets current terminal attributes
+    term.c_lflag &= ~ECHOCTL;       // Unsets the ECHOCTL flag so that signals aren't printed, like ^C
+    tcsetattr(STDIN_FILENO, TCSANOW, &term); // Applies changes immediately
+}
 
 void	handle_sigint()
 {
@@ -125,25 +136,7 @@ int	is_seperator(char c)
 		return (1);
 	return (0);
 }
-/*
-void	free_tokens(t_tokens *tokens, t_capacity *capacity)
-{
-	int	i;
 
-	i = 0;
-	if (!tokens)
-		return ;
-	while (i < capacity->max_size)
-	{
-		if (i < capacity->current_size)
-			free(tokens[i].value);
-		tokens[i].value = NULL;
-		i++;
-	}
-	free(tokens);
-	tokens = NULL;
-}
-*/
 void	free_tokens(t_tokens *tokens, t_capacity *capacity)
 {
 	int	i;
@@ -185,38 +178,13 @@ t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens, t_capacity *capacity)
 			new_tokens[i].type = tokens[i].type;
 		}
 		else
-		{
 			new_tokens[i].value = NULL;
-			// new_tokens[i].type = NULL; // Is this necessary?
-		}
 	}
 	free_tokens(tokens, capacity);
 	capacity->max_size *= 2;
 	return (new_tokens);
 }
-/*
-t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens, t_capacity *capacity)
-{
-	int			i;
-	t_tokens	*new_tokens;
 
-	new_tokens = malloc(sizeof(t_tokens) * (capacity->max_size * 2));
-	if (new_tokens == NULL)
-	{
-		free_tokens(tokens, capacity);
-		return (NULL);
-	}
-	i = -1;
-	while (++i < capacity->current_size)
-	{
-		new_tokens[i].value = ft_strdup(tokens[i].value);
-		new_tokens[i].type = tokens[i].type;
-	}
-	free_tokens(tokens, capacity);
-	capacity->max_size *= 2;
-	return (new_tokens);
-}
-*/
 int	malloc_individual_tokens(t_tokens *tokens, char **input, char *temp, t_capacity *capacity, t_token_type type)
 {
 	tokens[capacity->current_size].value = malloc(sizeof(char) * (temp - *input + 1));
@@ -629,7 +597,7 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp)
 		else
 			handle_word(&input, tokens, capacity);
 	}
-	//print_tokens(tokens, capacity);
+	print_tokens(tokens, capacity);
 	if (which_quote_mode(tokens, capacity, envp) == -1)
 		return (NULL); // Make sure to free the tokens.
 	return (tokens);
