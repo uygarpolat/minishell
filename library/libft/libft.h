@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/11 22:44:36 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/24 16:47:18 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/29 22:31:06 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,8 @@ void			ft_lstclear(t_list **lst, void (*del)(void*));
 void			ft_lstiter(t_list *lst, void (*f)(void *));
 t_list			*ft_lstmap(t_list *lst, void *(*f)
 					(void *), void (*del)(void *));
+void			free_2d_array(void ***arr);
+void			*free_void(void **var, void *return_value);
 
 // get_next_line_bonus.c
 char			*get_next_line(int fd);
