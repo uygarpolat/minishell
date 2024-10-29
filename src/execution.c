@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/24 14:14:29 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/28 17:06:50 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,33 +36,34 @@ void	dupping(t_pipes *p, int in, int out, int n)
 	}
 }
 
-void	execute(t_ast *s, char **envp, t_pipes *p, int n)
+void	execute(t_ast *s, char **envp, t_minishell *minishell, int n)
 {
 	t_command	cmd;
 	int	i;
 	
-	p->pids[n] = fork();
-	if (p->pids[n] == 0)
+	minishell->p.pids[n] = fork();
+	if (minishell->p.pids[n] == 0)
 	{
 		//redirect input and output if needed
-		if (p->pipes)
+		if (minishell->p.pipes)
 		{
-			if (n == p->count)
-				p->o = p->count - 1;
-			dupping(p, p->pipes[p->i][0], p->pipes[p->o][1], n);
+			if (n == minishell->p.count)
+				minishell->p.o = minishell->p.count - 1;
+			dupping(&minishell->p, minishell->p.pipes[minishell->p.i][0], minishell->p.pipes[minishell->p.o][1], n);
 		}
 		i = 0;
-		while (i < p->count)
+		while (i < minishell->p.count)
 		{
-			close(p->pipes[i][0]);
-			close(p->pipes[i][1]);
+			close(minishell->p.pipes[i][0]);
+			close(minishell->p.pipes[i][1]);
 			i++;
 		}
 		cmd.args = ft_split(s->token->value, ' ');
 		cmd.path = get_path(cmd.args, envp);
 		if (is_builtin(s->token))
 		{
-			execute_builtin(cmd.args);
+			printf("hey\n");
+			execute_builtin(cmd.args, envp, minishell);
 			exit(0);
 		}
 		execve(cmd.path, cmd.args, envp);
@@ -184,34 +185,49 @@ void	in_out(t_pipes *p, t_ast *i)
 	}
 }
 */
+
 int	execution(t_ast *s, char **envp)
 {
+	t_minishell	minishell;
 	int	n;
 	int	j;
-	t_pipes	p;
-	t_ast	*i;
+	int	i;
+	t_command	cmd;
 
-	p.count = count_pipes(s);
-	mallocing(&p);
-	pipeing(&p);
-	i = s;
+	
+	minishell.ast = s;
+	minishell.p.count = count_pipes(minishell.ast);
+	mallocing(&minishell.p);
+	pipeing(&minishell.p);
+	minishell.pwd = getcwd(NULL, 0);
 	n = 0;
-	while (i)
+	cmd.args = ft_split(s->token->value, ' ');
+	if (is_builtin(s->token) && minishell.p.count == 0)
+			execute_builtin(cmd.args, envp, &minishell);
+	else
 	{
-		if (i->token->type == TOKEN_PIPE)
-			execute(i->left, envp, &p, n);
-		else if (i->token->type == TOKEN_WORD)
-			execute(i, envp, &p, n);
-		if (n > 0)
-			p.i++;
-		p.o++;
-		n++;
-		i = i->right;
+		while (minishell.ast)
+		{
+			if (minishell.ast->token->type == TOKEN_PIPE)
+				execute(minishell.ast->left, envp, &minishell, n);
+			else if (minishell.ast->token->type == TOKEN_WORD)
+				execute(minishell.ast, envp, &minishell, n);
+			if (n > 0)
+				minishell.p.i++;
+			minishell.p.o++;
+			n++;
+			minishell.ast = minishell.ast->right;
+		}
+		close_and_free(&minishell.p);
+		j = 0;
+		while (j <= minishell.p.count)
+			s->code = waiting(minishell.p.pids[j++]);
 	}
-	close_and_free(&p);
-	j = 0;
-	while (j <= p.count)
-		s->code = waiting(p.pids[j++]);
-	free(p.pids);
+	i = -1;
+	while (cmd.args[++i])
+		free(cmd.args[i]);
+	free(cmd.args);
+	free(minishell.pwd);
+	free(minishell.p.pids);
 	return (s->code);
 }
