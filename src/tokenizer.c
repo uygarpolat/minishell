@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/29 14:28:29 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/30 13:46:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -597,7 +597,7 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp)
 		else
 			handle_word(&input, tokens, capacity);
 	}
-	print_tokens(tokens, capacity);
+	//print_tokens(tokens, capacity);
 	if (which_quote_mode(tokens, capacity, envp) == -1)
 		return (NULL); // Make sure to free the tokens.
 	return (tokens);
