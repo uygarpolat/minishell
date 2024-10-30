@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/30 10:52:36 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/30 11:42:42 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -30,8 +30,11 @@ char	**ch_envp(char **envp, char *new_dir)
 	}
 	dir = ft_strjoin(dir, "/");
 	dir = ft_strjoin(dir, new_dir);
+	if (!dir)
+		return (NULL);
 	new_envp = ft_strdup3(envp, dir);
-	i = -1;
+	if (!new_envp)
+		return (NULL);
 	//i = -1;
 	//while (envp[++i])
 		//free(envp[i]);
@@ -61,11 +64,19 @@ int	execute_builtin(char **cmd, char **envp, t_minishell *minishell)
 	else if (!ft_strncmp(cmd[0], "cd", 3))
 	{
 		if (chdir(cmd[1]) != 0)
+		{
 			perror("chdir error\n");
+			return (0);
+		}
 		envp = ch_envp(envp, cmd[1]);
+		if (!envp)
+			return (0);
 		minishell->pwd = getcwd(buf, sizeof(buf));
 		if (!minishell->pwd)
+		{
 			perror("getcwd error\n");
+			return (0);
+		}
 	}
 	else if (!ft_strncmp(cmd[0], "pwd", 4))
 	{
@@ -81,7 +92,7 @@ int	execute_builtin(char **cmd, char **envp, t_minishell *minishell)
 		return (1);
 	else if (!ft_strncmp(cmd[0], "env", 4))
 		return (1);
-	return (0);
+	return (1);
 }
 
 int	is_builtin(t_tokens *token)

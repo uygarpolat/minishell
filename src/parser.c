@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/29 10:13:01 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/30 13:23:42 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -49,7 +49,7 @@ int	find_matching_paren(t_tokens *tokens, int start, int end)
 	}
 	return (-1);
 }
-
+/*
 void *free_void(void **var, void *return_value)
 {
 	if (var && *var)
@@ -59,7 +59,7 @@ void *free_void(void **var, void *return_value)
 	}
 	return (return_value);
 }
-
+*/
 void	free_ast(t_ast *node)
 {
 	if (!node)

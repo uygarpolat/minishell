@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/19 21:35:28 by upolat            #+#    #+#              #
-#    Updated: 2024/05/23 22:42:13 by upolat           ###   ########.fr        #
+#    Updated: 2024/10/30 13:14:35 by hpirkola         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -56,7 +56,7 @@ SRCS =	./ft_isalpha.c \
 		./ft_printf_base.c \
 		./ft_printf_types.c \
 		./ft_printf_utils.c \
-
+		./ft_freevoid.c \
 
 OBJS	= $(SRCS:.c=.o)
 
