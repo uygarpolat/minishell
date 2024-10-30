@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/30 14:03:33 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/30 16:28:42 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 17:20:14 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -27,7 +27,6 @@ int	main(int argc, char **argv, char **envp)
 	t_capacity	capacity;
 	t_ast	*ast;
 	char	**new_envp;
-	int	i;
 
 	(void) argc;
 	(void) argv;
@@ -62,7 +61,6 @@ int	main(int argc, char **argv, char **envp)
 		free_tokens(tokens, &capacity);
 		free(input);
 	}
-	i = -1;
 	free_2d_array((void ***)&new_envp);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/30 13:21:52 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/30 16:29:44 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,7 +195,7 @@ int	execution(t_ast *s, char **envp)
 	t_minishell	minishell;
 	int	n;
 	int	j;
-	int	i;
+	//int	i;
 	t_command	cmd;
 	
 	minishell.ast = s;
@@ -238,7 +238,7 @@ int	execution(t_ast *s, char **envp)
 		while (j <= minishell.p.count)
 			s->code = waiting(minishell.p.pids[j++]);
 	}
-	i = -1;
+	//i = -1;
 	//free(minishell.pwd);
 	free(minishell.p.pids);
 	return (s->code);
