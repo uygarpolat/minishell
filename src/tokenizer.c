@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/30 15:18:05 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/30 20:17:13 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/30 13:46:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -460,7 +460,7 @@ int	*expand_dollar(int *int_array, char **envp)
 			int_array++;
 			num = length_of_var(&int_array, envp);
 			if (num == -1)
-				return (0); // This is for malloc check in length_of_var function, handle better.
+				return (NULL); // This is for malloc check in length_of_var function, handle better.
 			len = len + num;
 		}
 		else
@@ -476,42 +476,49 @@ int	*expand_dollar(int *int_array, char **envp)
 	return (arr);
 }
 
+void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
+{
+	if (q->single_q_count % 2 != 1)
+		int_array[*m] = encode_char_with_flag(*str);
+	else
+		int_array[*m] = *str;
+	(*m)++;
+}
+
+void	assign_asterisk(char *str, int *int_array, t_quote *q, int *m)
+{
+	if (q->single_q_count % 2 == 0 && q->double_q_count % 2 == 0)
+		int_array[*m] = encode_char_with_flag(*str);
+	else
+		int_array[*m] = *str;
+	(*m)++;
+}
+
 int	populate_tokens(char *str, int *int_array)
 {
-	int		single_q_count;
-	int		double_q_count;
+	t_quote	q;
 	int		m;
 
 	m = 0;
-	single_q_count = 0;
-	double_q_count = 0;
+	q.single_q_count = 0;
+	q.double_q_count = 0;
 	int_array[ft_strlen(str)] = 0;
 	while (*str)
 	{
-		if (*str == '"' && single_q_count % 2 == 0)
-			double_q_count++;
-		else if (*str == '\'' && double_q_count % 2 == 0)
-			single_q_count++;
+		if (*str == '"' && q.single_q_count % 2 == 0)
+			q.double_q_count++;
+		else if (*str == '\'' && q.double_q_count % 2 == 0)
+			q.single_q_count++;
 		else if (*str == '$')
-		{
-			if (single_q_count % 2 != 1)
-				int_array[m++] = encode_char_with_flag(*str);
-			else
-				int_array[m++] = *str;
-		}
+			assign_dollar(str, int_array, &q, &m);
 		else if (*str == '*')
-		{
-			if (single_q_count % 2 == 0 && double_q_count % 2 == 0)
-				int_array[m++] = encode_char_with_flag(*str);
-			else
-				int_array[m++] = *str;
-		}
+			assign_asterisk(str, int_array, &q, &m);
 		else
 			int_array[m++] = *str;
 		str++;
 	}
 	int_array[m] = '\0';
-	if (single_q_count % 2 != 0 || double_q_count % 2 != 0)
+	if (q.single_q_count % 2 != 0 || q.double_q_count % 2 != 0)
 		return (-1);
 	return (0);
 }
@@ -519,74 +526,26 @@ int	populate_tokens(char *str, int *int_array)
 int	which_quote_mode(t_tokens *tokens, t_capacity *capacity, char **envp)
 {
 	int		i;
-	//int		j;
-	//int		m;
-	//int		single_q_count;
-	//int		double_q_count;
-	//int		flag;
 	int		*int_array;
 	int		*int_array_new;
 
-	//single_q_count = 0;
-	//double_q_count = 0;
-	//flag = 0;
 	int_array = NULL;
 	int_array_new = NULL;
-	i = 0;
-	while (i < capacity->current_size)
+	i = -1;
+	while (++i < capacity->current_size)
 	{
-		//single_q_count = 0;
-		//double_q_count = 0;
-		//flag = 0;
-		//j = 0;
-		//m = 0;
 		int_array = malloc(sizeof(int) * (ft_strlen(tokens[i].value) + 1));
 		if (int_array == NULL)
-			return (0);
+			return (-1);
 		int_array[ft_strlen(tokens[i].value)] = 0;
 		if (populate_tokens(tokens[i].value, int_array))
 			return (printf("Unmatched quotes error!\n"), -1);
-
-/*		while (tokens[i].value[j])
-		{
-			if (tokens[i].value[j] == '"' && single_q_count % 2 == 0)
-				double_q_count++;
-			else if (tokens[i].value[j] == '\'' && double_q_count % 2 == 0)
-				single_q_count++;
-			else if (tokens[i].value[j] == '$')
-			{
-				if (single_q_count % 2 != 1)
-					int_array[m++] = encode_char_with_flag(tokens[i].value[j]);
-				else
-					int_array[m++] = tokens[i].value[j];
-			}
-			else if (tokens[i].value[j] == '*')
-			{
-				if (single_q_count % 2 == 0 && double_q_count % 2 == 0)
-					int_array[m++] = encode_char_with_flag(tokens[i].value[j]);
-				else
-					int_array[m++] = tokens[i].value[j];
-			}
-			else
-				int_array[m++] = tokens[i].value[j];
-			j++;
-		}
-		int_array[m] = '\0'; */
 		int_array_new = expand_dollar(int_array, envp);
 		finalize_dollar_expansion(int_array, &int_array_new, envp);
-		if (tokens[i].value)
-		{
-			free(tokens[i].value);
-			tokens[i].value = NULL;
-		}
+		free_void((void **)&tokens[i].value, NULL);
 		tokens[i].value = expand_wildcard(int_array_new);
 		free_void((void **)&int_array, NULL);
 		free_void((void **)&int_array_new, NULL);
-		//if (single_q_count % 2 != 0 || double_q_count % 2 != 0)
-		//	flag = -1;
-		//if (flag == -1)
-		//	return (printf("Unmatched quotes error!\n"), -1);
-		i++;
 	}
 	return (0);
 }
