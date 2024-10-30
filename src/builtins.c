@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/30 11:42:42 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/30 15:35:37 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -15,7 +15,6 @@
 
 char	**ch_envp(char **envp, char *new_dir)
 {
-	//int	i;
 	char	*dir;
 	char	**new_envp;
 
@@ -35,10 +34,70 @@ char	**ch_envp(char **envp, char *new_dir)
 	new_envp = ft_strdup3(envp, dir);
 	if (!new_envp)
 		return (NULL);
-	//i = -1;
-	//while (envp[++i])
-		//free(envp[i]);
-	//free (envp);
+	return (new_envp);
+}
+
+void	print_env(char **envp)
+{
+	int	i;
+
+	i = -1;
+	while (envp && envp[++i])
+		printf("%s\n", envp[i]);
+}
+
+char	**rm_envp(char **envp, char *str)
+{
+	char	**new_envp;
+	int		i;
+
+	i = 0;
+	while (envp[i])
+		i++;
+	new_envp = malloc(sizeof(char *) * i);
+	if (new_envp == NULL)
+		return (NULL);
+	i = -1;
+	while (envp[++i])
+	{
+		if (!ft_strncmp(str, envp[i], ft_strlen(str)))
+			continue ;
+		new_envp[i] = ft_strdup(envp[i]);
+		if (!new_envp[i])
+		{
+			free_2d_array((void ***)&new_envp);
+			return (NULL);
+		}
+	}
+	new_envp[i] = NULL;
+	return (new_envp);
+}
+
+char	**add_env(char **envp, char *str)
+{
+	char	**new_envp;
+	int		i;
+
+
+	printf("helou\n");
+	i = 0;
+	while (envp[i])
+		i++;
+	new_envp = malloc(sizeof(char *) * (i + 2));
+	if (new_envp == NULL)
+		return (NULL);
+	i = -1;
+	while (envp[++i])
+	{
+		new_envp[i] = ft_strdup(envp[i]);
+		if (!new_envp[i])
+		{
+			free_2d_array((void ***)&new_envp);
+			return (NULL);
+		}
+	}
+	new_envp[i] = ft_strdup(str);
+	new_envp[++i] = NULL;
 	return (new_envp);
 }
 
@@ -87,11 +146,25 @@ int	execute_builtin(char **cmd, char **envp, t_minishell *minishell)
 			//perror("getcwd error\n");
 	}
 	else if (!ft_strncmp(cmd[0], "export", 7))
-		return (1);
+	{
+		envp = add_env(envp, cmd[1]);
+		if (!envp)
+		{
+			perror("export error\n");
+			return (0);
+		}
+	}
 	else if (!ft_strncmp(cmd[0], "unset", 6))
-		return (1);
+	{
+		envp = rm_envp(envp, cmd[1]);
+		if (!envp)
+		{
+			perror("unset error\n");
+			return (0);
+		}
+	}
 	else if (!ft_strncmp(cmd[0], "env", 4))
-		return (1);
+		print_env(envp);
 	return (1);
 }
 
