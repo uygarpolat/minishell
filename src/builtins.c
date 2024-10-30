@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/28 17:43:34 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/28 18:11:43 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ char	**ch_envp(char **envp, char *new_dir)
 	int	i;
 	char	*dir;
 	char	**new_envp;
-	//char	**all_dir;
 
 	while (*envp)
 	{
@@ -28,16 +27,11 @@ char	**ch_envp(char **envp, char *new_dir)
 		}
 		envp++;
 	}
-	//all_dir = ft_split(dir, '/');
 	dir = ft_strjoin(dir, "/");
 	dir = ft_strjoin(dir, new_dir);
 	new_envp = ft_strdup3(envp, dir);
 	i = -1;
-	//while (envp[++i])
-		//free(envp[i]);
-	//free (envp);
 	return (new_envp);
-	//return (0) //no access
 }
 
 int	execute_builtin(char **cmd, char **envp, t_minishell *minishell)
@@ -61,7 +55,6 @@ int	execute_builtin(char **cmd, char **envp, t_minishell *minishell)
 	}
 	else if (!ft_strncmp(cmd[0], "cd", 3))
 	{
-		//ch_envp(envp, cmd[1]);
 		if (chdir(cmd[1]) != 0)
 			perror("chdir error\n");
 		envp = ch_envp(envp, cmd[1]);
