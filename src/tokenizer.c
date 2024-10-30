@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/29 14:28:29 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/30 13:16:10 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -536,38 +536,8 @@ int	which_quote_mode(t_tokens *tokens, t_capacity *capacity, char **envp)
 			tokens[i].value = NULL;
 		}
 		tokens[i].value = expand_wildcard(int_array_new);
-/*
-		int k = 0;
-
-		while (int_array[k])
-		{
-			printf("%c", int_array[k]);
-			//if ((int_array[k] >> 8) & 1)
-			//	printf("!");
-			k++;
-		}
-		printf("\n");
-
-		k = 0;
-		while (int_array_new[k])
-		{
-			printf("%c", int_array_new[k]);
-			if ((int_array_new[k] >> 8) & 1)
-				printf("!");
-			k++;
-		}
-		printf("\n");
-*/
-		if (int_array)
-		{
-			free(int_array);
-			int_array = NULL;
-		}
-		if (int_array_new)
-		{
-			free(int_array_new);
-			int_array_new = NULL;
-		}
+		free_void((void **)&int_array, NULL);
+		free_void((void **)&int_array_new, NULL);
 		if (single_q_count % 2 != 0 || double_q_count % 2 != 0)
 			flag = -1;
 		if (flag == -1)
