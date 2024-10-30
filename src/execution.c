@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/28 17:06:50 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/30 13:21:52 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,9 @@ void	execute(t_ast *s, char **envp, t_minishell *minishell, int n)
 {
 	t_command	cmd;
 	int	i;
-	
+
+	cmd.args = NULL;
+	cmd.path = NULL;	
 	minishell->p.pids[n] = fork();
 	if (minishell->p.pids[n] == 0)
 	{
@@ -59,7 +61,7 @@ void	execute(t_ast *s, char **envp, t_minishell *minishell, int n)
 			i++;
 		}
 		cmd.args = ft_split(s->token->value, ' ');
-		cmd.path = get_path(cmd.args, envp);
+		cmd.path = get_path(&cmd, envp, minishell);
 		if (is_builtin(s->token))
 		{
 			printf("hey\n");
@@ -87,10 +89,10 @@ int	count_pipes(t_ast *s)
 	return (count);
 }
 
-void	pipeing(t_pipes *p)
+int	pipeing(t_pipes *p)
 {
 	int	i;
-	int	j;
+	//int	j;
 
 	p->i = 0;
 	p->o = 0;
@@ -99,19 +101,20 @@ void	pipeing(t_pipes *p)
 	{
 		if (pipe(p->pipes[i]) < 0)
 		{
-			j = 0;
-			while (j < i)
-			{
-				close(p->pipes[i][0]);
-				close(p->pipes[i][1]);
-				j++;
-			}
-			//error function here
+			//j = 0;
+			//while (j < i)
+			//{
+				//close(p->pipes[i][0]);
+				//close(p->pipes[i][1]);
+				//j++;
+			//}
+			return (0);
 		}
 	}
+	return (1);
 }
 
-void	mallocing(t_pipes *p)
+int	mallocing(t_pipes *p)
 {
 	int	i;
 	//HANDLe MALLOC ERROR
@@ -121,20 +124,21 @@ void	mallocing(t_pipes *p)
 	{
 		p->pipes = malloc(sizeof(int *) * p->count);
 		if (!p->pipes)
-			return ;
+			return (0);
 		i = -1;
 		while (++i < p->count)
 			p->pipes[i] = malloc(sizeof(int) * 2);
 		p->pids = malloc(sizeof(int) * (p->count + 1));
 		if (!p->pids)
-			return ;
+			return (0);
 	}
 	else
 	{
 		p->pids = malloc(sizeof(int) * 1);
 		if (!p->pids)
-			return ;
+			return (0);
 	}
+	return (1);
 }
 
 void	close_and_free(t_pipes *p)
@@ -193,19 +197,30 @@ int	execution(t_ast *s, char **envp)
 	int	j;
 	int	i;
 	t_command	cmd;
-
 	
 	minishell.ast = s;
+	minishell.pwd = getcwd(NULL, PATH_MAX);
 	minishell.p.count = count_pipes(minishell.ast);
-	mallocing(&minishell.p);
-	pipeing(&minishell.p);
-	minishell.pwd = getcwd(NULL, 0);
-	n = 0;
+	cmd.path = NULL;
 	cmd.args = ft_split(s->token->value, ' ');
+	if (!mallocing(&minishell.p) || !pipeing(&minishell.p))
+	{
+		error(&minishell, &cmd, "malloc failed\n");
+		return (1);
+	}
+	n = 0;
 	if (is_builtin(s->token) && minishell.p.count == 0)
-			execute_builtin(cmd.args, envp, &minishell);
+	{
+			if (!execute_builtin(cmd.args, envp, &minishell))
+			{	
+				error(&minishell, &cmd, "builtin failed\n");
+				return (1);
+			}
+	}
 	else
 	{
+		
+		free_2d_array((void ***)&cmd.args);
 		while (minishell.ast)
 		{
 			if (minishell.ast->token->type == TOKEN_PIPE)
@@ -224,10 +239,7 @@ int	execution(t_ast *s, char **envp)
 			s->code = waiting(minishell.p.pids[j++]);
 	}
 	i = -1;
-	while (cmd.args[++i])
-		free(cmd.args[i]);
-	free(cmd.args);
-	free(minishell.pwd);
+	//free(minishell.pwd);
 	free(minishell.p.pids);
 	return (s->code);
 }
