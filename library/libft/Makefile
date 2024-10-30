@@ -58,7 +58,6 @@ SRCS =	./ft_isalpha.c \
 		./ft_printf_utils.c \
 		./ft_freevoid.c \
 
-
 OBJS	= $(SRCS:.c=.o)
 
 BONUS_SRCS =	./ft_lstnew_bonus.c \

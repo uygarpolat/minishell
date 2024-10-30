@@ -6,8 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/29 22:01:53 by upolat           ###   ########.fr       */
-/*   Updated: 2024/10/28 16:40:46 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/10/30 12:45:33 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,9 +84,10 @@ void	free_ast(t_ast *node);
 
 //execution.c
 int	execution(t_ast *s, char **envp);
+void	close_and_free(t_pipes *p);
 
 //path.c
-char	*get_path(char **cmd, char **envp);
+char	*get_path(t_command *cmd, char **envp, t_minishell *minishell);
 char	**paths(char **envp);
 
 //builtins.c
@@ -97,4 +97,10 @@ int	is_builtin(t_tokens *token);
 //ft_strdup2.c
 char	**ft_strdup2(char **str);
 char	**ft_strdup3(char **str, char *dir);
+
+//errors.c
+void	error(t_minishell *minishell, t_command *command, char *str);
+
+//parser.c
+void	free_ast(t_ast *node);
 #endif
