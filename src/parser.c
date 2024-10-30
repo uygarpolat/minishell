@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/29 22:32:21 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/30 10:20:08 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -49,17 +49,7 @@ int	find_matching_paren(t_tokens *tokens, int start, int end)
 	}
 	return (-1);
 }
-/*
-void	*free_void(void **var, void *return_value)
-{
-	if (var && *var)
-	{
-		free(*var);
-		*var = NULL;
-	}
-	return (return_value);
-}
-*/
+
 void	free_ast(t_ast *node)
 {
 	if (!node)
@@ -246,6 +236,33 @@ int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 	return (0);
 }
 
+void	build_non_command_node(t_tokens *tokens, t_ast **root,
+			t_precedence *p, int *error_code)
+{
+	*root = create_node(&tokens[p->lowest_prec_pos]);
+	if (*root == NULL)
+		*error_code = -1;
+	if (!*error_code)
+	{
+		(*root)->left = build_ast(tokens, p->start, p->lowest_prec_pos - 1);
+		if ((*root)->left == NULL)
+		{
+			free_void((void **)root, NULL);
+			*error_code = -1;
+		}
+	}
+	if (!*error_code)
+	{
+		(*root)->right = build_ast(tokens, p->lowest_prec_pos + 1, p->end);
+		if ((*root)->right == NULL)
+		{
+			free_void((void **)(*root)->left, NULL);
+			free_void((void **)root, NULL);
+			*error_code = -1;
+		}
+	}
+}
+
 t_ast	*build_ast(t_tokens *tokens, int start, int end)
 {
 	t_precedence	p;
@@ -261,20 +278,7 @@ t_ast	*build_ast(t_tokens *tokens, int start, int end)
 	if (!error_code && establish_lowest_precedence(tokens, &p) == -1)
 		return (NULL);
 	if (!error_code && p.lowest_prec <= 3 && p.lowest_prec >= 0)
-	{
-		root = create_node(&tokens[p.lowest_prec_pos]);
-		if (root == NULL)
-			error_code = -1;
-		root->left = build_ast(tokens, p.start, p.lowest_prec_pos - 1);
-		if (root->left == NULL)
-			error_code = *(int *)free_void((void **)&root, &error_code);
-		root->right = build_ast(tokens, p.lowest_prec_pos + 1, p.end);
-		if (root->right == NULL)
-		{
-			error_code = *(int *)free_void((void **)&root->left, &error_code);
-			error_code = *(int *)free_void((void **)&root, &error_code);
-		}
-	}
+		build_non_command_node(tokens, &root, &p, &error_code);
 	else if (!error_code)
 	{
 		root = create_node(&tokens[p.start]);
@@ -282,7 +286,7 @@ t_ast	*build_ast(t_tokens *tokens, int start, int end)
 			error_code = -1;
 		if (!error_code && populate_command_node(tokens,
 				root, p.start, &(p.end)) == -1)
-			error_code = *(int *)free_void((void **)&root, &error_code);
+			free_void((void **)&root, NULL);
 	}
 	return (root);
 }
