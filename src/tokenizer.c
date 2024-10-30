@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/30 14:00:28 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/30 15:18:05 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/30 13:46:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -476,35 +476,78 @@ int	*expand_dollar(int *int_array, char **envp)
 	return (arr);
 }
 
+int	populate_tokens(char *str, int *int_array)
+{
+	int		single_q_count;
+	int		double_q_count;
+	int		m;
+
+	m = 0;
+	single_q_count = 0;
+	double_q_count = 0;
+	int_array[ft_strlen(str)] = 0;
+	while (*str)
+	{
+		if (*str == '"' && single_q_count % 2 == 0)
+			double_q_count++;
+		else if (*str == '\'' && double_q_count % 2 == 0)
+			single_q_count++;
+		else if (*str == '$')
+		{
+			if (single_q_count % 2 != 1)
+				int_array[m++] = encode_char_with_flag(*str);
+			else
+				int_array[m++] = *str;
+		}
+		else if (*str == '*')
+		{
+			if (single_q_count % 2 == 0 && double_q_count % 2 == 0)
+				int_array[m++] = encode_char_with_flag(*str);
+			else
+				int_array[m++] = *str;
+		}
+		else
+			int_array[m++] = *str;
+		str++;
+	}
+	int_array[m] = '\0';
+	if (single_q_count % 2 != 0 || double_q_count % 2 != 0)
+		return (-1);
+	return (0);
+}
+
 int	which_quote_mode(t_tokens *tokens, t_capacity *capacity, char **envp)
 {
 	int		i;
-	int		j;
-	int		m;
-	int		single_q_count;
-	int		double_q_count;
-	int		flag;
+	//int		j;
+	//int		m;
+	//int		single_q_count;
+	//int		double_q_count;
+	//int		flag;
 	int		*int_array;
 	int		*int_array_new;
 
-	single_q_count = 0;
-	double_q_count = 0;
-	flag = 0;
+	//single_q_count = 0;
+	//double_q_count = 0;
+	//flag = 0;
 	int_array = NULL;
 	int_array_new = NULL;
 	i = 0;
 	while (i < capacity->current_size)
 	{
-		single_q_count = 0;
-		double_q_count = 0;
-		flag = 0;
-		j = 0;
-		m = 0;
+		//single_q_count = 0;
+		//double_q_count = 0;
+		//flag = 0;
+		//j = 0;
+		//m = 0;
 		int_array = malloc(sizeof(int) * (ft_strlen(tokens[i].value) + 1));
 		if (int_array == NULL)
 			return (0);
 		int_array[ft_strlen(tokens[i].value)] = 0;
-		while (tokens[i].value[j])
+		if (populate_tokens(tokens[i].value, int_array))
+			return (printf("Unmatched quotes error!\n"), -1);
+
+/*		while (tokens[i].value[j])
 		{
 			if (tokens[i].value[j] == '"' && single_q_count % 2 == 0)
 				double_q_count++;
@@ -528,7 +571,7 @@ int	which_quote_mode(t_tokens *tokens, t_capacity *capacity, char **envp)
 				int_array[m++] = tokens[i].value[j];
 			j++;
 		}
-		int_array[m] = '\0';
+		int_array[m] = '\0'; */
 		int_array_new = expand_dollar(int_array, envp);
 		finalize_dollar_expansion(int_array, &int_array_new, envp);
 		if (tokens[i].value)
@@ -539,13 +582,13 @@ int	which_quote_mode(t_tokens *tokens, t_capacity *capacity, char **envp)
 		tokens[i].value = expand_wildcard(int_array_new);
 		free_void((void **)&int_array, NULL);
 		free_void((void **)&int_array_new, NULL);
-		if (single_q_count % 2 != 0 || double_q_count % 2 != 0)
-			flag = -1;
-		if (flag == -1)
-			return (printf("Unmatched quotes error!\n"), -1);
+		//if (single_q_count % 2 != 0 || double_q_count % 2 != 0)
+		//	flag = -1;
+		//if (flag == -1)
+		//	return (printf("Unmatched quotes error!\n"), -1);
 		i++;
 	}
-	return (flag);
+	return (0);
 }
 
 t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp)
@@ -568,7 +611,7 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp)
 		else
 			handle_word(&input, tokens, capacity);
 	}
-	//print_tokens(tokens, capacity);
+	print_tokens(tokens, capacity);
 	if (which_quote_mode(tokens, capacity, envp) == -1)
 		return (NULL); // Make sure to free the tokens.
 	return (tokens);
