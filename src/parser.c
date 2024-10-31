@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/30 17:27:39 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/31 13:24:08 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -41,19 +41,12 @@ int	find_matching_paren(t_tokens *tokens, int start, int end)
 		{
 			paren_count--;
 			if (paren_count < 0)
-			{
-				printf("Paren count went below 0 at token[%d]\n", i);
 				return (-1);
-			}
 			if (paren_count == 0)
-			{
-				printf("Matching parennnn was found at token[%d]\n", i);
 				return (i);
-			}
 		}
 		i++;
 	}
-	printf("No matching paren was found until and including token[%d]\n", i - 1);
 	return (-1);
 }
 
@@ -224,7 +217,6 @@ int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 		while ((p->i == p->start) && (tokens[p->start].type == TOKEN_OPEN_PAREN)
 			&& (p->end == find_matching_paren(tokens, p->start, p->end)))
 		{
-			printf("The statement above refers to first and last being paren!\n");
 			p->i++;
 			p->start++;
 			p->end--;

@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/30 20:17:13 by upolat           ###   ########.fr       */
+/*   Updated: 2024/10/31 16:44:05 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/30 13:46:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -130,10 +130,10 @@ int	is_space(char c)
 	return (0);
 }
 
-int	is_seperator(char c)
+int	is_seperator(char c, char c_plus_one)
 {
-	if (c == '<' || c == '>' || c == '&' || c == '|'
-		|| c == '(' || c == ')')
+	if (c == '<' || c == '>' || (c == '&' && c_plus_one == '&')
+		|| c == '|' || c == '(' || c == ')')
 		return (1);
 	return (0);
 }
@@ -159,38 +159,56 @@ void	free_tokens(t_tokens *tokens, t_capacity *capacity)
 	}
 }
 
-t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens, t_capacity *capacity)
+t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens, t_capacity *capacity, int i)
 {
-	int			i;
 	t_tokens	*new_tokens;
 
 	new_tokens = malloc(sizeof(t_tokens) * (capacity->max_size * 2));
 	if (new_tokens == NULL)
-	{
-		free_tokens(tokens, capacity);
-		return (NULL);
-	}
-	i = -1;
-	while (++i < capacity->max_size * 2)
+		return (free_tokens(tokens, capacity), NULL);
+	while (i < capacity->max_size * 2)
 	{
 		if (i < capacity->current_size)
 		{
 			new_tokens[i].value = ft_strdup(tokens[i].value);
+			if (new_tokens[i].value == NULL)
+			{
+				free_tokens(tokens, capacity);
+				capacity->max_size *= 2;
+				return(free_tokens(new_tokens, capacity), NULL);
+			}
 			new_tokens[i].type = tokens[i].type;
 		}
 		else
 			new_tokens[i].value = NULL;
+		i++;
 	}
 	free_tokens(tokens, capacity);
 	capacity->max_size *= 2;
 	return (new_tokens);
 }
 
+void	assign_token_types(char **temp, t_token_type *type, t_token_type type1, t_token_type type2)
+{
+	(*temp)++;
+	if (type2 != TOKEN_UNKNOWN && **temp == *(*temp - 1))
+	{
+		(*temp)++;
+		*type = type2;
+	}
+	else
+		*type = type1;
+}
+
 int	malloc_individual_tokens(t_tokens *tokens, char **input, char *temp, t_capacity *capacity, t_token_type type)
 {
 	tokens[capacity->current_size].value = malloc(sizeof(char) * (temp - *input + 1));
 	if (tokens[capacity->current_size].value == NULL)
-		return (1);
+	{
+		while (--capacity->current_size >= 0)
+			free_void((void **)&tokens[capacity->current_size].value, NULL);
+		return (-1);
+	}
 	ft_strlcpy(tokens[capacity->current_size].value, *input, temp - *input + 1);
 	tokens[capacity->current_size].type = type;
 	capacity->current_size++;
@@ -198,73 +216,30 @@ int	malloc_individual_tokens(t_tokens *tokens, char **input, char *temp, t_capac
 	return (0);
 }
 
-void	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
+int	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 {
 	char			*temp;
 	t_token_type	type;
 
 	temp = *input;
-	type = TOKEN_UNKNOWN;
 	if (*temp == '<')
-	{
-		temp++;
-		if (*temp == '<')
-		{
-			temp++;
-			type = TOKEN_HEREDOC;
-		}
-		else
-			type = TOKEN_REDIR_IN;
-	}
+		assign_token_types(&temp, &type, TOKEN_REDIR_IN, TOKEN_HEREDOC);
 	else if (*temp == '>')
-	{
-		temp++;
-		if (*temp == '>')
-		{
-			temp++;
-			type = TOKEN_APPEND;
-		}
-		else
-			type = TOKEN_REDIR_OUT;
-	}
+   		assign_token_types(&temp, &type, TOKEN_REDIR_OUT, TOKEN_APPEND);
+	else if (*temp == '|')
+		assign_token_types(&temp, &type, TOKEN_PIPE, TOKEN_OR);
 	else if (*temp == '&' && *(temp + 1) == '&')
 	{
 		temp += 2;
 		type = TOKEN_AND;
 	}
-	else if (*temp == '|')
-	{
-		temp++;
-		if (*temp == '|')
-		{
-			temp++;
-			type = TOKEN_OR;
-		}
-		else
-			type = TOKEN_PIPE;
-	}
 	else if (*temp == '(')
-	{
-		temp++;
-		type = TOKEN_OPEN_PAREN;
-	}
-	else if (*temp == ')')
-	{
-		temp++;
-		type = TOKEN_CLOSE_PAREN;
-	}
-	else if (*temp == '&')
-	{
-		temp++;
-		type = TOKEN_UNKNOWN;
-	}
+		assign_token_types(&temp, &type, TOKEN_OPEN_PAREN, TOKEN_UNKNOWN);
 	else
-	{
-		temp++;
-		type = TOKEN_UNKNOWN;
-	}
+		assign_token_types(&temp, &type, TOKEN_CLOSE_PAREN, TOKEN_UNKNOWN);
 	if (malloc_individual_tokens(tokens, input, temp, capacity, type))
-		return ;
+		return (-1);
+	return (0);
 }
 
 char	*skip_a_char(char *str, char c)
@@ -272,8 +247,6 @@ char	*skip_a_char(char *str, char c)
 	str++;
 	while (*str && *str != c)
 		str++;
-	//if (*str)
-	//	str++;
 	return (str);
 }
 
@@ -281,14 +254,7 @@ int	skip_quotes_and_ampersand(char **temp)
 {
 	if (ft_strchr(" \n\t<>|&()\"'", **temp))
 	{
-		if (**temp == '&')
-		{
-			if (**(temp + 1) == '&')
-				return (0);
-			else
-				return (1);
-		}
-		else if (**temp == '"')
+		if (**temp == '"')
 			*temp = skip_a_char(*temp, '"');
 		else if (**temp == '\'')
 			*temp = skip_a_char(*temp, '\'');
@@ -305,42 +271,23 @@ void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 	temp = *input;
 	if (!*temp)
 		return ;
-	while (*temp && skip_quotes_and_ampersand(&temp))
-		temp++;
-
+	while (*temp)
+	{
+		while (*temp && skip_quotes_and_ampersand(&temp))
+			temp++;
+		if (!*temp)
+			break ;
+		if (*temp == '&')
+		{
+			if (*(temp + 1) == '&')
+				break ;
+			temp++;
+		}
+		else
+			break ;
+	}
 	if (malloc_individual_tokens(tokens, input, temp, capacity, TOKEN_WORD))
 		return ;
-}
-
-char	*append_char(char *str, char c)
-{
-	char	*new_str;
-	int		len;
-	int		i;
-
-	len = 0;
-	if (str != NULL)
-	{
-		while (str[len] != '\0')
-			len++;
-	}
-	new_str = (char *)malloc((len + 2) * sizeof(char));
-	if (new_str == NULL)
-	{
-		free(str);
-		return (NULL);
-	}
-	i = 0;
-	while (i < len)
-	{
-		new_str[i] = str[i];
-		i++;
-	}
-	new_str[i++] = c;
-	new_str[i] = '\0';
-	free(str);
-	str = NULL;
-	return (new_str);
 }
 
 int	encode_char_with_flag(char c)
@@ -523,7 +470,7 @@ int	populate_tokens(char *str, int *int_array)
 	return (0);
 }
 
-int	which_quote_mode(t_tokens *tokens, t_capacity *capacity, char **envp)
+int	handle_expansion_and_wildcard(t_tokens *tokens, t_capacity *capacity, char **envp)
 {
 	int		i;
 	int		*int_array;
@@ -564,14 +511,16 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp)
 		while (ft_strchr(" \t\n", *input) && *input)
 			input++;
 		if (capacity->max_size <= capacity->current_size)
-			tokens = ft_realloc_tokens_when_full(tokens, capacity);
-		if (is_seperator(*input))
+			tokens = ft_realloc_tokens_when_full(tokens, capacity, 0);
+		if (tokens == NULL)
+			return (NULL); // Currently old tokens are being freed inside realloc, did that change when you read this?
+		if (*input && is_seperator(*input, *(input + 1)))
 			handle_seperator(&input, tokens, capacity);
 		else
 			handle_word(&input, tokens, capacity);
 	}
 	print_tokens(tokens, capacity);
-	if (which_quote_mode(tokens, capacity, envp) == -1)
+	if (handle_expansion_and_wildcard(tokens, capacity, envp) == -1)
 		return (NULL); // Make sure to free the tokens.
 	return (tokens);
 }
