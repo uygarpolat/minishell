@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/31 16:44:05 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/01 00:35:38 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/30 13:46:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -18,17 +18,17 @@
 
 char	*expand_wildcard(int *int_array);
 
-void	init_signal()
+void	init_signal(void)
 {
 	struct termios	term;
 
 	// Is error handling necessary in any of this?
 	tcgetattr(STDIN_FILENO, &term); // Gets current terminal attributes
-    term.c_lflag &= ~ECHOCTL;       // Unsets the ECHOCTL flag so that signals aren't printed, like ^C
-    tcsetattr(STDIN_FILENO, TCSANOW, &term); // Applies changes immediately
+	term.c_lflag &= ~ECHOCTL; // Unsets the ECHOCTL flag so that signals aren't printed, like ^C
+	tcsetattr(STDIN_FILENO, TCSANOW, &term); // Applies changes immediately
 }
 
-void	handle_sigint()
+void	handle_sigint(void)
 {
 	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
@@ -36,7 +36,7 @@ void	handle_sigint()
 	rl_redisplay();
 }
 
-void	handle_sigquit()
+void	handle_sigquit(void)
 {
 	rl_on_new_line();
 	rl_replace_line("", 0);
@@ -159,7 +159,8 @@ void	free_tokens(t_tokens *tokens, t_capacity *capacity)
 	}
 }
 
-t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens, t_capacity *capacity, int i)
+t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens,
+		t_capacity *capacity, int i)
 {
 	t_tokens	*new_tokens;
 
@@ -175,7 +176,7 @@ t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens, t_capacity *capacity, in
 			{
 				free_tokens(tokens, capacity);
 				capacity->max_size *= 2;
-				return(free_tokens(new_tokens, capacity), NULL);
+				return (free_tokens(new_tokens, capacity), NULL);
 			}
 			new_tokens[i].type = tokens[i].type;
 		}
@@ -188,7 +189,8 @@ t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens, t_capacity *capacity, in
 	return (new_tokens);
 }
 
-void	assign_token_types(char **temp, t_token_type *type, t_token_type type1, t_token_type type2)
+void	assign_token_types(char **temp, t_token_type *type,
+			t_token_type type1, t_token_type type2)
 {
 	(*temp)++;
 	if (type2 != TOKEN_UNKNOWN && **temp == *(*temp - 1))
@@ -200,15 +202,13 @@ void	assign_token_types(char **temp, t_token_type *type, t_token_type type1, t_t
 		*type = type1;
 }
 
-int	malloc_individual_tokens(t_tokens *tokens, char **input, char *temp, t_capacity *capacity, t_token_type type)
+int	malloc_individual_tokens(t_tokens *tokens, char **input,
+		char *temp, t_capacity *capacity, t_token_type type)
 {
-	tokens[capacity->current_size].value = malloc(sizeof(char) * (temp - *input + 1));
+	tokens[capacity->current_size].value
+		= malloc(sizeof(char) * (temp - *input + 1));
 	if (tokens[capacity->current_size].value == NULL)
-	{
-		while (--capacity->current_size >= 0)
-			free_void((void **)&tokens[capacity->current_size].value, NULL);
-		return (-1);
-	}
+		return (free_void((void **)&tokens, NULL), -1);
 	ft_strlcpy(tokens[capacity->current_size].value, *input, temp - *input + 1);
 	tokens[capacity->current_size].type = type;
 	capacity->current_size++;
@@ -225,7 +225,7 @@ int	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 	if (*temp == '<')
 		assign_token_types(&temp, &type, TOKEN_REDIR_IN, TOKEN_HEREDOC);
 	else if (*temp == '>')
-   		assign_token_types(&temp, &type, TOKEN_REDIR_OUT, TOKEN_APPEND);
+		assign_token_types(&temp, &type, TOKEN_REDIR_OUT, TOKEN_APPEND);
 	else if (*temp == '|')
 		assign_token_types(&temp, &type, TOKEN_PIPE, TOKEN_OR);
 	else if (*temp == '&' && *(temp + 1) == '&')
@@ -250,7 +250,7 @@ char	*skip_a_char(char *str, char c)
 	return (str);
 }
 
-int	skip_quotes_and_ampersand(char **temp)
+int	skip_quotes(char **temp)
 {
 	if (ft_strchr(" \n\t<>|&()\"'", **temp))
 	{
@@ -264,16 +264,16 @@ int	skip_quotes_and_ampersand(char **temp)
 	return (1);
 }
 
-void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
+int	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 {
 	char	*temp;
 
 	temp = *input;
 	if (!*temp)
-		return ;
+		return (0);
 	while (*temp)
 	{
-		while (*temp && skip_quotes_and_ampersand(&temp))
+		while (*temp && skip_quotes(&temp))
 			temp++;
 		if (!*temp)
 			break ;
@@ -287,7 +287,8 @@ void	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 			break ;
 	}
 	if (malloc_individual_tokens(tokens, input, temp, capacity, TOKEN_WORD))
-		return ;
+		return (-1);
+	return (0);
 }
 
 int	encode_char_with_flag(char c)
@@ -369,7 +370,8 @@ int	str_of_var(int **int_array_old, int **int_array_new, char **envp)
 	return (0);
 }
 
-int	finalize_dollar_expansion(int *int_array_old, int **int_array_new, char **envp)
+int	finalize_dollar_expansion(int *int_array_old,
+		int **int_array_new, char **envp)
 {
 	int	*temp;
 
@@ -466,11 +468,12 @@ int	populate_tokens(char *str, int *int_array)
 	}
 	int_array[m] = '\0';
 	if (q.single_q_count % 2 != 0 || q.double_q_count % 2 != 0)
-		return (-1);
+		return (ft_putstr_fd("Unmatched quotes error!\n", 2), -1);
 	return (0);
 }
 
-int	handle_expansion_and_wildcard(t_tokens *tokens, t_capacity *capacity, char **envp)
+int	handle_expansion_and_wildcard(t_tokens *tokens,
+		t_capacity *capacity, char **envp)
 {
 	int		i;
 	int		*int_array;
@@ -486,7 +489,7 @@ int	handle_expansion_and_wildcard(t_tokens *tokens, t_capacity *capacity, char *
 			return (-1);
 		int_array[ft_strlen(tokens[i].value)] = 0;
 		if (populate_tokens(tokens[i].value, int_array))
-			return (printf("Unmatched quotes error!\n"), -1);
+			return (free_void((void **)&int_array, NULL), -1);
 		int_array_new = expand_dollar(int_array, envp);
 		finalize_dollar_expansion(int_array, &int_array_new, envp);
 		free_void((void **)&tokens[i].value, NULL);
@@ -500,6 +503,7 @@ int	handle_expansion_and_wildcard(t_tokens *tokens, t_capacity *capacity, char *
 t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp)
 {
 	t_tokens	*tokens;
+	int			error_code;
 
 	capacity->max_size = 1;
 	capacity->current_size = 0;
@@ -513,14 +517,16 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp)
 		if (capacity->max_size <= capacity->current_size)
 			tokens = ft_realloc_tokens_when_full(tokens, capacity, 0);
 		if (tokens == NULL)
-			return (NULL); // Currently old tokens are being freed inside realloc, did that change when you read this?
+			return (NULL);
 		if (*input && is_seperator(*input, *(input + 1)))
-			handle_seperator(&input, tokens, capacity);
+			error_code = handle_seperator(&input, tokens, capacity);
 		else
-			handle_word(&input, tokens, capacity);
+			error_code = handle_word(&input, tokens, capacity);
+		if (error_code == -1)
+			return (NULL);
 	}
 	print_tokens(tokens, capacity);
 	if (handle_expansion_and_wildcard(tokens, capacity, envp) == -1)
-		return (NULL); // Make sure to free the tokens.
+		return (free_tokens(tokens, capacity), NULL);
 	return (tokens);
 }
