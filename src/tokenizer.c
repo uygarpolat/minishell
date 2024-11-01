@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/01 11:44:18 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/01 14:55:22 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/30 13:46:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -78,8 +78,21 @@ void	print_ast(t_ast *node, int level)
 	indent_level = -1;
 	while (++indent_level < level)
 		printf("  ");
+	char	**temp_double_arr;
 	if (node->type == AST_COMMAND)
+	{
+		temp_double_arr = node->words;
 		printf("AST_COMMAND [TOKEN: %s]\n", node->token->value);
+		while (*node->words)
+		{
+			indent_level = -1;
+			while (++indent_level < level + 1)
+				printf("  ");
+			printf("[TOKEN: %s]\n", *(node->words));
+			(node->words)++;
+		}
+		node->words = temp_double_arr;
+	}
 	else if (node->type == AST_PIPE)
 		printf("AST_PIPE [TOKEN: |]\n");
 	else if (node->type == AST_REDIR_OUT)

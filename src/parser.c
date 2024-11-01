@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/31 13:24:08 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/01 14:56:06 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -59,6 +59,8 @@ void	free_ast(t_ast *node)
 		free_void((void **)&node->token->value, NULL);
 		free_void((void **)&node->token, NULL);
 	}
+	if (node->words)
+		free_2d_array((void ***)&node->words);
 	if (node->left)
 		free_ast(node->left);
 	if (node->right)
@@ -113,6 +115,7 @@ t_ast	*create_node(t_tokens *token)
 	node->token = copy_token(token);
 	if (node->token == NULL)
 		return ((t_ast *)free_void((void **)&node, NULL));
+	node->words = NULL;
 	node->left = NULL;
 	node->right = NULL;
 	node->redir_target = NULL;
@@ -144,7 +147,27 @@ int	redirection_node_creator(t_tokens *tokens, t_ast *root, int *i)
 	}
 	return (0);
 }
-
+/*
+int	concatenate_commands(char **str, t_tokens *tokens, int *i)
+{
+	if (*str != NULL)
+	{
+		*str = ft_strjoin_free(*str, " ");
+		if (*str == NULL)
+			return (-1);
+		*str = ft_strjoin_free(*str, tokens[*i].value);
+		if (*str == NULL)
+			return (-1);
+	}
+	else
+	{
+		*str = ft_strdup(tokens[*i].value);
+		if (*str == NULL)
+			return (-1);
+	}
+	return (0);
+}
+*/
 int	concatenate_commands(char **str, t_tokens *tokens, int *i)
 {
 	if (*str != NULL)
@@ -186,7 +209,15 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 {
 	int		i;
 	char	*str;
+	char	**temp;
 	int		error_code;
+
+	root->words = ft_calloc(*end - start + 2, sizeof(char *));
+	if (root->words == NULL)
+		return (-1);
+	root->words[*end - start + 1] = 0;
+	temp = root->words;
+
 
 	error_code = 0;
 	str = NULL;
@@ -197,8 +228,14 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 		if (identify_token(tokens[i].type))
 			error_code = redirection_node_creator(tokens, root, &i);
 		else
+		{
+			while(*root->words)
+				root->words++;
+			*root->words = ft_strdup(tokens[i].value);
 			error_code = concatenate_commands(&str, tokens, &i);
+		}
 	}
+	root->words = temp;
 	if (str && !error_code)
 	{
 		free_void((void **)&root->token->value, NULL);
@@ -235,34 +272,7 @@ int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 	}
 	return (0);
 }
-/*
-int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
-{
-	while (p->i <= p->end)
-	{
-		if ((p->i == p->start) && (tokens[p->start].type == TOKEN_OPEN_PAREN)
-			&& (p->end == find_matching_paren(tokens, p->start, p->end)))
-		{
-			printf("The statement above refers to first and last being paren!\n");
-			p->i++;
-			p->start++;
-			p->end--;
-		}
-		if (tokens[p->i].type == TOKEN_OPEN_PAREN)
-			p->i = find_matching_paren(tokens, p->i, p->end);
-		if (p->i < 0)
-			return (ft_putstr_fd("Error: parenthesis mismatch.\n", 2), -1);
-		p->prec = get_precedence(tokens[p->i].type);
-		if (p->prec != -1 && p->prec < p->lowest_prec)
-		{
-			p->lowest_prec = p->prec;
-			p->lowest_prec_pos = p->i;
-		}
-		p->i++;
-	}
-	return (0);
-}
-*/
+
 void	build_non_command_node(t_tokens *tokens, t_ast **root,
 			t_precedence *p, int *error_code)
 {

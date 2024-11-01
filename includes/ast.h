@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/30 12:45:33 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/01 13:15:31 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,15 +37,16 @@ typedef enum    e_ast_node_type {
     AST_OR
 }    t_ast_node_type;
 
-typedef struct    s_ast
+typedef struct	s_ast
 {
 	t_ast_node_type	type;
 	t_tokens		*token;
+	char			**words;
 	struct s_ast    *left;
 	struct s_ast    *right;
 	struct s_ast    *redir_target;
 	int				code;
-}    t_ast;
+}					t_ast;
 
 typedef struct	s_precedence
 {
