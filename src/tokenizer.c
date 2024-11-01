@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/01 14:55:22 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/01 17:44:56 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/30 13:46:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -23,9 +23,9 @@ void	init_signal(void)
 	struct termios	term;
 
 	// Is error handling necessary in any of this?
-	tcgetattr(STDIN_FILENO, &term); // Gets current terminal attributes
-	term.c_lflag &= ~ECHOCTL; // Unsets the ECHOCTL flag so that signals aren't printed, like ^C
-	tcsetattr(STDIN_FILENO, TCSANOW, &term); // Applies changes immediately
+	tcgetattr(STDIN_FILENO, &term);
+	term.c_lflag &= ~ECHOCTL;
+	tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }
 
 void	handle_sigint(void)
@@ -216,14 +216,14 @@ void	assign_token_types(char **temp, t_token_type *type,
 }
 
 int	malloc_individual_tokens(t_tokens *tokens, char **input,
-		char *temp, t_capacity *capacity, t_token_type type)
+		char *temp, t_capacity *capacity)
 {
 	tokens[capacity->current_size].value
 		= malloc(sizeof(char) * (temp - *input + 1));
 	if (tokens[capacity->current_size].value == NULL)
 		return (free_void((void **)&tokens, NULL), -1);
 	ft_strlcpy(tokens[capacity->current_size].value, *input, temp - *input + 1);
-	tokens[capacity->current_size].type = type;
+	//tokens[capacity->current_size].type = type;
 	capacity->current_size++;
 	*input = temp;
 	return (0);
@@ -250,7 +250,8 @@ int	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 		assign_token_types(&temp, &type, TOKEN_OPEN_PAREN, TOKEN_UNKNOWN);
 	else
 		assign_token_types(&temp, &type, TOKEN_CLOSE_PAREN, TOKEN_UNKNOWN);
-	if (malloc_individual_tokens(tokens, input, temp, capacity, type))
+	tokens[capacity->current_size].type = type;
+	if (malloc_individual_tokens(tokens, input, temp, capacity))
 		return (-1);
 	return (0);
 }
@@ -299,7 +300,8 @@ int	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 		else
 			break ;
 	}
-	if (malloc_individual_tokens(tokens, input, temp, capacity, TOKEN_WORD))
+	tokens[capacity->current_size].type = TOKEN_WORD;
+	if (malloc_individual_tokens(tokens, input, temp, capacity))
 		return (-1);
 	return (0);
 }
@@ -344,6 +346,8 @@ int	length_of_var(int **int_array, char **envp)
 	while (++n < i)
 		str[n] = (*int_array)[n];
 	str[n] = '\0';
+	if (get_var(str, envp) == NULL)
+		return (1); // free str!!!
 	len = ft_strlen(get_var(str, envp));
 	*int_array = *int_array + i;
 	if (str)
@@ -371,9 +375,17 @@ int	str_of_var(int **int_array_old, int **int_array_new, char **envp)
 	while (++n < i)
 		str[n] = (*int_array_old)[n];
 	str[n] = '\0';
+	if (get_var(str, envp) == NULL)
+	{
+		**int_array_new = '$';
+		(*int_array_new)++;
+		free(str);
+		str = NULL;
+		return (1);
+	}
 	*int_array_old = *int_array_old + i;
 	var = get_var(str, envp);
-	free(str);
+	free(str); // Properly free!
 	while (*var)
 	{
 		**int_array_new = *var;
@@ -407,14 +419,10 @@ int	finalize_dollar_expansion(int *int_array_old,
 	return (0);
 }
 
-int	*expand_dollar(int *int_array, char **envp)
+int	*expand_dollar(int *int_array, char **envp, int len, int num)
 {
 	int		*arr;
-	int		len;
-	int		num;
 
-	len = 0;
-	num = 0;
 	while (*int_array)
 	{
 		if (((*int_array & 0xFF) == '$') && ((*int_array >> 8) & 1))
@@ -422,7 +430,7 @@ int	*expand_dollar(int *int_array, char **envp)
 			int_array++;
 			num = length_of_var(&int_array, envp);
 			if (num == -1)
-				return (NULL); // This is for malloc check in length_of_var function, handle better.
+				return (NULL); // Handle better.
 			len = len + num;
 		}
 		else
@@ -503,7 +511,7 @@ int	handle_expansion_and_wildcard(t_tokens *tokens,
 		int_array[ft_strlen(tokens[i].value)] = 0;
 		if (populate_tokens(tokens[i].value, int_array))
 			return (free_void((void **)&int_array, NULL), -1);
-		int_array_new = expand_dollar(int_array, envp);
+		int_array_new = expand_dollar(int_array, envp, 0, 0);
 		finalize_dollar_expansion(int_array, &int_array_new, envp);
 		free_void((void **)&tokens[i].value, NULL);
 		tokens[i].value = expand_wildcard(int_array_new);
