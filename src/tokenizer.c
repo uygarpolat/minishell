@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/01 17:44:56 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/01 18:00:08 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/30 13:46:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -385,7 +385,7 @@ int	str_of_var(int **int_array_old, int **int_array_new, char **envp)
 	}
 	*int_array_old = *int_array_old + i;
 	var = get_var(str, envp);
-	free(str); // Properly free!
+	free_void((void **)&str, NULL);
 	while (*var)
 	{
 		**int_array_new = *var;
