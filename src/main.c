@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/31 17:11:37 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/02 03:06:01 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 17:20:14 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -54,12 +54,13 @@ int	main(int argc, char **argv, char **envp)
 		if (tokens)
 		{
 			ast = build_ast(tokens, 0, capacity.current_size - 1);
-			print_ast(ast, 0);		
+			if (ast)
+				print_ast(ast, 0);		
 		}
 		else
 			continue ;
 		//execution(ast, new_envp);
-		free_ast(ast);
+		free_ast(&ast);
 		free_tokens(tokens, &capacity);
 		free(input);
 	}

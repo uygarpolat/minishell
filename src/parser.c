@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/01 14:56:06 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/02 03:46:23 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -18,9 +18,9 @@
 int	get_precedence(t_token_type type)
 {
 	if (type == TOKEN_AND)
-		return (1);
-	else if (type == TOKEN_OR)
 		return (2);
+	else if (type == TOKEN_OR)
+		return (1); // Is this correct?
 	else if (type == TOKEN_PIPE)
 		return (3);
 	return (-1);
@@ -50,25 +50,26 @@ int	find_matching_paren(t_tokens *tokens, int start, int end)
 	return (-1);
 }
 
-void	free_ast(t_ast *node)
+void free_ast(t_ast **node)
 {
-	if (!node)
-		return ;
-	if (node->token)
+	if (node == NULL || *node == NULL)
+		return;
+	if ((*node)->token)
 	{
-		free_void((void **)&node->token->value, NULL);
-		free_void((void **)&node->token, NULL);
+		free_void((void **)&(*node)->token->value, NULL);
+		free_void((void **)&(*node)->token, NULL);
 	}
-	if (node->words)
-		free_2d_array((void ***)&node->words);
-	if (node->left)
-		free_ast(node->left);
-	if (node->right)
-		free_ast(node->right);
-	if (node->redir_target)
-		free_ast(node->redir_target);
-	free_void((void **)&node, NULL);
+	if ((*node)->words)
+		free_2d_array((void ***)&(*node)->words);
+	if ((*node)->left)
+		free_ast(&(*node)->left);
+	if ((*node)->right)
+		free_ast(&(*node)->right);
+	if ((*node)->redir_target)
+		free_ast(&(*node)->redir_target);
+	free_void((void **)node, NULL);
 }
+
 
 t_tokens	*copy_token(t_tokens *token)
 {
@@ -135,7 +136,7 @@ int	redirection_node_creator(t_tokens *tokens, t_ast *root, int *i)
 	free_void((void **)&new_redir_node->token->value, 0);
 	new_redir_node->token->value = ft_strdup(tokens[++(*i)].value);
 	if (new_redir_node->token->value == NULL)
-		return (free_ast(new_redir_node), -1);
+		return (free_ast(&new_redir_node), -1);
 	if (root->redir_target == NULL)
 		root->redir_target = new_redir_node;
 	else
@@ -147,27 +148,7 @@ int	redirection_node_creator(t_tokens *tokens, t_ast *root, int *i)
 	}
 	return (0);
 }
-/*
-int	concatenate_commands(char **str, t_tokens *tokens, int *i)
-{
-	if (*str != NULL)
-	{
-		*str = ft_strjoin_free(*str, " ");
-		if (*str == NULL)
-			return (-1);
-		*str = ft_strjoin_free(*str, tokens[*i].value);
-		if (*str == NULL)
-			return (-1);
-	}
-	else
-	{
-		*str = ft_strdup(tokens[*i].value);
-		if (*str == NULL)
-			return (-1);
-	}
-	return (0);
-}
-*/
+
 int	concatenate_commands(char **str, t_tokens *tokens, int *i)
 {
 	if (*str != NULL)
@@ -200,9 +181,25 @@ int	cleanup_populate_command_node(t_ast **root, char **str, int *error_code)
 {
 	if (!*error_code)
 		return (0);
-	free_void((void **)root, error_code);
+	free_ast(root);
 	free_void((void **)str, error_code);
 	return (-1);
+}
+
+void	syntax_error_near(void)
+{
+	ft_putstr_fd("bash: syntax error near unexpected token 'newline'\n", 2);
+}
+
+int	basic_command_node_error_handling(t_tokens *tokens, int start, int *end)
+{
+	(void)start;
+	if (tokens[*end].type != TOKEN_WORD)
+	{
+		syntax_error_near();
+		return(1);
+	}
+	return (0);
 }
 
 int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
@@ -211,7 +208,11 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 	char	*str;
 	char	**temp;
 	int		error_code;
-
+	if (basic_command_node_error_handling(tokens, start, end))
+	{
+		error_code = -1;
+		return (error_code);
+	}
 	root->words = ft_calloc(*end - start + 2, sizeof(char *));
 	if (root->words == NULL)
 		return (-1);
@@ -284,7 +285,7 @@ void	build_non_command_node(t_tokens *tokens, t_ast **root,
 		(*root)->left = build_ast(tokens, p->start, p->lowest_prec_pos - 1);
 		if ((*root)->left == NULL)
 		{
-			free_void((void **)root, NULL);
+			free_ast(root);
 			*error_code = -1;
 		}
 	}
@@ -293,8 +294,8 @@ void	build_non_command_node(t_tokens *tokens, t_ast **root,
 		(*root)->right = build_ast(tokens, p->lowest_prec_pos + 1, p->end);
 		if ((*root)->right == NULL)
 		{
-			free_void((void **)(*root)->left, NULL);
-			free_void((void **)root, NULL);
+			free_ast(&(*root)->left);
+			free_ast(root);
 			*error_code = -1;
 		}
 	}
@@ -307,6 +308,8 @@ t_ast	*build_ast(t_tokens *tokens, int start, int end)
 	static int		error_code = 0;
 
 	root = NULL;
+	if (start > end)
+		return (root);
 	p.start = start;
 	p.end = end;
 	p.lowest_prec = 1000;
@@ -322,8 +325,8 @@ t_ast	*build_ast(t_tokens *tokens, int start, int end)
 		if (root == NULL)
 			error_code = -1;
 		if (!error_code && populate_command_node(tokens,
-				root, p.start, &(p.end)) == -1)
-			free_void((void **)&root, NULL);
+				root, p.start, &(p.end)) == -1) // Is this check really correct?
+			free_ast(&root);
 	}
 	return (root);
 }

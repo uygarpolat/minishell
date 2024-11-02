@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2024/11/01 16:17:15 by upolat           ###   ########.fr        #
+#    Updated: 2024/11/02 03:14:37 by upolat           ###   ########.fr        #
 #    Updated: 2024/10/28 17:53:33 by hpirkola         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
@@ -26,7 +26,7 @@ SOURCES_BONUS = $(SRC_DIR)/readline_test.c
 OBJECTS = $(SOURCES:.c=.o)
 OBJECTS_BONUS = $(SOURCES_BONUS:.c=.o)
 
-CFLAGS = -Wall -Wextra -Werror -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror # -fsanitize=address
 
 libft_dir := library/libft
 libft := $(libft_dir)/libft.a
