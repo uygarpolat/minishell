@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/03 20:45:09 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/03 22:35:47 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -268,8 +268,8 @@ int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 			p->start++;
 			p->end--;
 		}
-		//if (basic_command_node_error_handling(tokens, p->start, &p->end))
-		//	return (-1);
+		if (basic_command_node_error_handling(tokens, p->start, &p->end))
+			return (-1);
 		if (tokens[p->i].type == TOKEN_OPEN_PAREN || tokens[p->i].type == TOKEN_CLOSE_PAREN) 
 			p->i = find_matching_paren(tokens, p->i, p->end);
 		if (p->i < 0)
