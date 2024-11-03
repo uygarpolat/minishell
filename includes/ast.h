@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/02 03:01:00 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/03 00:34:24 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ typedef struct	s_minishell
 	char	*pwd;
 }	t_minishell;
 
-t_ast	*build_ast(t_tokens *tokens, int start, int end);
+t_ast	*build_ast(t_tokens *tokens, int start, int end, int code);
 
 //execution.c
 int	execution(t_ast *s, char **envp);

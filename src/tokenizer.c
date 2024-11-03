@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/01 18:00:08 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/02 18:58:12 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/30 13:46:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -223,7 +223,6 @@ int	malloc_individual_tokens(t_tokens *tokens, char **input,
 	if (tokens[capacity->current_size].value == NULL)
 		return (free_void((void **)&tokens, NULL), -1);
 	ft_strlcpy(tokens[capacity->current_size].value, *input, temp - *input + 1);
-	//tokens[capacity->current_size].type = type;
 	capacity->current_size++;
 	*input = temp;
 	return (0);
@@ -347,7 +346,11 @@ int	length_of_var(int **int_array, char **envp)
 		str[n] = (*int_array)[n];
 	str[n] = '\0';
 	if (get_var(str, envp) == NULL)
-		return (1); // free str!!!
+	{
+		*int_array = *int_array + i;
+		free_void((void **)&str, NULL);
+		return (0); // free str!!
+	}
 	len = ft_strlen(get_var(str, envp));
 	*int_array = *int_array + i;
 	if (str)
@@ -377,8 +380,7 @@ int	str_of_var(int **int_array_old, int **int_array_new, char **envp)
 	str[n] = '\0';
 	if (get_var(str, envp) == NULL)
 	{
-		**int_array_new = '$';
-		(*int_array_new)++;
+		*int_array_old = *int_array_old + i;
 		free(str);
 		str = NULL;
 		return (1);

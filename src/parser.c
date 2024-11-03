@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/02 03:46:23 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/03 20:45:09 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -18,7 +18,7 @@
 int	get_precedence(t_token_type type)
 {
 	if (type == TOKEN_AND)
-		return (2);
+		return (1);
 	else if (type == TOKEN_OR)
 		return (1); // Is this correct?
 	else if (type == TOKEN_PIPE)
@@ -186,9 +186,17 @@ int	cleanup_populate_command_node(t_ast **root, char **str, int *error_code)
 	return (-1);
 }
 
-void	syntax_error_near(void)
+void	syntax_error_near(t_tokens *tokens, int loc)
 {
-	ft_putstr_fd("bash: syntax error near unexpected token 'newline'\n", 2);
+	char	*str;
+
+	if (tokens[loc].value == NULL)
+		str = "newline";
+	else
+		str = tokens[loc].value;
+	ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
+	ft_putstr_fd(str, 2);
+	ft_putstr_fd("'\n", 2);
 }
 
 int	basic_command_node_error_handling(t_tokens *tokens, int start, int *end)
@@ -196,8 +204,8 @@ int	basic_command_node_error_handling(t_tokens *tokens, int start, int *end)
 	(void)start;
 	if (tokens[*end].type != TOKEN_WORD)
 	{
-		syntax_error_near();
-		return(1);
+		syntax_error_near(tokens, *end + 1); // This seg faults for instance for "echo hello world >", because capacity is full and the next one is not NULL (everything in capacity that is not malloced is set to NULL.
+		return(-1);
 	}
 	return (0);
 }
@@ -219,13 +227,14 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 	root->words[*end - start + 1] = 0;
 	temp = root->words;
 
-
 	error_code = 0;
 	str = NULL;
 	i = start - 1;
 	root->type = AST_COMMAND;
 	while (++i <= *end && !error_code)
 	{
+		if (tokens[i].type == TOKEN_OPEN_PAREN || tokens[i].type == TOKEN_CLOSE_PAREN)
+			i++;
 		if (identify_token(tokens[i].type))
 			error_code = redirection_node_creator(tokens, root, &i);
 		else
@@ -259,6 +268,8 @@ int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 			p->start++;
 			p->end--;
 		}
+		//if (basic_command_node_error_handling(tokens, p->start, &p->end))
+		//	return (-1);
 		if (tokens[p->i].type == TOKEN_OPEN_PAREN || tokens[p->i].type == TOKEN_CLOSE_PAREN) 
 			p->i = find_matching_paren(tokens, p->i, p->end);
 		if (p->i < 0)
@@ -282,7 +293,7 @@ void	build_non_command_node(t_tokens *tokens, t_ast **root,
 		*error_code = -1;
 	if (!*error_code)
 	{
-		(*root)->left = build_ast(tokens, p->start, p->lowest_prec_pos - 1);
+		(*root)->left = build_ast(tokens, p->start, p->lowest_prec_pos - 1, *error_code);
 		if ((*root)->left == NULL)
 		{
 			free_ast(root);
@@ -291,7 +302,7 @@ void	build_non_command_node(t_tokens *tokens, t_ast **root,
 	}
 	if (!*error_code)
 	{
-		(*root)->right = build_ast(tokens, p->lowest_prec_pos + 1, p->end);
+		(*root)->right = build_ast(tokens, p->lowest_prec_pos + 1, p->end, *error_code);
 		if ((*root)->right == NULL)
 		{
 			free_ast(&(*root)->left);
@@ -301,15 +312,23 @@ void	build_non_command_node(t_tokens *tokens, t_ast **root,
 	}
 }
 
-t_ast	*build_ast(t_tokens *tokens, int start, int end)
+t_ast	*build_ast(t_tokens *tokens, int start, int end, int code)
 {
 	t_precedence	p;
 	t_ast			*root;
-	static int		error_code = 0;
+	static int		error_code;
+
+	error_code = code;
 
 	root = NULL;
 	if (start > end)
+	{
+		error_code = -1;
+		if (start < 0)
+			start = 0;
+		syntax_error_near(tokens, start);
 		return (root);
+	}
 	p.start = start;
 	p.end = end;
 	p.lowest_prec = 1000;
