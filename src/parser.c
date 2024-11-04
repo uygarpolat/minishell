@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/04 10:09:08 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/04 13:31:00 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -284,6 +284,7 @@ int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 	}
 	return (0);
 }
+
 
 void	build_non_command_node(t_tokens *tokens, t_ast **root,
 			t_precedence *p, int *error_code)
