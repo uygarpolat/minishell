@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/04 13:31:00 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/05 01:09:34 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -201,11 +201,41 @@ void	syntax_error_near(t_tokens *tokens, int loc)
 
 int	basic_command_node_error_handling(t_tokens *tokens, int start, int *end)
 {
-	(void)start;
+	int	i;
+	int	k;
+
+	i = start;
+	k = *end;
+	if (tokens[i].type != TOKEN_OPEN_PAREN)
+	{
+		while (++i <= *end)
+		{
+			if (tokens[i].type == TOKEN_OPEN_PAREN)
+			{
+				printf("Aborting because encountered a TOKEN_WORD before TOKEN_OPEN_PAREN, which is %s!\n", tokens[i - 1].value);
+				return (syntax_error_near(tokens, i), -1);
+			}
+		}
+	}
+	else
+	{
+		k = find_matching_paren(tokens, i, k);
+		if (k >= 0)
+		{
+			if (!identify_token(tokens[k + 1].type))
+			{
+				printf("Aborting because encountered a non-redirection token after TOKEN_CLOSE_PAREN, which is %s!\n", tokens[k + 1].value);
+				return (syntax_error_near(tokens, k + 1), -1);
+			}
+		}
+	}
 	if (tokens[*end].type != TOKEN_WORD)
 	{
-		syntax_error_near(tokens, *end + 1); // This seg faults for instance for "echo hello world >", because capacity is full and the next one is not NULL (everything in capacity that is not malloced is set to NULL.
-		return(-1);
+		// This seg faults for instance for "echo hello world >",
+		// because capacity is full and the next one is not NULL
+		// (everything in capacity that is not malloced is set to NULL.
+		printf("Aborting due to last token not being TOKEN_WORD, which was %s\n", tokens[*end].value);
+		return (syntax_error_near(tokens, *end + 1), -1);
 	}
 	return (0);
 }
@@ -268,8 +298,8 @@ int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 			p->start++;
 			p->end--;
 		}
-		if (basic_command_node_error_handling(tokens, p->start, &p->end))
-			return (-1);
+		//if (basic_command_node_error_handling(tokens, p->start, &p->end))
+		//	return (-1); // This was intending to check if the last token is redirection. Refactored it, but is that feature still there?
 		if (tokens[p->i].type == TOKEN_OPEN_PAREN || tokens[p->i].type == TOKEN_CLOSE_PAREN) 
 			p->i = find_matching_paren(tokens, p->i, p->end);
 		if (p->i < 0)
@@ -325,8 +355,8 @@ t_ast	*build_ast(t_tokens *tokens, int start, int end, int code)
 	if (start > end)
 	{
 		error_code = -1;
-		if (start < 0)
-			start = 0;
+		if (end > 0)
+			start -= 1;
 		syntax_error_near(tokens, start);
 		return (root);
 	}
