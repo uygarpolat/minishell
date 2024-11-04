@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/03 22:35:47 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/04 10:09:08 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -234,10 +234,10 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 	while (++i <= *end && !error_code)
 	{
 		if (tokens[i].type == TOKEN_OPEN_PAREN || tokens[i].type == TOKEN_CLOSE_PAREN)
-			i++;
+			continue ;
 		if (identify_token(tokens[i].type))
 			error_code = redirection_node_creator(tokens, root, &i);
-		else
+		else if (ft_strlen(tokens[i].value) > 0)
 		{
 			while(*root->words)
 				root->words++;
