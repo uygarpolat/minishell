@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/05 01:09:34 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/06 00:06:47 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -20,7 +20,7 @@ int	get_precedence(t_token_type type)
 	if (type == TOKEN_AND)
 		return (1);
 	else if (type == TOKEN_OR)
-		return (1); // Is this correct?
+		return (1); // Is thos correct?
 	else if (type == TOKEN_PIPE)
 		return (3);
 	return (-1);
@@ -50,10 +50,10 @@ int	find_matching_paren(t_tokens *tokens, int start, int end)
 	return (-1);
 }
 
-void free_ast(t_ast **node)
+void	free_ast(t_ast **node)
 {
 	if (node == NULL || *node == NULL)
-		return;
+		return ;
 	if ((*node)->token)
 	{
 		free_void((void **)&(*node)->token->value, NULL);
@@ -69,7 +69,6 @@ void free_ast(t_ast **node)
 		free_ast(&(*node)->redir_target);
 	free_void((void **)node, NULL);
 }
-
 
 t_tokens	*copy_token(t_tokens *token)
 {
@@ -190,7 +189,9 @@ void	syntax_error_near(t_tokens *tokens, int loc)
 {
 	char	*str;
 
-	if (tokens[loc].value == NULL)
+	if (loc == -1)
+		str = "newline";
+	else if (tokens[loc].value == NULL)
 		str = "newline";
 	else
 		str = tokens[loc].value;
@@ -233,9 +234,9 @@ int	basic_command_node_error_handling(t_tokens *tokens, int start, int *end)
 	{
 		// This seg faults for instance for "echo hello world >",
 		// because capacity is full and the next one is not NULL
-		// (everything in capacity that is not malloced is set to NULL.
+		// (everything in capacity that is not malloced is set to NULL. See syntax_error_near to understand.
 		printf("Aborting due to last token not being TOKEN_WORD, which was %s\n", tokens[*end].value);
-		return (syntax_error_near(tokens, *end + 1), -1);
+		return (syntax_error_near(tokens, -1), -1); // The paramters before the refactor was (tokens, *end + 1).
 	}
 	return (0);
 }
@@ -246,6 +247,7 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 	char	*str;
 	char	**temp;
 	int		error_code;
+
 	if (basic_command_node_error_handling(tokens, start, end))
 	{
 		error_code = -1;
@@ -256,20 +258,20 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 		return (-1);
 	root->words[*end - start + 1] = 0;
 	temp = root->words;
-
 	error_code = 0;
 	str = NULL;
 	i = start - 1;
 	root->type = AST_COMMAND;
 	while (++i <= *end && !error_code)
 	{
-		if (tokens[i].type == TOKEN_OPEN_PAREN || tokens[i].type == TOKEN_CLOSE_PAREN)
+		if (tokens[i].type == TOKEN_OPEN_PAREN
+			|| tokens[i].type == TOKEN_CLOSE_PAREN)
 			continue ;
 		if (identify_token(tokens[i].type))
 			error_code = redirection_node_creator(tokens, root, &i);
 		else if (ft_strlen(tokens[i].value) > 0)
 		{
-			while(*root->words)
+			while (*root->words)
 				root->words++;
 			*root->words = ft_strdup(tokens[i].value);
 			error_code = concatenate_commands(&str, tokens, &i);
@@ -300,7 +302,8 @@ int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 		}
 		//if (basic_command_node_error_handling(tokens, p->start, &p->end))
 		//	return (-1); // This was intending to check if the last token is redirection. Refactored it, but is that feature still there?
-		if (tokens[p->i].type == TOKEN_OPEN_PAREN || tokens[p->i].type == TOKEN_CLOSE_PAREN) 
+		if (tokens[p->i].type == TOKEN_OPEN_PAREN
+			|| tokens[p->i].type == TOKEN_CLOSE_PAREN)
 			p->i = find_matching_paren(tokens, p->i, p->end);
 		if (p->i < 0)
 			return (ft_putstr_fd("Error: parenthesis mismatch.\n", 2), -1);
@@ -315,7 +318,6 @@ int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 	return (0);
 }
 
-
 void	build_non_command_node(t_tokens *tokens, t_ast **root,
 			t_precedence *p, int *error_code)
 {
@@ -324,7 +326,8 @@ void	build_non_command_node(t_tokens *tokens, t_ast **root,
 		*error_code = -1;
 	if (!*error_code)
 	{
-		(*root)->left = build_ast(tokens, p->start, p->lowest_prec_pos - 1, *error_code);
+		(*root)->left = build_ast(tokens, p->start,
+				p->lowest_prec_pos - 1, *error_code);
 		if ((*root)->left == NULL)
 		{
 			free_ast(root);
@@ -333,7 +336,8 @@ void	build_non_command_node(t_tokens *tokens, t_ast **root,
 	}
 	if (!*error_code)
 	{
-		(*root)->right = build_ast(tokens, p->lowest_prec_pos + 1, p->end, *error_code);
+		(*root)->right = build_ast(tokens, p->lowest_prec_pos + 1,
+				p->end, *error_code);
 		if ((*root)->right == NULL)
 		{
 			free_ast(&(*root)->left);
@@ -343,6 +347,22 @@ void	build_non_command_node(t_tokens *tokens, t_ast **root,
 	}
 }
 
+int	build_ast_error_check(t_tokens *tokens, t_precedence *p, int *error_code)
+{
+	p->lowest_prec = 1000;
+	p->lowest_prec_pos = -1;
+	p->i = p->start;
+	if (p->start > p->end)
+	{
+		*error_code = -1;
+		if (p->end > 0)
+			p->start -= 1;
+		syntax_error_near(tokens, p->start);
+		return (-1);
+	}
+	return (0);
+}
+
 t_ast	*build_ast(t_tokens *tokens, int start, int end, int code)
 {
 	t_precedence	p;
@@ -350,21 +370,11 @@ t_ast	*build_ast(t_tokens *tokens, int start, int end, int code)
 	static int		error_code;
 
 	error_code = code;
-
 	root = NULL;
-	if (start > end)
-	{
-		error_code = -1;
-		if (end > 0)
-			start -= 1;
-		syntax_error_near(tokens, start);
-		return (root);
-	}
 	p.start = start;
 	p.end = end;
-	p.lowest_prec = 1000;
-	p.lowest_prec_pos = -1;
-	p.i = p.start;
+	if (build_ast_error_check(tokens, &p, &error_code) == -1)
+		return (root);
 	if (!error_code && establish_lowest_precedence(tokens, &p) == -1)
 		return (NULL);
 	if (!error_code && p.lowest_prec <= 3 && p.lowest_prec >= 0)

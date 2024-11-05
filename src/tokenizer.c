@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/05 20:52:54 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/05 23:09:53 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/30 13:46:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -254,7 +254,7 @@ int	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 		return (-1);
 	return (0);
 }
-
+/*
 char	*skip_a_char(char *str, char c)
 {
 	str++;
@@ -262,7 +262,7 @@ char	*skip_a_char(char *str, char c)
 		str++;
 	return (str);
 }
-/*
+*/
 char	*skip_a_char(char *str, char c)
 {
 	char	*temp;
@@ -285,7 +285,7 @@ char	*skip_a_char(char *str, char c)
 	else
 		return (temp);
 }
-*/
+
 int	skip_quotes(char **temp)
 {
 	if (ft_strchr(" \n\t<>|&()\"'", **temp))
