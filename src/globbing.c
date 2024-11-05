@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/26 00:45:16 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/27 22:34:38 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/05 20:55:52 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,11 @@ char	*expand_wildcard(int *int_array)
 	entry = readdir(dir);
 	while (entry != NULL)
 	{
+		if ((*int_array & 0xFF) == '*' && entry->d_name[0] == '.')
+		{
+			entry = readdir(dir);
+			continue ;
+		}
 		if (match_pattern(entry->d_name, int_array))
 		{
 			if (result == NULL)
@@ -83,12 +88,17 @@ char	*expand_wildcard(int *int_array)
 			else
 			{
 				result = ft_strjoin_free(result, " ");
+				if (result == NULL)
+					return (free_void((void **)&result, NULL));
 				result = ft_strjoin_free(result, entry->d_name);
 			}
+			if (result == NULL)
+				return (free_void((void **)&result, NULL));
 		}
 		entry = readdir(dir);
 	}
-	closedir(dir);
+	if (closedir(dir) == -1)
+		return (free_void((void **)&result, NULL));
 	if (result == NULL)
 		return (back_to_char(int_array));
 	else

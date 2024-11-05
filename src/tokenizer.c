@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/05 01:55:34 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/05 20:52:54 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/30 13:46:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -262,7 +262,30 @@ char	*skip_a_char(char *str, char c)
 		str++;
 	return (str);
 }
+/*
+char	*skip_a_char(char *str, char c)
+{
+	char	*temp;
+	int		flag;
 
+	temp = NULL;
+	flag = 0;
+	str++;
+	while (*str && *str != c)
+	{
+		if (ft_strchr(" \n\t<>|&()\"'", *str) && !flag)
+		{
+			flag = 1;
+			temp = str - 1;
+		}
+		str++;
+	}
+	if (*str)
+		return (str);
+	else
+		return (temp);
+}
+*/
 int	skip_quotes(char **temp)
 {
 	if (ft_strchr(" \n\t<>|&()\"'", **temp))
@@ -287,9 +310,12 @@ int	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 	while (*temp)
 	{
 		while (*temp && skip_quotes(&temp))
-			temp++;
-		if (!*temp)
-			break ;
+		{
+			if (*temp)
+				temp++;
+		}
+		//if (!*temp)
+		//	break ;
 		if (*temp == '&')
 		{
 			if (*(temp + 1) == '&')
@@ -517,6 +543,8 @@ int	handle_expansion_and_wildcard(t_tokens *tokens,
 		finalize_dollar_expansion(int_array, &int_array_new, envp);
 		free_void((void **)&tokens[i].value, NULL);
 		tokens[i].value = expand_wildcard(int_array_new);
+		if (tokens[i].value == NULL)
+			return (-1); // Handle better.
 		free_void((void **)&int_array, NULL);
 		free_void((void **)&int_array_new, NULL);
 	}
@@ -548,7 +576,7 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp)
 		if (error_code == -1)
 			return (NULL);
 	}
-	//print_tokens(tokens, capacity);
+	print_tokens(tokens, capacity);
 	if (handle_expansion_and_wildcard(tokens, capacity, envp) == -1)
 		return (free_tokens(tokens, capacity), NULL);
 	return (tokens);
