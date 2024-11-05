@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/26 00:45:16 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/05 20:55:52 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/05 23:03:15 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,22 @@ int	match_pattern(char *filename, int *pattern)
 	return (0);
 }
 
+int	append_result(char **result, char *d_name)
+{
+	if (*result == NULL)
+		*result = ft_strdup(d_name);
+	else
+	{
+		*result = ft_strjoin_free(*result, " ");
+		if (result == NULL)
+			return (-1);
+		*result = ft_strjoin_free(*result, d_name);
+	}
+	if (*result == NULL)
+		return (-1);
+	return (0);
+}
+
 char	*expand_wildcard(int *int_array)
 {
 	DIR				*dir;
@@ -72,28 +88,15 @@ char	*expand_wildcard(int *int_array)
 	result = NULL;
 	dir = opendir(".");
 	if (dir == NULL)
-		return (NULL); // Handle better!
+		return (NULL);
 	entry = readdir(dir);
 	while (entry != NULL)
 	{
-		if ((*int_array & 0xFF) == '*' && entry->d_name[0] == '.')
+		if (!((*int_array & 0xFF) == '*' && entry->d_name[0] == '.')
+			&& match_pattern(entry->d_name, int_array))
 		{
-			entry = readdir(dir);
-			continue ;
-		}
-		if (match_pattern(entry->d_name, int_array))
-		{
-			if (result == NULL)
-				result = ft_strdup(entry->d_name);
-			else
-			{
-				result = ft_strjoin_free(result, " ");
-				if (result == NULL)
-					return (free_void((void **)&result, NULL));
-				result = ft_strjoin_free(result, entry->d_name);
-			}
-			if (result == NULL)
-				return (free_void((void **)&result, NULL));
+			if (append_result(&result, entry->d_name) == -1)
+				return (NULL);
 		}
 		entry = readdir(dir);
 	}
