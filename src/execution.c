@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/06 11:53:05 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/06 13:20:06 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	dupping(t_pipes *p, int in, int out, int n)
 	}
 }
 
-void	execute(t_ast *s, char **envp, t_minishell *minishell, int n)
+void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 {
 	int	i;
 	char	*path;
@@ -58,13 +58,13 @@ void	execute(t_ast *s, char **envp, t_minishell *minishell, int n)
 			close(minishell->p.pipes[i][1]);
 			i++;
 		}
-		path = get_path(s->words, envp, minishell);
+		path = get_path(s->words, *envp, minishell);
 		if (is_builtin(s->words))
 		{
 			execute_builtin(s->words, envp, minishell);
 			exit(0);
 		}
-		execve(path, s->words, envp);
+		execve(path, s->words, *envp);
 		printf("error with execve\n");
 	}
 }
@@ -186,7 +186,7 @@ void	in_out(t_pipes *p, t_ast *i)
 }
 */
 
-int	execution(t_ast *s, char **envp)
+int	execution(t_ast *s, char ***envp)
 {
 	t_minishell	minishell;
 	int	n;

@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/06 10:43:20 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/06 13:30:39 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/28 17:20:14 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -30,6 +30,7 @@ int	main(int argc, char **argv, char **envp)
 
 	(void) argc;
 	(void) argv;
+	new_envp = NULL;
 	new_envp = ft_strdup2(envp);
 	if (!new_envp)
 		return (1);
@@ -59,7 +60,7 @@ int	main(int argc, char **argv, char **envp)
 		}
 		else
 			continue ;
-		execution(ast, new_envp);
+		execution(ast, &new_envp);
 		free_ast(&ast);
 		free_tokens(tokens, &capacity);
 		free(input);

@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/06 11:45:27 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/06 13:20:58 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ typedef struct	s_minishell
 t_ast	*build_ast(t_tokens *tokens, int start, int end, int code);
 
 //execution.c
-int	execution(t_ast *s, char **envp);
+int	execution(t_ast *s, char ***envp);
 void	close_and_free(t_pipes *p);
 
 //path.c
@@ -91,7 +91,7 @@ char	*get_path(char **cmd, char **envp, t_minishell *minishell);
 char	**paths(char **envp);
 
 //builtins.c
-int	execute_builtin(char **cmd, char **envp, t_minishell *minishell);
+int	execute_builtin(char **cmd, char ***envp, t_minishell *minishell);
 int	is_builtin(char **cmd);
 
 //ft_strdup2.c
