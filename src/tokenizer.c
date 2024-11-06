@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/05 23:09:53 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/06 14:18:11 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/30 13:46:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -375,7 +375,7 @@ int	length_of_var(int **int_array, char **envp)
 	{
 		*int_array = *int_array + i;
 		free_void((void **)&str, NULL);
-		return (0); // free str!!
+		return (0);
 	}
 	len = ft_strlen(get_var(str, envp));
 	*int_array = *int_array + i;
@@ -431,7 +431,7 @@ int	finalize_dollar_expansion(int *int_array_old,
 	temp = *int_array_new;
 	while (*int_array_old)
 	{
-		if (((*int_array_old & 0xFF) == '$') && ((*int_array_old >> 8) & 1))
+		if (((*int_array_old & 0xFF) == '$') && ((*int_array_old >> 8) & 1) && *(int_array_old + 1))
 		{
 			int_array_old++;
 			str_of_var(&int_array_old, int_array_new, envp);
@@ -453,7 +453,7 @@ int	*expand_dollar(int *int_array, char **envp, int len, int num)
 
 	while (*int_array)
 	{
-		if (((*int_array & 0xFF) == '$') && ((*int_array >> 8) & 1))
+		if (((*int_array & 0xFF) == '$') && ((*int_array >> 8) & 1) && *(int_array + 1))
 		{
 			int_array++;
 			num = length_of_var(&int_array, envp);

@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/05 01:54:49 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/06 13:18:50 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 17:20:14 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -62,8 +62,9 @@ int	main(int argc, char **argv, char **envp)
 		//execution(ast, new_envp);
 		free_ast(&ast);
 		free_tokens(tokens, &capacity);
-		free(input);
+		free_void((void **)&input, NULL);
 	}
+	free_void((void **)&input, NULL);
 	free_2d_array((void ***)&new_envp);
 	return (0);
 }
