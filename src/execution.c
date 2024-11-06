@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/06 16:03:24 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/06 16:20:51 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	dupping2()
 void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 {
 	int	i;
-	t_ast	redir;
+	//t_ast	redir;
 	char	*path;
 
 	minishell->p.pids[n] = fork();
@@ -79,7 +79,9 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 			exit(0);
 		}
 		execve(path, s->words, *envp);
-		printf("error with execve\n");
+		//FREE EVERYTHING HERE
+		exit(126);
+		
 	}
 }
 

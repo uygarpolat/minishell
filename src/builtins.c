@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/06 14:13:00 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/06 16:29:22 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -120,23 +120,37 @@ void	print_env(char **envp)
 int	execute_builtin(char **cmd, char ***envp, t_minishell *minishell)
 {
 	//char	buf[PATH_MAX];
-	//int	i;
+	int	i;
 	//char	**pwd;
 
 	if (!ft_strncmp(cmd[0], "echo", 5))
 	{
 		if (cmd[2] && !ft_strncmp(cmd[1], "-n", 3))
-			printf("%s", cmd[2]);
+		{
+			i = 1;
+			while (cmd[++i])
+			{
+				if (i > 2)
+					printf(" ");
+				printf("%s", cmd[i]);
+			}
+		}
 		else
-			printf("%s\n", cmd[1]);
+		{
+			i = 0;
+			while (cmd[++i])
+			{
+				if (i > 1)
+					printf(" ");
+				printf("%s", cmd[i]);
+			}
+			printf("\n");
+		}
 	}
 	else if (!ft_strncmp(cmd[0], "cd", 3))
 	{
 		if (chdir(cmd[1]) != 0)
-		{
-			perror("chdir error\n");
 			return (0);
-		}
 		*envp = ch_envp(*envp, cmd[1]);
 		if (!envp)
 			return (0);
@@ -168,19 +182,13 @@ int	execute_builtin(char **cmd, char ***envp, t_minishell *minishell)
 	{
 		*envp = add_env(*envp, cmd[1]);
 		if (!envp)
-		{
-			perror("export error\n");
 			return (0);
-		}
 	}
 	else if (!ft_strncmp(cmd[0], "unset", 6))
 	{
 		*envp = rm_envp(*envp, cmd[1]);
 		if (!envp)
-		{
-			perror("unset error\n");
 			return (0);
-		}
 	}
 	else if (!ft_strncmp(cmd[0], "env", 4))
 		print_env(*envp);
