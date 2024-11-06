@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/30 12:45:33 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/03 00:34:24 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,17 +35,18 @@ typedef enum    e_ast_node_type {
     AST_HEREDOC,
     AST_AND,
     AST_OR
-}    t_ast_node_type;
+}	t_ast_node_type;
 
-typedef struct    s_ast
+typedef struct	s_ast
 {
 	t_ast_node_type	type;
 	t_tokens		*token;
+	char			**words;
 	struct s_ast    *left;
 	struct s_ast    *right;
 	struct s_ast    *redir_target;
 	int				code;
-}    t_ast;
+}					t_ast;
 
 typedef struct	s_precedence
 {
@@ -79,8 +80,7 @@ typedef struct	s_minishell
 	char	*pwd;
 }	t_minishell;
 
-t_ast	*build_ast(t_tokens *tokens, int start, int end);
-void	free_ast(t_ast *node);
+t_ast	*build_ast(t_tokens *tokens, int start, int end, int code);
 
 //execution.c
 int	execution(t_ast *s, char **envp);
@@ -102,5 +102,5 @@ char	**ft_strdup3(char **str, char *dir);
 void	error(t_minishell *minishell, t_command *command, char *str);
 
 //parser.c
-void	free_ast(t_ast *node);
+void	free_ast(t_ast **node);
 #endif

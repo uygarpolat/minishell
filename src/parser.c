@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/30 10:20:08 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/06 09:54:56 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -20,7 +20,7 @@ int	get_precedence(t_token_type type)
 	if (type == TOKEN_AND)
 		return (1);
 	else if (type == TOKEN_OR)
-		return (2);
+		return (1); // Is thos correct?
 	else if (type == TOKEN_PIPE)
 		return (3);
 	return (-1);
@@ -50,22 +50,24 @@ int	find_matching_paren(t_tokens *tokens, int start, int end)
 	return (-1);
 }
 
-void	free_ast(t_ast *node)
+void	free_ast(t_ast **node)
 {
-	if (!node)
+	if (node == NULL || *node == NULL)
 		return ;
-	if (node->token)
+	if ((*node)->token)
 	{
-		free_void((void **)&node->token->value, NULL);
-		free_void((void **)&node->token, NULL);
+		free_void((void **)&(*node)->token->value, NULL);
+		free_void((void **)&(*node)->token, NULL);
 	}
-	if (node->left)
-		free_ast(node->left);
-	if (node->right)
-		free_ast(node->right);
-	if (node->redir_target)
-		free_ast(node->redir_target);
-	free_void((void **)&node, NULL);
+	if ((*node)->words)
+		free_2d_array((void ***)&(*node)->words);
+	if ((*node)->left)
+		free_ast(&(*node)->left);
+	if ((*node)->right)
+		free_ast(&(*node)->right);
+	if ((*node)->redir_target)
+		free_ast(&(*node)->redir_target);
+	free_void((void **)node, NULL);
 }
 
 t_tokens	*copy_token(t_tokens *token)
@@ -113,6 +115,7 @@ t_ast	*create_node(t_tokens *token)
 	node->token = copy_token(token);
 	if (node->token == NULL)
 		return ((t_ast *)free_void((void **)&node, NULL));
+	node->words = NULL;
 	node->left = NULL;
 	node->right = NULL;
 	node->redir_target = NULL;
@@ -132,7 +135,7 @@ int	redirection_node_creator(t_tokens *tokens, t_ast *root, int *i)
 	free_void((void **)&new_redir_node->token->value, 0);
 	new_redir_node->token->value = ft_strdup(tokens[++(*i)].value);
 	if (new_redir_node->token->value == NULL)
-		return (free_ast(new_redir_node), -1);
+		return (free_ast(&new_redir_node), -1);
 	if (root->redir_target == NULL)
 		root->redir_target = new_redir_node;
 	else
@@ -177,28 +180,104 @@ int	cleanup_populate_command_node(t_ast **root, char **str, int *error_code)
 {
 	if (!*error_code)
 		return (0);
-	free_void((void **)root, error_code);
+	free_ast(root);
 	free_void((void **)str, error_code);
 	return (-1);
+}
+
+void	syntax_error_near(t_tokens *tokens, int loc)
+{
+	char	*str;
+
+	if (loc == -1)
+		str = "newline";
+	else if (tokens[loc].value == NULL)
+		str = "newline";
+	else
+		str = tokens[loc].value;
+	ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
+	ft_putstr_fd(str, 2);
+	ft_putstr_fd("'\n", 2);
+}
+
+int	populate_command_node_error_check(t_tokens *tokens, int start, int *end)
+{
+	int	i;
+	int	k;
+
+	i = start;
+	k = *end;
+	if (tokens[i].type != TOKEN_OPEN_PAREN)
+	{
+		while (++i <= *end)
+		{
+			if (tokens[i].type == TOKEN_OPEN_PAREN)
+			{
+				printf("Aborting because encountered a TOKEN_WORD before TOKEN_OPEN_PAREN, which is %s!\n", tokens[i - 1].value);
+				return (syntax_error_near(tokens, i), -1);
+			}
+		}
+	}
+	else
+	{
+		k = find_matching_paren(tokens, i, k);
+		//if (k >= 0)
+		//{
+			//if (!identify_token(tokens[k + 1].type))
+			//{
+				printf("Aborting because encountered a non-redirection token after TOKEN_CLOSE_PAREN, which is %s!\n", tokens[k + 1].value);
+				return (syntax_error_near(tokens, k + 1), -1);
+			//}
+		//}
+	}
+	if (tokens[*end].type != TOKEN_WORD)
+	{
+		// This seg faults for instance for "echo hello world >",
+		// because capacity is full and the next one is not NULL
+		// (everything in capacity that is not malloced is set to NULL. See syntax_error_near to understand.
+		printf("Aborting due to last token not being TOKEN_WORD, which was %s\n", tokens[*end].value);
+		return (syntax_error_near(tokens, -1), -1); // The paramters before the refactor was (tokens, *end + 1).
+	}
+	return (0);
 }
 
 int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 {
 	int		i;
 	char	*str;
+	char	**temp;
 	int		error_code;
 
+	if (populate_command_node_error_check(tokens, start, end))
+	{
+		error_code = -1;
+		return (error_code);
+	}
+	root->words = ft_calloc(*end - start + 2, sizeof(char *));
+	if (root->words == NULL)
+		return (-1);
+	root->words[*end - start + 1] = 0;
+	temp = root->words;
 	error_code = 0;
 	str = NULL;
 	i = start - 1;
 	root->type = AST_COMMAND;
 	while (++i <= *end && !error_code)
 	{
+		if (tokens[i].type == TOKEN_OPEN_PAREN
+			|| tokens[i].type == TOKEN_CLOSE_PAREN)
+			continue ;
 		if (identify_token(tokens[i].type))
 			error_code = redirection_node_creator(tokens, root, &i);
-		else
+		else if (ft_strlen(tokens[i].value) > 0)
+		{
+			while (*root->words)
+				root->words++;
+			*root->words = ft_strdup(tokens[i].value);
 			error_code = concatenate_commands(&str, tokens, &i);
+		}
 	}
+	root->words = temp;
 	if (str && !error_code)
 	{
 		free_void((void **)&root->token->value, NULL);
@@ -214,14 +293,17 @@ int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 {
 	while (p->i <= p->end)
 	{
-		if ((p->i == p->start) && (tokens[p->start].type == TOKEN_OPEN_PAREN)
+		while ((p->i == p->start) && (tokens[p->start].type == TOKEN_OPEN_PAREN)
 			&& (p->end == find_matching_paren(tokens, p->start, p->end)))
 		{
 			p->i++;
 			p->start++;
 			p->end--;
 		}
-		if (tokens[p->i].type == TOKEN_OPEN_PAREN)
+		//if (basic_command_node_error_handling(tokens, p->start, &p->end))
+		//	return (-1); // This was intending to check if the last token is redirection. Refactored it, but is that feature still there?
+		if (tokens[p->i].type == TOKEN_OPEN_PAREN
+			|| tokens[p->i].type == TOKEN_CLOSE_PAREN)
 			p->i = find_matching_paren(tokens, p->i, p->end);
 		if (p->i < 0)
 			return (ft_putstr_fd("Error: parenthesis mismatch.\n", 2), -1);
@@ -244,37 +326,55 @@ void	build_non_command_node(t_tokens *tokens, t_ast **root,
 		*error_code = -1;
 	if (!*error_code)
 	{
-		(*root)->left = build_ast(tokens, p->start, p->lowest_prec_pos - 1);
+		(*root)->left = build_ast(tokens, p->start,
+				p->lowest_prec_pos - 1, *error_code);
 		if ((*root)->left == NULL)
 		{
-			free_void((void **)root, NULL);
+			free_ast(root);
 			*error_code = -1;
 		}
 	}
 	if (!*error_code)
 	{
-		(*root)->right = build_ast(tokens, p->lowest_prec_pos + 1, p->end);
+		(*root)->right = build_ast(tokens, p->lowest_prec_pos + 1,
+				p->end, *error_code);
 		if ((*root)->right == NULL)
 		{
-			free_void((void **)(*root)->left, NULL);
-			free_void((void **)root, NULL);
+			free_ast(&(*root)->left);
+			free_ast(root);
 			*error_code = -1;
 		}
 	}
 }
 
-t_ast	*build_ast(t_tokens *tokens, int start, int end)
+int	build_ast_error_check(t_tokens *tokens, t_precedence *p, int *error_code)
+{
+	p->lowest_prec = 1000;
+	p->lowest_prec_pos = -1;
+	p->i = p->start;
+	if (p->start > p->end)
+	{
+		*error_code = -1;
+		if (p->end > 0)
+			p->start -= 1;
+		syntax_error_near(tokens, p->start);
+		return (-1);
+	}
+	return (0);
+}
+
+t_ast	*build_ast(t_tokens *tokens, int start, int end, int code)
 {
 	t_precedence	p;
 	t_ast			*root;
-	static int		error_code = 0;
+	static int		error_code;
 
+	error_code = code;
 	root = NULL;
 	p.start = start;
 	p.end = end;
-	p.lowest_prec = 1000;
-	p.lowest_prec_pos = -1;
-	p.i = p.start;
+	if (build_ast_error_check(tokens, &p, &error_code) == -1)
+		return (root);
 	if (!error_code && establish_lowest_precedence(tokens, &p) == -1)
 		return (NULL);
 	if (!error_code && p.lowest_prec <= 3 && p.lowest_prec >= 0)
@@ -285,8 +385,8 @@ t_ast	*build_ast(t_tokens *tokens, int start, int end)
 		if (root == NULL)
 			error_code = -1;
 		if (!error_code && populate_command_node(tokens,
-				root, p.start, &(p.end)) == -1)
-			free_void((void **)&root, NULL);
+				root, p.start, &(p.end)) == -1) // Is this check really correct?
+			free_ast(&root);
 	}
 	return (root);
 }

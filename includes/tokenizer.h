@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/10/27 18:53:47 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/02 00:19:29 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,13 +42,19 @@ typedef struct	s_tokens
 {
 	enum e_token_type	type;
 	char				*value;
-}	t_tokens;
+}						t_tokens;
 
 typedef struct	s_capacity
 {
 	int			max_size;
 	int			current_size;
-}	t_capacity;
+}				t_capacity;
+
+typedef struct	s_quote
+{
+	int			single_q_count;
+	int			double_q_count;
+}				t_quote;
 
 t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp);
 void		free_tokens(t_tokens *tokens, t_capacity *capacity);
