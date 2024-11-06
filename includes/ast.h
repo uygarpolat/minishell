@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/03 00:34:24 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/06 13:20:58 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,29 +77,29 @@ typedef struct	s_minishell
 {
 	t_ast	*ast;
 	t_pipes	p;
-	char	*pwd;
+	char	pwd[PATH_MAX];
 }	t_minishell;
 
 t_ast	*build_ast(t_tokens *tokens, int start, int end, int code);
 
 //execution.c
-int	execution(t_ast *s, char **envp);
+int	execution(t_ast *s, char ***envp);
 void	close_and_free(t_pipes *p);
 
 //path.c
-char	*get_path(t_command *cmd, char **envp, t_minishell *minishell);
+char	*get_path(char **cmd, char **envp, t_minishell *minishell);
 char	**paths(char **envp);
 
 //builtins.c
-int	execute_builtin(char **cmd, char **envp, t_minishell *minishell);
-int	is_builtin(t_tokens *token);
+int	execute_builtin(char **cmd, char ***envp, t_minishell *minishell);
+int	is_builtin(char **cmd);
 
 //ft_strdup2.c
 char	**ft_strdup2(char **str);
 char	**ft_strdup3(char **str, char *dir);
 
 //errors.c
-void	error(t_minishell *minishell, t_command *command, char *str);
+void	error(t_minishell *minishell, char *str);
 
 //parser.c
 void	free_ast(t_ast **node);
