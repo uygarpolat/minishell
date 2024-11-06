@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/06 16:03:29 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/06 16:32:05 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/30 13:46:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -438,16 +438,13 @@ int	finalize_dollar_expansion(int *int_array_old,
 				char	*str_num;
 
 				str_num = ft_itoa(code);
-				int num = ft_strlen(str_num);
 				while(*str_num)
 				{
 					**int_array_new = *str_num;
 					(*int_array_new)++;
 					str_num++;
 				}
-
 				int_array_old += 2;
-				(void)num;
 				//free_void((void **)&str_num - num, NULL);
 			}
 			else
@@ -660,7 +657,7 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code)
 		if (error_code == -1)
 			return (NULL);
 	}
-	//print_tokens(tokens, capacity);
+	print_tokens(tokens, capacity);
 	if (handle_expansion_and_wildcard(tokens, capacity, envp, code) == -1)
 		return (free_tokens(tokens, capacity), NULL);
 	return (tokens);
