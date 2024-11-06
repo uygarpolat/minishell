@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/06 00:06:47 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/06 09:54:56 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -200,7 +200,7 @@ void	syntax_error_near(t_tokens *tokens, int loc)
 	ft_putstr_fd("'\n", 2);
 }
 
-int	basic_command_node_error_handling(t_tokens *tokens, int start, int *end)
+int	populate_command_node_error_check(t_tokens *tokens, int start, int *end)
 {
 	int	i;
 	int	k;
@@ -221,14 +221,14 @@ int	basic_command_node_error_handling(t_tokens *tokens, int start, int *end)
 	else
 	{
 		k = find_matching_paren(tokens, i, k);
-		if (k >= 0)
-		{
-			if (!identify_token(tokens[k + 1].type))
-			{
+		//if (k >= 0)
+		//{
+			//if (!identify_token(tokens[k + 1].type))
+			//{
 				printf("Aborting because encountered a non-redirection token after TOKEN_CLOSE_PAREN, which is %s!\n", tokens[k + 1].value);
 				return (syntax_error_near(tokens, k + 1), -1);
-			}
-		}
+			//}
+		//}
 	}
 	if (tokens[*end].type != TOKEN_WORD)
 	{
@@ -248,7 +248,7 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 	char	**temp;
 	int		error_code;
 
-	if (basic_command_node_error_handling(tokens, start, end))
+	if (populate_command_node_error_check(tokens, start, end))
 	{
 		error_code = -1;
 		return (error_code);
