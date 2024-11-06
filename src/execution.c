@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/30 16:29:44 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/06 11:53:05 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,9 @@ void	dupping(t_pipes *p, int in, int out, int n)
 
 void	execute(t_ast *s, char **envp, t_minishell *minishell, int n)
 {
-	t_command	cmd;
 	int	i;
+	char	*path;
 
-	cmd.args = NULL;
-	cmd.path = NULL;	
 	minishell->p.pids[n] = fork();
 	if (minishell->p.pids[n] == 0)
 	{
@@ -60,15 +58,13 @@ void	execute(t_ast *s, char **envp, t_minishell *minishell, int n)
 			close(minishell->p.pipes[i][1]);
 			i++;
 		}
-		cmd.args = ft_split(s->token->value, ' ');
-		cmd.path = get_path(&cmd, envp, minishell);
-		if (is_builtin(s->token))
+		path = get_path(s->words, envp, minishell);
+		if (is_builtin(s->words))
 		{
-			printf("hey\n");
-			execute_builtin(cmd.args, envp, minishell);
+			execute_builtin(s->words, envp, minishell);
 			exit(0);
 		}
-		execve(cmd.path, cmd.args, envp);
+		execve(path, s->words, envp);
 		printf("error with execve\n");
 	}
 }
@@ -82,7 +78,7 @@ int	count_pipes(t_ast *s)
 	count = 0;
 	while (i)
 	{
-		if (i->token->type == TOKEN_PIPE)
+		if (i->type == AST_PIPE)
 			count++;
 		i = i->right;
 	}
@@ -195,37 +191,31 @@ int	execution(t_ast *s, char **envp)
 	t_minishell	minishell;
 	int	n;
 	int	j;
-	//int	i;
-	t_command	cmd;
 	
 	minishell.ast = s;
-	minishell.pwd = getcwd(NULL, PATH_MAX);
+	getcwd(minishell.pwd, sizeof(minishell.pwd));
 	minishell.p.count = count_pipes(minishell.ast);
-	cmd.path = NULL;
-	cmd.args = ft_split(s->token->value, ' ');
 	if (!mallocing(&minishell.p) || !pipeing(&minishell.p))
 	{
-		error(&minishell, &cmd, "malloc failed\n");
+		error(&minishell, "malloc failed\n");
 		return (1);
 	}
 	n = 0;
-	if (is_builtin(s->token) && minishell.p.count == 0)
+	if (minishell.p.count == 0 && is_builtin(s->words))
 	{
-			if (!execute_builtin(cmd.args, envp, &minishell))
+			if (!execute_builtin(s->words, envp, &minishell))
 			{	
-				error(&minishell, &cmd, "builtin failed\n");
+				error(&minishell, "builtin failed\n");
 				return (1);
 			}
 	}
 	else
 	{
-		
-		free_2d_array((void ***)&cmd.args);
 		while (minishell.ast)
 		{
-			if (minishell.ast->token->type == TOKEN_PIPE)
+			if (minishell.ast->type == AST_PIPE)
 				execute(minishell.ast->left, envp, &minishell, n);
-			else if (minishell.ast->token->type == TOKEN_WORD)
+			else if (minishell.ast->type == AST_COMMAND)
 				execute(minishell.ast, envp, &minishell, n);
 			if (n > 0)
 				minishell.p.i++;
