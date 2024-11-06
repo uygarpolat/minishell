@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/06 13:20:06 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/06 16:03:24 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,16 +35,30 @@ void	dupping(t_pipes *p, int in, int out, int n)
 		close(out);
 	}
 }
-
+/*
+void	dupping2()
+{
+}
+*/
 void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 {
 	int	i;
+	t_ast	redir;
 	char	*path;
 
 	minishell->p.pids[n] = fork();
 	if (minishell->p.pids[n] == 0)
 	{
-		//redirect input and output if needed
+		/*//redirect input and output if needed
+		if (s->redir_target)
+		{
+			//do something
+			redir = s->redir_target;
+			if (redir->token.type == '>')
+				dupping2(&minishell->p, minishell->p.pipes[minishell->p.i][0], redir->token.value, n);
+			else if (redir->token.type == '<')
+				dupping2(&minishell->p, redir->token.value, minishell->pipes[minishell->p.o][1]);
+		}*/
 		if (minishell->p.pipes)
 		{
 			if (n == minishell->p.count)
