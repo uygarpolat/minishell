@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/06 09:54:56 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/06 10:31:06 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -77,7 +77,7 @@ t_tokens	*copy_token(t_tokens *token)
 	new_token = malloc(sizeof(t_tokens));
 	if (new_token == NULL)
 		return (NULL);
-	new_token->value = ft_strdup(token->value);
+	new_token->value = ft_strdup(token->value); // This is probably not necessary after the major refactor, but if you remove it it could mess up print_ast
 	if (new_token->value == NULL)
 		return ((t_tokens *)free_void((void **)&new_token, NULL));
 	new_token->type = token->type;
@@ -236,7 +236,7 @@ int	populate_command_node_error_check(t_tokens *tokens, int start, int *end)
 		// because capacity is full and the next one is not NULL
 		// (everything in capacity that is not malloced is set to NULL. See syntax_error_near to understand.
 		printf("Aborting due to last token not being TOKEN_WORD, which was %s\n", tokens[*end].value);
-		return (syntax_error_near(tokens, -1), -1); // The paramters before the refactor was (tokens, *end + 1).
+		return (syntax_error_near(tokens, -1), -1); // The parameters before the refactor was (tokens, *end + 1).
 	}
 	return (0);
 }
