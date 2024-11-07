@@ -6,50 +6,126 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/06 13:20:06 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/07 12:03:47 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
 
-void	dupping(t_pipes *p, int in, int out, int n)
+void	dupping(t_minishell *minishell, t_pipes *p, t_ast *s, int n)
 {
+	int	in;
+	int	out;
+
+	in = p->pipes[p->i][0];
+	out = p->pipes[p->o][1];
 	if (p->pipes)
 	{
 		if (n == 0)
 		{
-			if (dup2(out, STDOUT_FILENO) == -1)
-				printf("dup2 error\n");
+			if (!s->redir_target || s->redir_target->token->type != TOKEN_REDIR_OUT)
+			{
+				if (dup2(out, STDOUT_FILENO) == -1)
+					error(minishell, "dup2 error\n");
+			}
 		}
-		else if (n == p->count)
+		else if (n == minishell->p.count)
 		{
-			if (dup2(in, STDIN_FILENO) == -1)
-				printf("dup2 error\n");
+			if (!s->redir_target || s->redir_target->type != TOKEN_REDIR_IN)
+			{
+				if (dup2(in, STDIN_FILENO) == -1)
+					error(minishell, "dup2 error\n");
+			}
 		}
 		else
 		{
-			if (dup2(in, STDIN_FILENO) == -1 || dup2(out, STDOUT_FILENO) == -1)
-				printf("dup2 error\n");
+			if (!s->redir_target)
+			{
+				if (dup2(in, STDIN_FILENO) == -1 || dup2(out, STDOUT_FILENO) == -1)
+					error(minishell, "dup2 error\n");
+			}
+			else
+			{
+				if (s->redir_target->type == TOKEN_REDIR_IN)
+				{
+					if (dup2(out, STDOUT_FILENO) == -1)
+						error(minishell, "dup2 error\n");
+				}
+				else
+				{
+					if (dup2(in, STDIN_FILENO) == -1)
+						error(minishell, "dup2 error\n");
+				}
+			}
 		}
 		close(in);
 		close(out);
 	}
 }
 
+int	dupping2(t_ast *s, char c)
+{
+	int	fd;
+	
+	if (c == 'i')
+	{
+		//open with read permissions
+		fd = open(s->token->value, O_RDONLY);
+		if (fd < 0)
+			return (0);
+		if (dup2(fd, STDIN_FILENO) == -1)
+			printf("dup2 error\n");
+	}
+	else if (c == 'o')
+	{
+		//open with write permissions
+		if (s->type == AST_REDIR_OUT)
+			fd = open(s->token->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		else
+			fd = open(s->token->value, O_APPEND | O_CREAT | O_WRONLY, 0644);
+		if (fd < 0)
+			return (0);
+		if (dup2(fd, STDOUT_FILENO) == -1)
+			printf("dup2 error\n");
+	}
+	return (1);
+}
+
 void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 {
 	int	i;
+	t_ast	*redir;
 	char	*path;
 
 	minishell->p.pids[n] = fork();
 	if (minishell->p.pids[n] == 0)
 	{
 		//redirect input and output if needed
+		redir = s->redir_target;
+		while (redir != NULL)
+		{
+			//do something
+			if (redir->type == AST_REDIR_OUT || redir->type == AST_REDIR_APPEND)
+			{
+				if (!dupping2(redir, 'o'))
+				{
+					error(minishell, "Permission denied\n");
+					exit(1);
+				}
+			}
+			else if (redir->type == AST_REDIR_IN)
+				if (!dupping2(redir, 'i'))
+				{
+					error(minishell, "Permission denied\n");
+					exit(1);
+				}
+		}
 		if (minishell->p.pipes)
 		{
 			if (n == minishell->p.count)
 				minishell->p.o = minishell->p.count - 1;
-			dupping(&minishell->p, minishell->p.pipes[minishell->p.i][0], minishell->p.pipes[minishell->p.o][1], n);
+			dupping(minishell, &minishell->p, s, n);
+			//dupping(&minishell->p, minishell->p.pipes[minishell->p.i][0], minishell->p.pipes[minishell->p.o][1], n);
 		}
 		i = 0;
 		while (i < minishell->p.count)
@@ -65,7 +141,9 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 			exit(0);
 		}
 		execve(path, s->words, *envp);
-		printf("error with execve\n");
+		//FREE EVERYTHING HERE
+		exit(126);
+		
 	}
 }
 
