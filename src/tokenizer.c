@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/06 16:03:29 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/07 10:37:41 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/30 13:46:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -254,7 +254,7 @@ int	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 		return (-1);
 	return (0);
 }
-/*
+
 char	*skip_a_char(char *str, char c)
 {
 	str++;
@@ -262,7 +262,7 @@ char	*skip_a_char(char *str, char c)
 		str++;
 	return (str);
 }
-*/
+/*
 char	*skip_a_char(char *str, char c)
 {
 	char	*temp;
@@ -285,7 +285,7 @@ char	*skip_a_char(char *str, char c)
 	else
 		return (temp);
 }
-
+*/
 int	skip_quotes(char **temp)
 {
 	if (ft_strchr(" \n\t<>|&()\"'", **temp))
@@ -363,8 +363,11 @@ int	length_of_var(int **int_array, char **envp)
 	len = 0;
 	i = 0;
 	n = -1;
-	while (ft_isalnum((*int_array)[i]) || (*int_array)[i] == '_')
+	//while (ft_isalnum((*int_array)[i]) || (*int_array)[i] == '_')
+	//	i++;
+	while ((ft_isalnum((*int_array)[i] & 0xFF) || ((*int_array)[i] & 0xFF) == '_') && !(((*int_array)[i] >> 8) & 1))
 		i++;
+
 	str = malloc(sizeof(char) * (i + 1));
 	if (str == NULL)
 		return (-1);
@@ -396,8 +399,11 @@ int	str_of_var(int **int_array_old, int **int_array_new, char **envp)
 
 	i = 0;
 	n = -1;
-	while (ft_isalnum((*int_array_old)[i]) || (*int_array_old)[i] == '_')
+	//while (((*int_array & 0xFF) == '$') && ((*int_array >> 8) & 1) && *(int_array + 1))
+	while ((ft_isalnum((*int_array_old)[i] & 0xFF) || ((*int_array_old)[i] & 0xFF) == '_') && !(((*int_array_old)[i] >> 8) & 1))
 		i++;
+	//while (ft_isalnum((*int_array_old)[i]) || (*int_array_old)[i] == '_')
+	//	i++;
 	str = malloc(sizeof(char) * (i + 1));
 	if (str == NULL)
 		return (-1);
@@ -445,10 +451,9 @@ int	finalize_dollar_expansion(int *int_array_old,
 					(*int_array_new)++;
 					str_num++;
 				}
-
 				int_array_old += 2;
-				(void)num;
-				//free_void((void **)&str_num - num, NULL);
+				str_num = str_num - num;
+				free_void((void **)&str_num, NULL);
 			}
 			else
 			{
@@ -560,7 +565,7 @@ int	*expand_dollar(int *int_array, char **envp, int len, int num, int code)
 */
 void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 {
-	if (q->single_q_count % 2 != 1)
+	if (q->single_q_count % 2 != 1 && (ft_isalnum(*(str + 1)) || (*(str + 1) == '_') || (*(str + 1) == '?')))
 		int_array[*m] = encode_char_with_flag(*str);
 	else
 		int_array[*m] = *str;
@@ -576,6 +581,21 @@ void	assign_asterisk(char *str, int *int_array, t_quote *q, int *m)
 	(*m)++;
 }
 
+void	assign_quote(char **str, int *int_array, t_quote *q, int *m, int flag)
+{
+	if (flag == 1)
+		q->double_q_count++;
+	else
+		q->single_q_count++;
+	if (ft_isalnum(*(*str + 1)) || *(*str + 1) == '_')
+	{
+		int_array[*m] = encode_char_with_flag(*(*str + 1));
+		(*m)++;
+	if (*(*str + 1) & 0xFF)
+		(*str)++;
+	}
+}
+
 int	populate_tokens(char *str, int *int_array)
 {
 	t_quote	q;
@@ -588,9 +608,15 @@ int	populate_tokens(char *str, int *int_array)
 	while (*str)
 	{
 		if (*str == '"' && q.single_q_count % 2 == 0)
-			q.double_q_count++;
+		{
+			assign_quote(&str, int_array, &q, &m, 1);
+			//q.double_q_count++;
+		}
 		else if (*str == '\'' && q.double_q_count % 2 == 0)
-			q.single_q_count++;
+		{
+			assign_quote(&str, int_array, &q, &m, 0);
+			//q.single_q_count++;
+		}
 		else if (*str == '$')
 			assign_dollar(str, int_array, &q, &m);
 		else if (*str == '*')
@@ -655,7 +681,7 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code)
 			return (NULL);
 		if (*input && is_seperator(*input, *(input + 1)))
 			error_code = handle_seperator(&input, tokens, capacity);
-		else
+		else if (*input)
 			error_code = handle_word(&input, tokens, capacity);
 		if (error_code == -1)
 			return (NULL);

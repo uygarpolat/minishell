@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/06 15:20:00 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/07 09:58:50 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -213,7 +213,7 @@ int	populate_command_node_error_check(t_tokens *tokens, int start, int *end)
 		{
 			if (tokens[i].type == TOKEN_OPEN_PAREN)
 			{
-				printf("Aborting because encountered a TOKEN_WORD before TOKEN_OPEN_PAREN, which is %s!\n", tokens[i - 1].value);
+				//printf("Aborting because encountered a TOKEN_WORD before TOKEN_OPEN_PAREN, which is %s!\n", tokens[i - 1].value);
 				return (syntax_error_near(tokens, i), -1);
 			}
 		}
@@ -225,7 +225,7 @@ int	populate_command_node_error_check(t_tokens *tokens, int start, int *end)
 		//{
 			//if (!identify_token(tokens[k + 1].type))
 			//{
-				printf("Aborting because encountered a non-redirection token after TOKEN_CLOSE_PAREN, which is %s!\n", tokens[k + 1].value);
+				//printf("Aborting because encountered a non-redirection token after TOKEN_CLOSE_PAREN, which is %s!\n", tokens[k + 1].value);
 				return (syntax_error_near(tokens, k + 1), -1);
 			//}
 		//}
@@ -235,7 +235,8 @@ int	populate_command_node_error_check(t_tokens *tokens, int start, int *end)
 		// This seg faults for instance for "echo hello world >",
 		// because capacity is full and the next one is not NULL
 		// (everything in capacity that is not malloced is set to NULL. See syntax_error_near to understand.
-		printf("Aborting due to last token not being TOKEN_WORD, which was %s\n", tokens[*end].value);
+		// Fixed with changing return value from *end + 1 to -1.
+		//printf("Aborting due to last token not being TOKEN_WORD, which was %s\n", tokens[*end].value);
 		return (syntax_error_near(tokens, -1), -1); // The parameters before the refactor was (tokens, *end + 1).
 	}
 	return (0);
