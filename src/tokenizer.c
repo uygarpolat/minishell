@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/06 23:00:12 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/07 10:37:41 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/30 13:46:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -368,7 +368,6 @@ int	length_of_var(int **int_array, char **envp)
 	while ((ft_isalnum((*int_array)[i] & 0xFF) || ((*int_array)[i] & 0xFF) == '_') && !(((*int_array)[i] >> 8) & 1))
 		i++;
 
-	printf("Expansion length counted as: %d\n", i);
 	str = malloc(sizeof(char) * (i + 1));
 	if (str == NULL)
 		return (-1);
@@ -566,7 +565,7 @@ int	*expand_dollar(int *int_array, char **envp, int len, int num, int code)
 */
 void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 {
-	if (q->single_q_count % 2 != 1)
+	if (q->single_q_count % 2 != 1 && (ft_isalnum(*(str + 1)) || (*(str + 1) == '_') || (*(str + 1) == '?')))
 		int_array[*m] = encode_char_with_flag(*str);
 	else
 		int_array[*m] = *str;
@@ -687,7 +686,7 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code)
 		if (error_code == -1)
 			return (NULL);
 	}
-	print_tokens(tokens, capacity);
+	//print_tokens(tokens, capacity);
 	if (handle_expansion_and_wildcard(tokens, capacity, envp, code) == -1)
 		return (free_tokens(tokens, capacity), NULL);
 	return (tokens);
