@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/06 16:29:22 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/07 11:40:40 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -192,6 +192,14 @@ int	execute_builtin(char **cmd, char ***envp, t_minishell *minishell)
 	}
 	else if (!ft_strncmp(cmd[0], "env", 4))
 		print_env(*envp);
+	else if (!ft_strncmp(cmd[0], "exit", 5))
+	{
+		i = ft_atoi(cmd[1]);
+		if (i == 0 && ft_strncmp(cmd[1], "0", 2) && ft_strncmp(cmd[1], "+0", 3) && ft_strncmp(cmd[1], "-0", 3))
+			exit(1);
+		else
+			exit(i);
+	}
 	return (1);
 }
 
@@ -208,6 +216,8 @@ int	is_builtin(char **cmd)
 	else if (!ft_strncmp(cmd[0], "unset", 6))
 		return (1);
 	else if (!ft_strncmp(cmd[0], "env", 4))
+		return (1);
+	else if (!ft_strncmp(cmd[0], "exit", 5))
 		return (1);
 	return (0);
 }
