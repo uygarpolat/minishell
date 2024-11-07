@@ -6,19 +6,38 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/07 12:03:47 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/07 15:03:43 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
 
-void	dupping(t_minishell *minishell, t_pipes *p, t_ast *s, int n)
+void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 {
 	int	in;
 	int	out;
 
-	in = p->pipes[p->i][0];
-	out = p->pipes[p->o][1];
+	in = -1;
+	out = -1;
+	if (!cmd->infile && p->count > 0)
+		in = p->pipes[p->i][0];
+	else if (cmd->infile)
+		in = cmd->in;
+	if (!cmd->outfile)
+		out = p->pipes[p->o][1];
+	else if (cmd->outfile)
+		out = cmd->out;
+	if (n < minishell->p.count || cmd->outfile)
+	{
+		if (dup2(out, STDOUT_FILENO) == -1)
+			error(minishell, "dup2 error\n");
+	}
+	if (n > 0 || cmd->infile)
+	{
+		if (dup2(in, STDIN_FILENO) == -1)
+			error(minishell, "dup2 error\n");
+	}
+	/*
 	if (p->pipes)
 	{
 		if (n == 0)
@@ -58,35 +77,27 @@ void	dupping(t_minishell *minishell, t_pipes *p, t_ast *s, int n)
 				}
 			}
 		}
-		close(in);
-		close(out);
-	}
+	}*/
+	close(in);
+	close(out);
 }
 
-int	dupping2(t_ast *s, char c)
-{
-	int	fd;
-	
-	if (c == 'i')
+int	open_files(t_put *cmd)
+{	
+	if (cmd->infile)
 	{
-		//open with read permissions
-		fd = open(s->token->value, O_RDONLY);
-		if (fd < 0)
+		cmd->in = open(cmd->infile, O_RDONLY);
+		if (cmd->in < 0)
 			return (0);
-		if (dup2(fd, STDIN_FILENO) == -1)
-			printf("dup2 error\n");
 	}
-	else if (c == 'o')
+	if (cmd->outfile)
 	{
-		//open with write permissions
-		if (s->type == AST_REDIR_OUT)
-			fd = open(s->token->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		if (cmd->o_type == 'o')
+			cmd->out = open(cmd->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		else
-			fd = open(s->token->value, O_APPEND | O_CREAT | O_WRONLY, 0644);
-		if (fd < 0)
+			cmd->out = open(cmd->outfile, O_APPEND | O_CREAT | O_WRONLY, 0644);
+		if (cmd->out < 0)
 			return (0);
-		if (dup2(fd, STDOUT_FILENO) == -1)
-			printf("dup2 error\n");
 	}
 	return (1);
 }
@@ -94,38 +105,46 @@ int	dupping2(t_ast *s, char c)
 void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 {
 	int	i;
-	t_ast	*redir;
 	char	*path;
+	t_ast	*temp;
+	t_put	cmd;
 
+	cmd.infile = NULL;
+	cmd.outfile = NULL;
 	minishell->p.pids[n] = fork();
 	if (minishell->p.pids[n] == 0)
 	{
-		//redirect input and output if needed
-		redir = s->redir_target;
-		while (redir != NULL)
+		temp = s->redir_target;
+		while (temp)
 		{
-			//do something
-			if (redir->type == AST_REDIR_OUT || redir->type == AST_REDIR_APPEND)
+			//echo hei > out | cat out
+			if (temp->type == AST_REDIR_IN)
+				cmd.infile = temp->token->value;
+			else if (temp->type == AST_REDIR_OUT)
 			{
-				if (!dupping2(redir, 'o'))
-				{
-					error(minishell, "Permission denied\n");
-					exit(1);
-				}
+				cmd.o_type = 'o';
+				cmd.outfile = temp->token->value;
 			}
-			else if (redir->type == AST_REDIR_IN)
-				if (!dupping2(redir, 'i'))
-				{
-					error(minishell, "Permission denied\n");
-					exit(1);
-				}
+			else if (temp->type == AST_REDIR_APPEND)
+			{
+				cmd.o_type = 'a';
+				cmd.outfile = temp->token->value;
+			}
+			temp = temp->redir_target;
 		}
-		if (minishell->p.pipes)
+		if (cmd.infile || cmd.outfile)
+		{
+			if (!open_files(&cmd))
+			{
+				error(minishell, "Permission denied\n");
+				exit(1);
+			}
+		}
+		if (minishell->p.pipes || cmd.infile || cmd.outfile)
 		{
 			if (n == minishell->p.count)
 				minishell->p.o = minishell->p.count - 1;
-			dupping(minishell, &minishell->p, s, n);
-			//dupping(&minishell->p, minishell->p.pipes[minishell->p.i][0], minishell->p.pipes[minishell->p.o][1], n);
+			dupping(minishell, &minishell->p, &cmd, n);
 		}
 		i = 0;
 		while (i < minishell->p.count)
@@ -269,7 +288,7 @@ int	execution(t_ast *s, char ***envp)
 	t_minishell	minishell;
 	int	n;
 	int	j;
-	
+
 	minishell.ast = s;
 	getcwd(minishell.pwd, sizeof(minishell.pwd));
 	minishell.p.count = count_pipes(minishell.ast);
