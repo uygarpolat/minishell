@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/07 09:58:50 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/07 17:31:57 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -184,6 +184,26 @@ int	cleanup_populate_command_node(t_ast **root, char **str, int *error_code)
 	free_void((void **)str, error_code);
 	return (-1);
 }
+/*
+void	syntax_error_near(t_tokens *tokens, int loc)
+{
+	char	*str;
+	char	**token_types;
+
+	token_types = (char *[]){"command", "(", ")", "<", ">", "|",
+		"<<", ">>", "||", "&&", "newline"};
+
+	if (loc == -1)
+		str = "newline";
+	else if (tokens[loc].value == NULL)
+		str = "newline";
+	else
+		str = tokens[loc].value;
+	ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
+	ft_putstr_fd(str, 2);
+	ft_putstr_fd("'\n", 2);
+}
+*/
 
 void	syntax_error_near(t_tokens *tokens, int loc)
 {
@@ -212,32 +232,18 @@ int	populate_command_node_error_check(t_tokens *tokens, int start, int *end)
 		while (++i <= *end)
 		{
 			if (tokens[i].type == TOKEN_OPEN_PAREN)
-			{
-				//printf("Aborting because encountered a TOKEN_WORD before TOKEN_OPEN_PAREN, which is %s!\n", tokens[i - 1].value);
 				return (syntax_error_near(tokens, i), -1);
-			}
 		}
 	}
 	else
 	{
 		k = find_matching_paren(tokens, i, k);
-		//if (k >= 0)
-		//{
-			//if (!identify_token(tokens[k + 1].type))
-			//{
-				//printf("Aborting because encountered a non-redirection token after TOKEN_CLOSE_PAREN, which is %s!\n", tokens[k + 1].value);
-				return (syntax_error_near(tokens, k + 1), -1);
-			//}
-		//}
+		return (syntax_error_near(tokens, k + 1), -1);
 	}
 	if (tokens[*end].type != TOKEN_WORD)
 	{
-		// This seg faults for instance for "echo hello world >",
-		// because capacity is full and the next one is not NULL
-		// (everything in capacity that is not malloced is set to NULL. See syntax_error_near to understand.
-		// Fixed with changing return value from *end + 1 to -1.
-		//printf("Aborting due to last token not being TOKEN_WORD, which was %s\n", tokens[*end].value);
-		return (syntax_error_near(tokens, -1), -1); // The parameters before the refactor was (tokens, *end + 1).
+		//return (syntax_error_near(tokens, -1), -1);
+		return (syntax_error_near(tokens, *end + 1), -1); // Change (*end + 1) to -1 to avoid seg fault. syntax_error_near would also need to be modified accordingly.
 	}
 	return (0);
 }
