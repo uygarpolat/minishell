@@ -6,8 +6,8 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/06 16:08:54 by hpirkola         ###   ########.fr       */
-/*   Updated: 2024/11/06 16:02:53 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/07 12:08:44 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/07 10:35:14 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ int	main(int argc, char **argv, char **envp)
 
 	(void) argc;
 	(void) argv;
+	input = NULL;
 	new_envp = NULL;
 	new_envp = ft_strdup2(envp);
 	if (!new_envp)
@@ -46,9 +47,12 @@ int	main(int argc, char **argv, char **envp)
 	signal(SIGQUIT, handle_sigquit);
 	while (1)
 	{
+		free_void((void **)&input, NULL);
 		input = readline("minishell> ");
 		if (!input)
 			break ;
+		if (!ft_strncmp(input, "\0", 1))
+			continue ;
 		if (!ft_strncmp(input, "exit", 5))
 			break ;
 		if (*input)
@@ -62,10 +66,10 @@ int	main(int argc, char **argv, char **envp)
 		}
 		else
 			continue ;
-		code = execution(ast, &new_envp);
+		if (ast)
+			code = execution(ast, &new_envp);
 		free_ast(&ast);
 		free_tokens(tokens, &capacity);
-		free_void((void **)&input, NULL);
 	}
 	free_void((void **)&input, NULL);
 	free_2d_array((void ***)&new_envp);
