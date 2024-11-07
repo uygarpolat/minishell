@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/07 17:18:40 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/08 01:05:30 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -15,6 +15,10 @@
 #include "../includes/tokenizer.h"
 #include "../includes/ast.h"
 #include "termios.h"
+
+int		populate_command_node_error_check(t_tokens *tokens, int start, int *end);
+int		identify_token(t_token_type type);
+void	syntax_error_near(t_tokens *tokens, int loc);
 
 char	*expand_wildcard(int *int_array);
 
@@ -660,6 +664,70 @@ int	handle_expansion_and_wildcard(t_tokens *tokens,
 	}
 	return (0);
 }
+/*
+
+   "word", "(", ")", "<", ">", "|",
+		"<<", ">>", "||", "&&"
+
+
+first: word, open_paren, redir
+
+before word: word, open_paren, redir, pipe, logic
+after word: word, close_paren, redir, pipe, logic
+
+before redir: word, open_paren, pipe, logic
+after redir: word
+
+before pipe: word, close_paren
+after pipe: word, open_paren, redir
+
+before logic: word, close_paren
+after logic: word, open_paren, redir
+
+before open paren: open_paren, logic, pipe
+after open paren: word, open_paren, redir
+
+before close_paren: word, close_paren
+after close_paren: close_paren, pipe, logic
+
+last: word, close_paren
+
+*/
+
+int	tokens_error_checker(t_tokens *tokens, t_capacity *capacity)
+{
+	int	i;
+
+	if (tokens[0].type != TOKEN_WORD && !identify_token(tokens[0].type) && tokens[0].type != TOKEN_OPEN_PAREN)
+	{
+		syntax_error_near(tokens, 0);
+		return (-1);
+	}
+
+	i = 0;
+	while (i < capacity->current_size - 1)
+	{
+		if ((identify_token(tokens[i].type) && tokens[i + 1].type != TOKEN_WORD)
+			|| (tokens[i].type == TOKEN_WORD && tokens[i + 1].type == TOKEN_OPEN_PAREN)
+			|| (tokens[i].type == TOKEN_PIPE && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
+			|| (tokens[i].type == TOKEN_AND && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
+			|| (tokens[i].type == TOKEN_OR && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
+			|| (tokens[i].type == TOKEN_OPEN_PAREN && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
+			|| (tokens[i].type == TOKEN_CLOSE_PAREN && tokens[i + 1].type == TOKEN_AND && tokens[i + 1].type == TOKEN_OR && tokens[i + 1].type != TOKEN_PIPE && tokens[i + 1].type != TOKEN_CLOSE_PAREN)
+			)
+		{
+			syntax_error_near(tokens, i + 1);
+			return (-1);
+		} 
+		i++;
+	}
+	if (tokens[capacity->current_size - 1].type != TOKEN_WORD)
+	{
+		syntax_error_near(tokens, -1);
+		return (-1);
+	}
+	return (0);
+}
 
 t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code)
 {
@@ -687,7 +755,8 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code)
 			return (NULL);
 	}
 	//print_tokens(tokens, capacity);
-	if (handle_expansion_and_wildcard(tokens, capacity, envp, code) == -1)
+	if (handle_expansion_and_wildcard(tokens, capacity, envp, code) == -1 || tokens_error_checker(tokens, capacity) == -1)
 		return (free_tokens(tokens, capacity), NULL);
+	
 	return (tokens);
 }
