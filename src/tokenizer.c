@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/08 01:05:30 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/08 14:00:52 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -155,25 +155,18 @@ int	is_seperator(char c, char c_plus_one)
 	return (0);
 }
 
-void	free_tokens(t_tokens *tokens, t_capacity *capacity)
+void *free_tokens(t_tokens *tokens, t_capacity *capacity)
 {
 	int	i;
 
 	i = 0;
 	if (!tokens)
-		return ;
+		return (tokens);
 	while (i < capacity->max_size)
-	{
-		if (tokens[i].value)
-			free(tokens[i].value);
-		tokens[i].value = NULL;
-		i++;
-	}
-	if (tokens)
-	{
-		free(tokens);
-		tokens = NULL;
-	}
+		free_void((void **)&tokens[i++].value, NULL);
+	free_void((void **)&tokens, NULL);
+	return ((void *)tokens);
+
 }
 
 t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens,
@@ -183,8 +176,8 @@ t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens,
 
 	new_tokens = malloc(sizeof(t_tokens) * (capacity->max_size * 2));
 	if (new_tokens == NULL)
-		return (free_tokens(tokens, capacity), NULL);
-	while (i < capacity->max_size * 2)
+		return ((t_tokens *)free_tokens(tokens, capacity));
+	while (++i < capacity->max_size * 2)
 	{
 		if (i < capacity->current_size)
 		{
@@ -193,13 +186,14 @@ t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens,
 			{
 				free_tokens(tokens, capacity);
 				capacity->max_size *= 2;
-				return (free_tokens(new_tokens, capacity), NULL);
+				while (++i < capacity->max_size)
+					new_tokens[i].value = NULL;
+				return ((t_tokens *)free_tokens(new_tokens, capacity));
 			}
 			new_tokens[i].type = tokens[i].type;
 		}
 		else
 			new_tokens[i].value = NULL;
-		i++;
 	}
 	free_tokens(tokens, capacity);
 	capacity->max_size *= 2;
@@ -744,7 +738,7 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code)
 		while (ft_strchr(" \t\n", *input) && *input)
 			input++;
 		if (capacity->max_size <= capacity->current_size)
-			tokens = ft_realloc_tokens_when_full(tokens, capacity, 0);
+			tokens = ft_realloc_tokens_when_full(tokens, capacity, -1);
 		if (tokens == NULL)
 			return (NULL);
 		if (*input && is_seperator(*input, *(input + 1)))
@@ -756,7 +750,6 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code)
 	}
 	//print_tokens(tokens, capacity);
 	if (handle_expansion_and_wildcard(tokens, capacity, envp, code) == -1 || tokens_error_checker(tokens, capacity) == -1)
-		return (free_tokens(tokens, capacity), NULL);
-	
+		return ((t_tokens *)free_tokens(tokens, capacity));	
 	return (tokens);
 }
