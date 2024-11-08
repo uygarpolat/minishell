@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/08 14:00:52 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/08 21:05:50 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -20,7 +20,7 @@ int		populate_command_node_error_check(t_tokens *tokens, int start, int *end);
 int		identify_token(t_token_type type);
 void	syntax_error_near(t_tokens *tokens, int loc);
 
-char	*expand_wildcard(int *int_array);
+char	*expand_wildcard(int *int_array, t_tokens *tokens, int loc, int flag);
 
 void	init_signal(void)
 {
@@ -650,9 +650,13 @@ int	handle_expansion_and_wildcard(t_tokens *tokens,
 		int_array_new = expand_dollar(int_array, envp, 0, 0, code);
 		finalize_dollar_expansion(int_array, &int_array_new, envp, code);
 		free_void((void **)&tokens[i].value, NULL);
-		tokens[i].value = expand_wildcard(int_array_new);
+		tokens[i].value = expand_wildcard(int_array_new, tokens, i, 0);
 		if (tokens[i].value == NULL)
-			return (-1); // Handle better.
+		{
+			free_void((void **)&int_array, NULL);
+			free_void((void **)&int_array_new, NULL);
+			return (-1);
+		}
 		free_void((void **)&int_array, NULL);
 		free_void((void **)&int_array_new, NULL);
 	}
@@ -749,7 +753,7 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code)
 			return (NULL);
 	}
 	//print_tokens(tokens, capacity);
-	if (handle_expansion_and_wildcard(tokens, capacity, envp, code) == -1 || tokens_error_checker(tokens, capacity) == -1)
-		return ((t_tokens *)free_tokens(tokens, capacity));	
+	if (tokens_error_checker(tokens, capacity) == -1 || handle_expansion_and_wildcard(tokens, capacity, envp, code) == -1)
+		return ((t_tokens *)free_tokens(tokens, capacity));
 	return (tokens);
 }

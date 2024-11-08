@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/08 12:22:39 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/08 19:16:33 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,5 +59,6 @@ typedef struct	s_quote
 t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code);
 void		*free_tokens(t_tokens *tokens, t_capacity *capacity);
 char		*ft_strjoin_free(char *s1, char *s2);
+int			identify_token(t_token_type type);
 
 #endif

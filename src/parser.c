@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/08 15:11:34 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/08 23:23:35 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -240,11 +240,11 @@ int	populate_command_node_error_check(t_tokens *tokens, int start, int *end)
 		k = find_matching_paren(tokens, i, k);
 		return (syntax_error_near(tokens, k + 1), -1);
 	}
-	if (tokens[*end].type != TOKEN_WORD)
+/*	if (tokens[*end].type != TOKEN_WORD)
 	{
 		//return (syntax_error_near(tokens, -1), -1);
 		return (syntax_error_near(tokens, *end + 1), -1); // Change (*end + 1) to -1 to avoid seg fault. syntax_error_near would also need to be modified accordingly.
-	}
+	} */
 	return (0);
 }
 
@@ -307,8 +307,6 @@ int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 			p->start++;
 			p->end--;
 		}
-		//if (basic_command_node_error_handling(tokens, p->start, &p->end))
-		//	return (-1); // This was intending to check if the last token is redirection. Refactored it, but is that feature still there?
 		if (tokens[p->i].type == TOKEN_OPEN_PAREN
 			|| tokens[p->i].type == TOKEN_CLOSE_PAREN)
 			p->i = find_matching_paren(tokens, p->i, p->end);
