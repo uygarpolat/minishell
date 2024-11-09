@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/09 21:30:08 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/10 01:42:34 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 10:35:14 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -20,59 +20,79 @@ void	handle_sigquit();
 void	print_ast(t_ast *node, int level);
 void	init_signal();
 
-int	main(int argc, char **argv, char **envp)
+int	execute_shell(char *input, int *code, char **new_envp)
 {
-	char		*input;
 	t_tokens	*tokens;
 	t_capacity	capacity;
-	t_ast	*ast;
-	char	**new_envp;
-	int	code;
+	t_ast		*ast;
 
-	(void) argc;
-	(void) argv;
-	input = NULL;
-	new_envp = NULL;
+	tokens = ft_tokenizer(input, &capacity, new_envp, *code);
+	if (tokens)
+	{
+		ast = build_ast(tokens, 0, capacity.current_size - 1, 0);
+		if (ast)
+		{
+			//print_ast(ast, 0);
+			*code = execution(ast, &new_envp);
+			free_ast(&ast);
+		}
+		free_tokens(tokens, &capacity);
+	}
+	else
+		*code = 2;
+	free_void((void **)&input, NULL);
+	return (0);
+}
+
+int	preliminary_input_check(char **input)
+{
+	char	*temp;
+
+	*input = readline("minishell> ");
+	if (!*input)
+		return (-2);
+	temp = *input;
+	while (ft_strchr(" \t\n", *temp) && *temp)
+		temp++;
+	if (!ft_strncmp(temp, "\0", 1))
+	{
+		free_void((void **)input, NULL);
+		return (-2);
+	}
+	if (!ft_strncmp(temp, "exit", 5))
+	{
+		free_void((void **)input, NULL);
+		return (printf("exit\n"), -1);
+	}
+	if (*input)
+		add_history(*input);
+	return (0);
+}
+
+int	main(int argc, char **argv, char **envp)
+{
+	char	*input;
+	char	**new_envp;
+	int		code;
+	int		input_res;
+
+	((void)argc, (void)argv);
 	new_envp = ft_strdup2(envp);
 	if (!new_envp)
 		return (1);
 	code = 0;
-	/*while (new_envp)
-	{
-		printf("%s\n", *new_envp);
-		new_envp++;
-	}*/
 	init_signal();
 	signal(SIGINT, handle_sigint);
 	signal(SIGQUIT, handle_sigquit);
 	while (1)
 	{
-		free_void((void **)&input, NULL);
-		input = readline("minishell> ");
-		if (!input)
-			break ;
-		if (!ft_strncmp(input, "\0", 1))
+		input_res = preliminary_input_check(&input);
+		if (input_res == -2)
 			continue ;
-		if (!ft_strncmp(input, "exit", 5))
+		else if (input_res == -1)
 			break ;
-		if (*input)
-			add_history(input);
-		tokens = ft_tokenizer(input, &capacity, new_envp, code);
-		if (tokens)
-		{
-			ast = build_ast(tokens, 0, capacity.current_size - 1, 0);
-			if (ast)
-			{
-				//print_ast(ast, 0);
-				code = execution(ast, &new_envp);
-				free_ast(&ast);
-			}
-			free_tokens(tokens, &capacity);
-		}
-		else
-			code = 2;
+		execute_shell(input, &code, new_envp);
 	}
-	free_void((void **)&input, NULL);
 	free_2d_array((void ***)&new_envp);
 	return (code);
 }

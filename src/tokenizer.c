@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/09 19:56:54 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/10 01:37:59 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -19,7 +19,6 @@
 int		populate_command_node_error_check(t_tokens *tokens, int start, int *end);
 int		identify_token(t_token_type type);
 void	syntax_error_near(t_tokens *tokens, int loc);
-
 char	*expand_wildcard(int *int_array, t_tokens *tokens, int loc, int flag);
 
 void	init_signal(void)
@@ -154,13 +153,6 @@ void	print_ast(t_ast *node, int level)
 	}
 }
 
-int	is_space(char c)
-{
-	if (c == ' ')
-		return (1);
-	return (0);
-}
-
 int	is_seperator(char c, char c_plus_one)
 {
 	if (c == '<' || c == '>' || (c == '&' && c_plus_one == '&')
@@ -187,7 +179,16 @@ void *free_tokens(t_tokens *tokens, t_capacity *capacity)
 
 }
 
-t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens,
+void	realloc_error(t_tokens *tokens, t_tokens *new_tokens, t_capacity *capacity, int i)
+{
+	free_tokens(tokens, capacity);
+	capacity->max_size *= 2;
+	while (++i < capacity->max_size)
+		new_tokens[i].value = NULL;
+	free_tokens(new_tokens, capacity);
+}
+
+t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
 		t_capacity *capacity, int i)
 {
 	t_tokens	*new_tokens;
@@ -201,26 +202,7 @@ t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens,
 		{
 			new_tokens[i].value = ft_strdup(tokens[i].value);
 			if (new_tokens[i].value == NULL)
-			{
-				free_tokens(tokens, capacity);
-				capacity->max_size *= 2;
-				while (++i < capacity->max_size)
-					new_tokens[i].value = NULL;
-				return ((t_tokens *)free_tokens(new_tokens, capacity));
-			}
-/*			if (tokens[i].globbed)
-			{
-				printf("->>>>>>>>>>>>>>>>>>>>Entering here for token %d\n", i);
-				int	k = 0;
-				int	counter = 0;
-				while (tokens[i].globbed[k++])
-					counter++;
-				new_tokens[i].globbed = ft_calloc(sizeof(char *), counter + 1);
-				if (new_tokens[i].globbed == NULL)
-					return (NULL); // Handle better!
-				while (--counter >= 0)
-					new_tokens[i].globbed[counter] = ft_strdup(tokens[i].globbed[counter]);
-			}*/
+				return (realloc_error(tokens, new_tokens, capacity, i), NULL);
 			new_tokens[i].globbed = NULL;
 			new_tokens[i].type = tokens[i].type;
 		}
@@ -287,7 +269,7 @@ int	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 		return (-1);
 	return (0);
 }
-
+/*
 char	*skip_a_char(char *str, char c)
 {
 	str++;
@@ -295,7 +277,7 @@ char	*skip_a_char(char *str, char c)
 		str++;
 	return (str);
 }
-/*
+*/
 char	*skip_a_char(char *str, char c)
 {
 	char	*temp;
@@ -315,10 +297,11 @@ char	*skip_a_char(char *str, char c)
 	}
 	if (*str)
 		return (str);
-	else
+	else if (temp != NULL)
 		return (temp);
+	return (str);
 }
-*/
+
 int	skip_quotes(char **temp)
 {
 	if (ft_strchr(" \n\t<>|&()\"'", **temp))
@@ -763,23 +746,31 @@ int	tokens_error_checker(t_tokens *tokens, t_capacity *capacity)
 	return (0);
 }
 
+int	init_tokenizer(t_tokens **tokens, t_capacity *capacity)
+{
+	capacity->max_size = 1;
+	capacity->current_size = 0;
+	*tokens = malloc(sizeof(t_tokens) * capacity->max_size);
+	if (*tokens == NULL)
+		return (-1);
+	(*tokens)->globbed = NULL;
+	return (0);
+}
+
 t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code)
 {
 	t_tokens	*tokens;
 	int			error_code;
 
-	capacity->max_size = 1;
-	capacity->current_size = 0;
-	tokens = malloc(sizeof(t_tokens) * capacity->max_size);
-	if (tokens == NULL)
+	tokens = NULL;
+	if (init_tokenizer(&tokens, capacity) == -1)
 		return (NULL);
-	tokens->globbed = NULL;
 	while (*input)
 	{
 		while (ft_strchr(" \t\n", *input) && *input)
 			input++;
 		if (capacity->max_size <= capacity->current_size)
-			tokens = ft_realloc_tokens_when_full(tokens, capacity, -1);
+			tokens = realloc_tokens_when_full(tokens, capacity, -1);
 		if (tokens == NULL)
 			return (NULL);
 		if (*input && is_seperator(*input, *(input + 1)))
