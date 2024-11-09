@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/08 21:05:50 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/09 19:56:54 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -86,7 +86,20 @@ void	print_ast(t_ast *node, int level)
 	if (node->type == AST_COMMAND)
 	{
 		temp_double_arr = node->words;
-		printf("AST_COMMAND [TOKEN: %s]\n", node->token->value);
+		//indent_level = -1;
+		while (++indent_level < level + 1)
+			printf("  ");
+		printf("AST_COMMAND [TOKEN: ");
+		while (*node->words)
+		{
+			//indent_level = -1;
+			//while (++indent_level < level + 1)
+			//	printf("  ");
+			printf("%s ", *(node->words));
+			(node->words)++;
+		}
+		printf("]\n");
+		node->words = temp_double_arr;
 		while (*node->words)
 		{
 			indent_level = -1;
@@ -95,6 +108,7 @@ void	print_ast(t_ast *node, int level)
 			printf("[TOKEN: %s]\n", *(node->words));
 			(node->words)++;
 		}
+
 		node->words = temp_double_arr;
 	}
 	else if (node->type == AST_PIPE)
@@ -163,7 +177,11 @@ void *free_tokens(t_tokens *tokens, t_capacity *capacity)
 	if (!tokens)
 		return (tokens);
 	while (i < capacity->max_size)
-		free_void((void **)&tokens[i++].value, NULL);
+	{
+		free_void((void **)&tokens[i].value, NULL);
+		free_2d_array((void ***)&tokens[i].globbed);
+		i++;
+	}
 	free_void((void **)&tokens, NULL);
 	return ((void *)tokens);
 
@@ -190,10 +208,27 @@ t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens,
 					new_tokens[i].value = NULL;
 				return ((t_tokens *)free_tokens(new_tokens, capacity));
 			}
+/*			if (tokens[i].globbed)
+			{
+				printf("->>>>>>>>>>>>>>>>>>>>Entering here for token %d\n", i);
+				int	k = 0;
+				int	counter = 0;
+				while (tokens[i].globbed[k++])
+					counter++;
+				new_tokens[i].globbed = ft_calloc(sizeof(char *), counter + 1);
+				if (new_tokens[i].globbed == NULL)
+					return (NULL); // Handle better!
+				while (--counter >= 0)
+					new_tokens[i].globbed[counter] = ft_strdup(tokens[i].globbed[counter]);
+			}*/
+			new_tokens[i].globbed = NULL;
 			new_tokens[i].type = tokens[i].type;
 		}
 		else
+		{
 			new_tokens[i].value = NULL;
+			new_tokens[i].globbed = NULL;
+		}
 	}
 	free_tokens(tokens, capacity);
 	capacity->max_size *= 2;
@@ -651,6 +686,7 @@ int	handle_expansion_and_wildcard(t_tokens *tokens,
 		finalize_dollar_expansion(int_array, &int_array_new, envp, code);
 		free_void((void **)&tokens[i].value, NULL);
 		tokens[i].value = expand_wildcard(int_array_new, tokens, i, 0);
+		
 		if (tokens[i].value == NULL)
 		{
 			free_void((void **)&int_array, NULL);
@@ -737,6 +773,7 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code)
 	tokens = malloc(sizeof(t_tokens) * capacity->max_size);
 	if (tokens == NULL)
 		return (NULL);
+	tokens->globbed = NULL;
 	while (*input)
 	{
 		while (ft_strchr(" \t\n", *input) && *input)

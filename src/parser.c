@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/08 23:23:35 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/09 16:55:57 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -184,26 +184,6 @@ int	cleanup_populate_command_node(t_ast **root, char **str, int *error_code)
 	free_void((void **)str, error_code);
 	return (-1);
 }
-/*
-void	syntax_error_near(t_tokens *tokens, int loc)
-{
-	char	*str;
-	char	**token_types;
-
-	token_types = (char *[]){"command", "(", ")", "<", ">", "|",
-		"<<", ">>", "||", "&&", "newline"};
-
-	if (loc == -1)
-		str = "newline";
-	else if (tokens[loc].value == NULL)
-		str = "newline";
-	else
-		str = tokens[loc].value;
-	ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
-	ft_putstr_fd(str, 2);
-	ft_putstr_fd("'\n", 2);
-}
-*/
 
 void	syntax_error_near(t_tokens *tokens, int loc)
 {
@@ -260,6 +240,95 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 		error_code = -1;
 		return (error_code);
 	}
+	int	j = start - 1;
+	int k;
+	int malloc_counter = 0;
+	while (++j <= *end)
+	{
+		k = 0;
+		if (tokens[j].globbed)
+		{
+			//printf("tokens[%d].globbed is not NULL!\n", j);
+			while (tokens[j].globbed[k++])
+				malloc_counter++;
+		}
+		else
+		{
+			//printf("tokens[%d].globbed is NULL!\n", j);
+			malloc_counter++;
+		}
+	}
+	root->words = ft_calloc(malloc_counter + 1, sizeof(char *));
+	if (root->words == NULL)
+		return (-1);
+	//printf("malloced for %d\n", malloc_counter + 1);
+	root->words[malloc_counter] = 0;
+	temp = root->words;
+	error_code = 0;
+	str = NULL;
+	i = start - 1;
+	root->type = AST_COMMAND;
+	while (++i <= *end && !error_code)
+	{
+		if (tokens[i].type == TOKEN_OPEN_PAREN
+			|| tokens[i].type == TOKEN_CLOSE_PAREN)
+			continue ;
+		if (identify_token(tokens[i].type))
+			error_code = redirection_node_creator(tokens, root, &i);
+		else if (tokens[i].globbed)
+		{
+			while (*root->words)
+				root->words++;
+			char **temp_double_pointer = tokens[i].globbed;
+			while (*(tokens[i].globbed))
+			{
+				*root->words = ft_strdup(*(tokens[i].globbed));
+				tokens[i].globbed++;
+				root->words++;
+			}
+			tokens[i].globbed = temp_double_pointer;
+		}
+		else if (ft_strlen(tokens[i].value) > 0)
+		{
+			while (*root->words)
+				root->words++;
+			*root->words = ft_strdup(tokens[i].value);
+			error_code = concatenate_commands(&str, tokens, &i);
+		}
+/*		root->words = temp;
+
+		printf("tokens[%d]: ", i);
+		while (*root->words)
+		{
+			printf("%s ", *root->words);
+			root->words++;
+		}
+		printf("\n"); */
+	}
+	root->words = temp;
+	if (str && !error_code)
+	{
+		free_void((void **)&root->token->value, NULL);
+		root->token->value = ft_strdup(str);
+		if (root->token->value == NULL)
+			error_code = -1;
+		free_void((void **)&str, NULL);
+	}
+	return (cleanup_populate_command_node(&root, &str, &error_code));
+}
+/*
+int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
+{
+	int		i;
+	char	*str;
+	char	**temp;
+	int		error_code;
+
+	if (populate_command_node_error_check(tokens, start, end))
+	{
+		error_code = -1;
+		return (error_code);
+	}
 	root->words = ft_calloc(*end - start + 2, sizeof(char *));
 	if (root->words == NULL)
 		return (-1);
@@ -295,7 +364,7 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 	}
 	return (cleanup_populate_command_node(&root, &str, &error_code));
 }
-
+*/
 int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 {
 	while (p->i <= p->end)

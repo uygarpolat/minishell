@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/08 19:16:33 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/09 12:21:47 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ typedef struct	s_tokens
 {
 	enum e_token_type	type;
 	char				*value;
+	char				**globbed;
 }						t_tokens;
 
 typedef struct	s_capacity
