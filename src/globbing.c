@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/26 00:45:16 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/09 21:18:57 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/10 17:43:44 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,7 @@ int	populate_res(t_tokens **tokens, t_globber *g, int *int_array, int counter)
 		exit_message = back_to_char(int_array);
 		if (exit_message == NULL)
 			return (-1);
-		ft_putstr_fd("minishell: ", 2);
-		ft_putstr_fd(exit_message, 2);
-		ft_putstr_fd(": ambiguous redirect\n", 2);
+		error_handler(exit_message, "ambiguous redirect");
 		free_void((void **)&exit_message, NULL);
 		return (-1);
 	}
@@ -71,12 +69,12 @@ int	init_expand_wildcard(t_globber *g, int loc)
 	g->loc = loc;
 	g->dir = opendir(".");
 	if (g->dir == NULL)
-		return (-1);
+		return (error_handler(NULL, NULL), -1);
 	g->entry = readdir(g->dir);
 	if (g->entry == NULL)
 	{
 		closedir(g->dir);
-		return (-1);
+		return (error_handler(NULL, NULL), -1);
 	}
 	return (0);
 }
@@ -84,7 +82,7 @@ int	init_expand_wildcard(t_globber *g, int loc)
 int	count_matching_entries(t_tokens **tokens, int *int_array,
 		t_globber *g, int counter_flag)
 {
-	int				counter;
+	int	counter;
 
 	counter = 0;
 	while (ft_strchrnul((char *)int_array, '*') && g->entry != NULL
@@ -95,20 +93,21 @@ int	count_matching_entries(t_tokens **tokens, int *int_array,
 		{
 			if (counter_flag == 1
 				&& populate_res(tokens, g, int_array, counter) == -1)
-				return (closedir(g->dir), -1); // Handle better?
+				return (closedir(g->dir), -1);
 			counter++;
 		}
 		g->entry = readdir(g->dir);
 	}
 	if (closedir(g->dir) == -1)
-		return (-1); // Handle better?
+		return (error_handler(NULL, NULL), -1);
 	return (counter);
 }
 
 char	*expand_wildcard(int *int_array, t_tokens *tokens, int loc, int flag)
 {
-	int				match_count;
-	t_globber		g;
+	int			match_count;
+	t_globber	g;
+	char		*globbed;
 
 	g.flag = flag;
 	match_count = 0;
@@ -120,13 +119,15 @@ char	*expand_wildcard(int *int_array, t_tokens *tokens, int loc, int flag)
 	if (!match_count)
 		return (back_to_char(int_array));
 	else if (match_count < 0)
-		return (NULL); // Is this fine?
+		return (NULL);
 	tokens[loc].globbed = ft_calloc(sizeof(char *), match_count + 1);
 	if (tokens[loc].globbed == NULL)
-		return (NULL); // Handle better?
-	if (init_expand_wildcard(&g, loc) == -1)
+		return (error_handler(NULL, NULL), NULL);
+	if (init_expand_wildcard(&g, loc) == -1
+		|| count_matching_entries(&tokens, int_array, &g, 1) == -1)
 		return (NULL);
-	if (count_matching_entries(&tokens, int_array, &g, 1) == -1)
-		return (NULL);
-	return (ft_strdup(tokens[loc].globbed[0]));
+	globbed = ft_strdup(tokens[loc].globbed[0]);
+	if (globbed == NULL)
+		return (error_handler(NULL, NULL), NULL);
+	return (globbed);
 }

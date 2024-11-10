@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/09 16:55:57 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/10 23:13:29 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -77,7 +77,7 @@ t_tokens	*copy_token(t_tokens *token)
 	new_token = malloc(sizeof(t_tokens));
 	if (new_token == NULL)
 		return (NULL);
-	new_token->value = ft_strdup(token->value); // This is probably not necessary after the major refactor, but if you remove it it could mess up print_ast
+	new_token->value = ft_strdup(token->value);
 	if (new_token->value == NULL)
 		return ((t_tokens *)free_void((void **)&new_token, NULL));
 	new_token->type = token->type;
@@ -220,11 +220,6 @@ int	populate_command_node_error_check(t_tokens *tokens, int start, int *end)
 		k = find_matching_paren(tokens, i, k);
 		return (syntax_error_near(tokens, k + 1), -1);
 	}
-/*	if (tokens[*end].type != TOKEN_WORD)
-	{
-		//return (syntax_error_near(tokens, -1), -1);
-		return (syntax_error_near(tokens, *end + 1), -1); // Change (*end + 1) to -1 to avoid seg fault. syntax_error_near would also need to be modified accordingly.
-	} */
 	return (0);
 }
 
@@ -248,20 +243,15 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 		k = 0;
 		if (tokens[j].globbed)
 		{
-			//printf("tokens[%d].globbed is not NULL!\n", j);
 			while (tokens[j].globbed[k++])
 				malloc_counter++;
 		}
 		else
-		{
-			//printf("tokens[%d].globbed is NULL!\n", j);
 			malloc_counter++;
-		}
 	}
 	root->words = ft_calloc(malloc_counter + 1, sizeof(char *));
 	if (root->words == NULL)
 		return (-1);
-	//printf("malloced for %d\n", malloc_counter + 1);
 	root->words[malloc_counter] = 0;
 	temp = root->words;
 	error_code = 0;
@@ -295,15 +285,6 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 			*root->words = ft_strdup(tokens[i].value);
 			error_code = concatenate_commands(&str, tokens, &i);
 		}
-/*		root->words = temp;
-
-		printf("tokens[%d]: ", i);
-		while (*root->words)
-		{
-			printf("%s ", *root->words);
-			root->words++;
-		}
-		printf("\n"); */
 	}
 	root->words = temp;
 	if (str && !error_code)
@@ -316,55 +297,7 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 	}
 	return (cleanup_populate_command_node(&root, &str, &error_code));
 }
-/*
-int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
-{
-	int		i;
-	char	*str;
-	char	**temp;
-	int		error_code;
 
-	if (populate_command_node_error_check(tokens, start, end))
-	{
-		error_code = -1;
-		return (error_code);
-	}
-	root->words = ft_calloc(*end - start + 2, sizeof(char *));
-	if (root->words == NULL)
-		return (-1);
-	root->words[*end - start + 1] = 0;
-	temp = root->words;
-	error_code = 0;
-	str = NULL;
-	i = start - 1;
-	root->type = AST_COMMAND;
-	while (++i <= *end && !error_code)
-	{
-		if (tokens[i].type == TOKEN_OPEN_PAREN
-			|| tokens[i].type == TOKEN_CLOSE_PAREN)
-			continue ;
-		if (identify_token(tokens[i].type))
-			error_code = redirection_node_creator(tokens, root, &i);
-		else if (ft_strlen(tokens[i].value) > 0)
-		{
-			while (*root->words)
-				root->words++;
-			*root->words = ft_strdup(tokens[i].value);
-			error_code = concatenate_commands(&str, tokens, &i);
-		}
-	}
-	root->words = temp;
-	if (str && !error_code)
-	{
-		free_void((void **)&root->token->value, NULL);
-		root->token->value = ft_strdup(str);
-		if (root->token->value == NULL)
-			error_code = -1;
-		free_void((void **)&str, NULL);
-	}
-	return (cleanup_populate_command_node(&root, &str, &error_code));
-}
-*/
 int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 {
 	while (p->i <= p->end)
@@ -380,7 +313,7 @@ int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 			|| tokens[p->i].type == TOKEN_CLOSE_PAREN)
 			p->i = find_matching_paren(tokens, p->i, p->end);
 		if (p->i < 0)
-			return (ft_putstr_fd("Error: parenthesis mismatch.\n", 2), -1);
+			return (error_handler(NULL, "parenthesis mismatch"), -1);
 		p->prec = get_precedence(tokens[p->i].type);
 		if (p->prec != -1 && p->prec < p->lowest_prec)
 		{

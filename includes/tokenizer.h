@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/09 21:17:56 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/10 20:48:52 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <readline/history.h>
 # include <readline/history.h>
 # include <string.h>
+# include <errno.h>
 
 typedef enum	e_token_type
 {
@@ -71,5 +72,7 @@ void		*free_tokens(t_tokens *tokens, t_capacity *capacity);
 char		*ft_strjoin_free(char *s1, char *s2);
 int			identify_token(t_token_type type);
 char		*back_to_char(int *int_array);
+void		error_handler(char *cause_str, char *error_str);
+int			find_matching_paren(t_tokens *tokens, int start, int end);
 
 #endif

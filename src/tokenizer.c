@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/10 03:11:06 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/10 23:47:18 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -624,15 +624,9 @@ int	populate_tokens(char *str, int *int_array)
 	while (*str)
 	{
 		if (*str == '"' && q.single_q_count % 2 == 0)
-		{
 			assign_quote(&str, int_array, &q, &m, 1);
-			//q.double_q_count++;
-		}
 		else if (*str == '\'' && q.double_q_count % 2 == 0)
-		{
 			assign_quote(&str, int_array, &q, &m, 0);
-			//q.single_q_count++;
-		}
 		else if (*str == '$')
 			assign_dollar(str, int_array, &q, &m);
 		else if (*str == '*')
@@ -643,9 +637,9 @@ int	populate_tokens(char *str, int *int_array)
 	}
 	int_array[m] = '\0';
 	if (q.double_q_count % 2 != 0)
-		return (ft_putstr_fd("unexpected EOF while looking for matching `\"'\n", 2), -1);
+		return (error_handler("unexpected EOF while looking for matching `\"'\n", NULL), -1);
 	if (q.single_q_count % 2 != 0)
-		return (ft_putstr_fd("unexpected EOF while looking for matching `''\n", 2), -1);
+		return (error_handler("unexpected EOF while looking for matching `''\n", NULL), -1);
 	return (0);
 }
 
@@ -740,10 +734,22 @@ int	tokens_error_checker(t_tokens *tokens, t_capacity *capacity)
 		} 
 		i++;
 	}
-	if (tokens[capacity->current_size - 1].type != TOKEN_WORD)
+	if (tokens[capacity->current_size - 1].type != TOKEN_WORD && tokens[capacity->current_size - 1].type != TOKEN_CLOSE_PAREN)
 	{
 		syntax_error_near(tokens, -1);
 		return (-1);
+	}
+	i = 0;
+	int k = 0;
+	while (i < capacity->current_size)
+	{
+		if (tokens[i].type == TOKEN_OPEN_PAREN || tokens[i].type == TOKEN_CLOSE_PAREN)
+			k = find_matching_paren(tokens, i, capacity->current_size - 1);
+		if (k < 0)
+			return (syntax_error_near(tokens, i), -1);
+		if (k > i)
+			i = k;
+		i++;
 	}
 	return (0);
 }
