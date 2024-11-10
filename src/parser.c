@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/07 09:58:50 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/10 23:13:29 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -77,7 +77,7 @@ t_tokens	*copy_token(t_tokens *token)
 	new_token = malloc(sizeof(t_tokens));
 	if (new_token == NULL)
 		return (NULL);
-	new_token->value = ft_strdup(token->value); // This is probably not necessary after the major refactor, but if you remove it it could mess up print_ast
+	new_token->value = ft_strdup(token->value);
 	if (new_token->value == NULL)
 		return ((t_tokens *)free_void((void **)&new_token, NULL));
 	new_token->type = token->type;
@@ -212,32 +212,13 @@ int	populate_command_node_error_check(t_tokens *tokens, int start, int *end)
 		while (++i <= *end)
 		{
 			if (tokens[i].type == TOKEN_OPEN_PAREN)
-			{
-				//printf("Aborting because encountered a TOKEN_WORD before TOKEN_OPEN_PAREN, which is %s!\n", tokens[i - 1].value);
 				return (syntax_error_near(tokens, i), -1);
-			}
 		}
 	}
 	else
 	{
 		k = find_matching_paren(tokens, i, k);
-		//if (k >= 0)
-		//{
-			//if (!identify_token(tokens[k + 1].type))
-			//{
-				//printf("Aborting because encountered a non-redirection token after TOKEN_CLOSE_PAREN, which is %s!\n", tokens[k + 1].value);
-				return (syntax_error_near(tokens, k + 1), -1);
-			//}
-		//}
-	}
-	if (tokens[*end].type != TOKEN_WORD)
-	{
-		// This seg faults for instance for "echo hello world >",
-		// because capacity is full and the next one is not NULL
-		// (everything in capacity that is not malloced is set to NULL. See syntax_error_near to understand.
-		// Fixed with changing return value from *end + 1 to -1.
-		//printf("Aborting due to last token not being TOKEN_WORD, which was %s\n", tokens[*end].value);
-		return (syntax_error_near(tokens, -1), -1); // The parameters before the refactor was (tokens, *end + 1).
+		return (syntax_error_near(tokens, k + 1), -1);
 	}
 	return (0);
 }
@@ -254,10 +235,24 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 		error_code = -1;
 		return (error_code);
 	}
-	root->words = ft_calloc(*end - start + 2, sizeof(char *));
+	int	j = start - 1;
+	int k;
+	int malloc_counter = 0;
+	while (++j <= *end)
+	{
+		k = 0;
+		if (tokens[j].globbed)
+		{
+			while (tokens[j].globbed[k++])
+				malloc_counter++;
+		}
+		else
+			malloc_counter++;
+	}
+	root->words = ft_calloc(malloc_counter + 1, sizeof(char *));
 	if (root->words == NULL)
 		return (-1);
-	root->words[*end - start + 1] = 0;
+	root->words[malloc_counter] = 0;
 	temp = root->words;
 	error_code = 0;
 	str = NULL;
@@ -270,6 +265,19 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 			continue ;
 		if (identify_token(tokens[i].type))
 			error_code = redirection_node_creator(tokens, root, &i);
+		else if (tokens[i].globbed)
+		{
+			while (*root->words)
+				root->words++;
+			char **temp_double_pointer = tokens[i].globbed;
+			while (*(tokens[i].globbed))
+			{
+				*root->words = ft_strdup(*(tokens[i].globbed));
+				tokens[i].globbed++;
+				root->words++;
+			}
+			tokens[i].globbed = temp_double_pointer;
+		}
 		else if (ft_strlen(tokens[i].value) > 0)
 		{
 			while (*root->words)
@@ -301,13 +309,11 @@ int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 			p->start++;
 			p->end--;
 		}
-		//if (basic_command_node_error_handling(tokens, p->start, &p->end))
-		//	return (-1); // This was intending to check if the last token is redirection. Refactored it, but is that feature still there?
 		if (tokens[p->i].type == TOKEN_OPEN_PAREN
 			|| tokens[p->i].type == TOKEN_CLOSE_PAREN)
 			p->i = find_matching_paren(tokens, p->i, p->end);
 		if (p->i < 0)
-			return (ft_putstr_fd("Error: parenthesis mismatch.\n", 2), -1);
+			return (error_handler(NULL, "parenthesis mismatch"), -1);
 		p->prec = get_precedence(tokens[p->i].type);
 		if (p->prec != -1 && p->prec < p->lowest_prec)
 		{
