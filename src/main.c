@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/10 01:42:34 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/10 03:01:57 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 10:35:14 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -44,13 +44,31 @@ int	execute_shell(char *input, int *code, char **new_envp)
 	return (0);
 }
 
+int	check_exit(char *temp)
+{
+	if (!ft_strncmp(temp, "exit", 4))
+	{
+		temp += 4;
+		if (*temp == '\0')
+			return (-1);
+		else
+		{
+			while (ft_strchr(" \t\n", *temp) && *temp)
+				temp++;
+			if (*temp == '\0')
+				return (-1);
+		}
+	}
+	return (0);
+}
+
 int	preliminary_input_check(char **input)
 {
 	char	*temp;
 
 	*input = readline("minishell> ");
-	if (!*input)
-		return (-2);
+	//if (*input == NULL)
+	//	return (-2); // Commenting this back in kills the tester, why?
 	temp = *input;
 	while (ft_strchr(" \t\n", *temp) && *temp)
 		temp++;
@@ -59,7 +77,7 @@ int	preliminary_input_check(char **input)
 		free_void((void **)input, NULL);
 		return (-2);
 	}
-	if (!ft_strncmp(temp, "exit", 5))
+	if (check_exit(temp) == -1)
 	{
 		free_void((void **)input, NULL);
 		return (printf("exit\n"), -1);
