@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/11 14:52:42 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/11 19:24:10 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -46,6 +46,7 @@ char	**rm_envp(char **envp, char *str)
 {
 	char	**new_envp;
 	int		i;
+	int		j;
 	int		flag;
 
 	i = 0;
@@ -56,6 +57,7 @@ char	**rm_envp(char **envp, char *str)
 	if (new_envp == NULL)
 		return (NULL);
 	i = -1;
+	j = 0;
 	while (envp[++i])
 	{
 		if (!ft_strncmp(str, envp[i], ft_strlen(str)))
@@ -63,8 +65,9 @@ char	**rm_envp(char **envp, char *str)
 			flag = 1;
 			continue ;
 		}
-		new_envp[i] = ft_strdup(envp[i]);
-		if (!new_envp[i])
+		if (new_envp[j])
+			new_envp[j] = ft_strdup(envp[i]);
+		if (!new_envp[j])
 		{
 			free_2d_array((void ***)&new_envp);
 			return (NULL);
@@ -117,11 +120,20 @@ void	print_env(char **envp)
 		printf("%s\n", envp[i]);
 }
 
-int	execute_builtin(char **cmd, char ***envp, t_minishell *minishell)
+int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n)
 {
 	int	i;
 	char	**str;
+	t_put	file;
 
+	file.infile = NULL;
+	file.outfile = NULL;
+	if (minishell->p.count == 0)
+	{
+		get_in_out(s, &file, minishell);
+		if (file.infile || file.outfile)
+			dupping(minishell, &minishell->p, &file, n);
+	}
 	if (!ft_strncmp(cmd[0], "echo", 5))
 	{
 		if (cmd[2] && !ft_strncmp(cmd[1], "-n", 3))
@@ -148,8 +160,16 @@ int	execute_builtin(char **cmd, char ***envp, t_minishell *minishell)
 	}
 	else if (!ft_strncmp(cmd[0], "cd", 3))
 	{
-		if (chdir(cmd[1]) != 0)
+		if (cmd[2])
+		{
+			ft_putstr_fd(" too many arguments\n", 2);
 			return (0);
+		}
+		if (chdir(cmd[1]) != 0)
+		{
+			ft_putstr_fd(" No such file or directory\n", 2);
+			return (0);
+		}
 		*envp = ch_envp(*envp, cmd[1]);
 		if (!envp)
 			return (0);
@@ -165,13 +185,13 @@ int	execute_builtin(char **cmd, char ***envp, t_minishell *minishell)
 	{
 		if (cmd[1][0] != '_' && !ft_isalpha(cmd[1][0]))
 		{
-			ft_putstr_fd("not a valid identifier\n", 2);
+			ft_putstr_fd(" not a valid identifier\n", 2);
 			return (0);
 		}
 		str = ft_split(cmd[1], '=');
 		if (!str)
 		{
-			ft_putstr_fd("not a valid identifier\n", 2);
+			ft_putstr_fd(" not a valid identifier\n", 2);
 			return (0);
 		}
 		i = -1;
@@ -179,7 +199,7 @@ int	execute_builtin(char **cmd, char ***envp, t_minishell *minishell)
 		{
 			if (str[0][i] != '_' && !ft_isalpha(str[0][i]) && !ft_isdigit(str[0][i]))
 			{
-				ft_putstr_fd("not a valid identifier\n", 2);
+				ft_putstr_fd(" not a valid identifier\n", 2);
 				return (0);
 			}
 		}
@@ -189,7 +209,8 @@ int	execute_builtin(char **cmd, char ***envp, t_minishell *minishell)
 	}
 	else if (!ft_strncmp(cmd[0], "unset", 6))
 	{
-		*envp = rm_envp(*envp, cmd[1]);
+		if (cmd[1])
+			*envp = rm_envp(*envp, cmd[1]);
 		if (!envp)
 			return (0);
 	}
@@ -197,9 +218,19 @@ int	execute_builtin(char **cmd, char ***envp, t_minishell *minishell)
 		print_env(*envp);
 	else if (!ft_strncmp(cmd[0], "exit", 5))
 	{
+		if (cmd[2])
+		{
+			ft_putstr_fd(" too many arguments\n", 2);
+			return (0);
+		}
 		i = ft_atoi(cmd[1]);
 		if (i == 0 && ft_strncmp(cmd[1], "0", 2) && ft_strncmp(cmd[1], "+0", 3) && ft_strncmp(cmd[1], "-0", 3))
-			exit(1);
+		{
+			ft_putstr_fd(" numeric argument required\n", 2);
+			//return (0);
+			error(minishell);
+			exit(2);
+		}
 		else
 			exit(i);
 	}
@@ -208,6 +239,8 @@ int	execute_builtin(char **cmd, char ***envp, t_minishell *minishell)
 
 int	is_builtin(char **cmd)
 {
+	if (!cmd[0])
+		return (0);
 	if (!ft_strncmp(cmd[0], "echo", 5))
 		return (1);
 	else if (!ft_strncmp(cmd[0], "cd", 3))

@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/08 15:18:36 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/11 19:03:12 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,13 +92,16 @@ t_ast	*build_ast(t_tokens *tokens, int start, int end, int code);
 //execution.c
 int		execution(t_ast *s, char ***envp);
 void	close_and_free(t_pipes *p);
+void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell);
+int	open_files(t_put *cmd);
+void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
 
 //path.c
 char	*get_path(char **cmd, char **envp, t_minishell *minishell);
 char	**paths(char **envp);
 
 //builtins.c
-int	execute_builtin(char **cmd, char ***envp, t_minishell *minishell);
+int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n);
 int	is_builtin(char **cmd);
 
 //ft_strdup2.c
