@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/10 23:13:29 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/11 13:15:52 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -236,8 +236,8 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 		return (error_code);
 	}
 	int	j = start - 1;
-	int k;
-	int malloc_counter = 0;
+	int	k;
+	int	malloc_counter = 0;
 	while (++j <= *end)
 	{
 		k = 0;
@@ -392,7 +392,7 @@ t_ast	*build_ast(t_tokens *tokens, int start, int end, int code)
 		if (root == NULL)
 			error_code = -1;
 		if (!error_code && populate_command_node(tokens,
-				root, p.start, &(p.end)) == -1) // Is this check really correct?
+				root, p.start, &(p.end)) == -1)
 			free_ast(&root);
 	}
 	return (root);
