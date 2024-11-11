@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/11 15:39:21 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/11 18:41:18 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -472,8 +472,6 @@ int	finalize_dollar_expansion(int *int_array_old,
 				str_of_var(&int_array_old, int_array_new, envp);
 			}
 		}
-		//else if (((*int_array_old & 0xFF) == '$') && !((*(int_array_old + 1) >> 8) & 1))
-		//	int_array_old++;
 		else
 		{
 			**int_array_new = *int_array_old;
@@ -512,8 +510,6 @@ int	*expand_dollar(int *int_array, char **envp, int len, int num, int code)
 				len = len + num;
 			}
 		}
-		//else if (((*int_array & 0xFF) == '$') && !((*(int_array + 1) >> 8) & 1))
-		//	int_array++;
 		else
 		{
 			len++;
@@ -568,6 +564,23 @@ int	*expand_dollar(int *int_array, char **envp, int len, int num, int code)
 	return (arr);
 }
 */
+
+void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
+{
+	if (q->single_q_count % 2 != 1)
+	{
+		if (ft_isalnum(*(str + 1)) || (*(str + 1) == '_') || (*(str + 1) == '?'))
+			int_array[*m] = encode_char_with_flag(*str);
+		else if ((*(str + 1) == '"' || *(str + 1) == '\'') && q->double_q_count % 2 != 1)
+			return ;
+		else
+			int_array[*m] = *str;
+	}
+	else
+		int_array[*m] = *str;
+	(*m)++;
+}
+/*
 void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 {
 	if (q->single_q_count % 2 != 1 && (ft_isalnum(*(str + 1)) || (*(str + 1) == '_') || (*(str + 1) == '?')))
@@ -576,7 +589,7 @@ void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 		int_array[*m] = *str;
 	(*m)++;
 }
-
+*/
 void	assign_asterisk(char *str, int *int_array, t_quote *q, int *m)
 {
 	if (q->single_q_count % 2 == 0 && q->double_q_count % 2 == 0)

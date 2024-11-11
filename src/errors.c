@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 11:05:16 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/11 15:15:01 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/11 16:04:33 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@ void	error(t_minishell *minishell)
 	//ft_putstr_fd(cmd->args[0], 2);
 	//ft_putstr_fd(": ", 2);
 	//ft_putstr_fd(str, 2);
-	if (minishell->ast)
-		free_ast(&minishell->ast);
+	//if (minishell->ast)
+	//	free_ast(&minishell->ast);
 	if (minishell->p.pipes)
 		close_and_free(&minishell->p);
 	if (minishell->p.pids)
