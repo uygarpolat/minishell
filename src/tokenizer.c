@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/11 00:26:31 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/11 03:40:28 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -726,8 +726,8 @@ int	tokens_error_checker(t_tokens *tokens, t_capacity *capacity)
 			|| (tokens[i].type == TOKEN_AND && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
 			|| (tokens[i].type == TOKEN_OR && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
 			|| (tokens[i].type == TOKEN_OPEN_PAREN && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
-			|| (tokens[i].type == TOKEN_CLOSE_PAREN && tokens[i + 1].type == TOKEN_AND && tokens[i + 1].type == TOKEN_OR && tokens[i + 1].type != TOKEN_PIPE && tokens[i + 1].type != TOKEN_CLOSE_PAREN)
-			)
+			|| (tokens[i].type == TOKEN_CLOSE_PAREN && tokens[i + 1].type != TOKEN_AND && tokens[i + 1].type != TOKEN_OR && tokens[i + 1].type != TOKEN_PIPE && tokens[i + 1].type != TOKEN_CLOSE_PAREN)
+			) // The last line changed and wasn't tested thoroughly afterwards. It was == TOKEN_AND and == TOKEN_OR. I think this version is correct, but do test!
 		{
 			syntax_error_near(tokens, i + 1);
 			return (-1);

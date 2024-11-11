@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/11 03:05:36 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/11 03:27:12 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 10:35:14 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -111,7 +111,7 @@ int	main(int argc, char **argv, char **envp)
 	init_signal();
 	signal(SIGINT, handle_sigint);
 	signal(SIGQUIT, handle_sigquit);
-	display_welcome_message(&code, new_envp);
+	//display_welcome_message(&code, new_envp);
 	while (1)
 	{
 		input_res = preliminary_input_check(&input, &code);
