@@ -6,18 +6,19 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:52:03 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/06 10:30:59 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/11 13:27:12 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
 
+
 static int	path_error(char **cmd, char **all_paths, t_minishell *minishell)
 {
 	if (all_paths && cmd[0][0] != '/')
-		error(minishell, "command not found\n");
+		error2(minishell, "command not found\n");
 	else
-		error(minishell, "No such file or directory\n");
+		error2(minishell, "No such file or directory\n");
 	free_2d_array((void ***)&all_paths);
 	return (127);
 }
@@ -27,7 +28,7 @@ static void	check_cmd(char **cmd, t_minishell *minishell, char **envp)
 	if (!cmd)
 	{
 		free_2d_array((void ***)&envp);
-		error(minishell, "command not found\n");
+		error2(minishell, "command not found\n");
 		exit (127);
 	}
 	if (cmd[0][0] == '.')
@@ -35,13 +36,13 @@ static void	check_cmd(char **cmd, t_minishell *minishell, char **envp)
 		if (cmd[0][ft_strlen(cmd[0]) - 1] == '/')
 		{
 			free_2d_array((void ***)&envp);
-			error(minishell, "Is a directroy\n");
+			error2(minishell, "Is a directroy\n");
 			exit (126);
 		}
 		else if (access(cmd[0], X_OK) == -1)
 		{
 			free_2d_array((void ***)&envp);
-			error(minishell, "command not found\n");
+			error2(minishell, "command not found\n");
 			exit (126);
 		}
 	}
