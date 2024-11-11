@@ -30,12 +30,12 @@ void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 	if (n < minishell->p.count || cmd->outfile)
 	{
 		if (dup2(out, STDOUT_FILENO) == -1)
-			error(minishell, "dup2 error\n");
+			error2(minishell, "dup2 error\n");
 	}
 	if (n > 0 || cmd->infile)
 	{
 		if (dup2(in, STDIN_FILENO) == -1)
-			error(minishell, "dup2 error\n");
+			error2(minishell, "dup2 error\n");
 	}
 	/*
 	if (p->pipes)
@@ -136,7 +136,7 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 		{
 			if (!open_files(&cmd))
 			{
-				error(minishell, "Permission denied\n");
+				error2(minishell, "Permission denied\n");
 				exit(1);
 			}
 		}
@@ -160,6 +160,11 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 			exit(0);
 		}
 		execve(path, s->words, *envp);
+		if (s->words[0][0] == '/')
+			ft_putstr_fd(" Is a directory\n", 2);
+		else
+			perror(strerror(126));
+		error(minishell);
 		//FREE EVERYTHING HERE
 		exit(126);
 		
@@ -294,7 +299,7 @@ int	execution(t_ast *s, char ***envp)
 	minishell.p.count = count_pipes(minishell.ast);
 	if (!mallocing(&minishell.p) || !pipeing(&minishell.p))
 	{
-		error(&minishell, "malloc failed\n");
+		error2(&minishell, "malloc failed\n");
 		return (1);
 	}
 	n = 0;
@@ -302,7 +307,7 @@ int	execution(t_ast *s, char ***envp)
 	{
 			if (!execute_builtin(s->words, envp, &minishell))
 			{	
-				error(&minishell, "builtin failed\n");
+				error(&minishell);
 				return (1);
 			}
 	}
@@ -327,6 +332,7 @@ int	execution(t_ast *s, char ***envp)
 	}
 	//i = -1;
 	//free(minishell.pwd);
-	free(minishell.p.pids);
+	if (minishell.p.pids)
+		free(minishell.p.pids);
 	return (s->code);
 }
