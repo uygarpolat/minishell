@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/08 15:18:06 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/11 19:40:57 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 		in = p->pipes[p->i][0];
 	else if (cmd->infile)
 		in = cmd->in;
-	if (!cmd->outfile)
+	if (!cmd->outfile && p->count > 0)
 		out = p->pipes[p->o][1];
 	else if (cmd->outfile)
 		out = cmd->out;
@@ -37,47 +37,6 @@ void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 		if (dup2(in, STDIN_FILENO) == -1)
 			error2(minishell, "dup2 error\n");
 	}
-	/*
-	if (p->pipes)
-	{
-		if (n == 0)
-		{
-			if (!s->redir_target || s->redir_target->token->type != TOKEN_REDIR_OUT)
-			{
-				if (dup2(out, STDOUT_FILENO) == -1)
-					error(minishell, "dup2 error\n");
-			}
-		}
-		else if (n == minishell->p.count)
-		{
-			if (!s->redir_target || s->redir_target->type != TOKEN_REDIR_IN)
-			{
-				if (dup2(in, STDIN_FILENO) == -1)
-					error(minishell, "dup2 error\n");
-			}
-		}
-		else
-		{
-			if (!s->redir_target)
-			{
-				if (dup2(in, STDIN_FILENO) == -1 || dup2(out, STDOUT_FILENO) == -1)
-					error(minishell, "dup2 error\n");
-			}
-			else
-			{
-				if (s->redir_target->type == TOKEN_REDIR_IN)
-				{
-					if (dup2(out, STDOUT_FILENO) == -1)
-						error(minishell, "dup2 error\n");
-				}
-				else
-				{
-					if (dup2(in, STDIN_FILENO) == -1)
-						error(minishell, "dup2 error\n");
-				}
-			}
-		}
-	}*/
 	close(in);
 	close(out);
 }
@@ -86,12 +45,16 @@ int	open_files(t_put *cmd)
 {	
 	if (cmd->infile)
 	{
+		if (cmd->in > 0)
+			close(cmd->in);
 		cmd->in = open(cmd->infile, O_RDONLY);
 		if (cmd->in < 0)
 			return (0);
 	}
 	if (cmd->outfile)
 	{
+		if (cmd->out > 0)
+			close(cmd->out);
 		if (cmd->o_type == 'o')
 			cmd->out = open(cmd->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 		else
@@ -102,11 +65,38 @@ int	open_files(t_put *cmd)
 	return (1);
 }
 
+void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell)
+{
+	t_ast	*temp;
+
+	temp = s->redir_target;
+	while (temp)
+	{
+		if (temp->type == AST_REDIR_IN)
+			cmd->infile = temp->token->value;
+		else if (temp->type == AST_REDIR_OUT)
+		{
+			cmd->o_type = 'o';
+			cmd->outfile = temp->token->value;
+		}
+		else if (temp->type == AST_REDIR_APPEND)
+		{
+			cmd->o_type = 'a';
+			cmd->outfile = temp->token->value;
+		}
+		if (!open_files(cmd))
+		{
+			error2(minishell, "Permission denied\n");
+			exit (1);
+		}
+		temp = temp->redir_target;
+	}
+}
+
 void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 {
 	int	i;
 	char	*path;
-	t_ast	*temp;
 	t_put	cmd;
 
 	cmd.infile = NULL;
@@ -114,32 +104,12 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 	minishell->p.pids[n] = fork();
 	if (minishell->p.pids[n] == 0)
 	{
-		temp = s->redir_target;
-		while (temp)
+		/*if (is_builtin(s->words))
 		{
-			//echo hei > out | cat out
-			if (temp->type == AST_REDIR_IN)
-				cmd.infile = temp->token->value;
-			else if (temp->type == AST_REDIR_OUT)
-			{
-				cmd.o_type = 'o';
-				cmd.outfile = temp->token->value;
-			}
-			else if (temp->type == AST_REDIR_APPEND)
-			{
-				cmd.o_type = 'a';
-				cmd.outfile = temp->token->value;
-			}
-			temp = temp->redir_target;
-		}
-		if (cmd.infile || cmd.outfile)
-		{
-			if (!open_files(&cmd))
-			{
-				error2(minishell, "Permission denied\n");
-				exit(1);
-			}
-		}
+			execute_builtin(s, s->words, envp, minishell, n);
+			exit(0);
+		}*/
+		get_in_out(s, &cmd, minishell);
 		if (minishell->p.pipes || cmd.infile || cmd.outfile)
 		{
 			if (n == minishell->p.count)
@@ -153,12 +123,14 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 			close(minishell->p.pipes[i][1]);
 			i++;
 		}
-		path = get_path(s->words, *envp, minishell);
 		if (is_builtin(s->words))
 		{
-			execute_builtin(s->words, envp, minishell);
+			execute_builtin(s, s->words, envp, minishell, n);
 			exit(0);
 		}
+		path = get_path(s->words, *envp, minishell);
+		if (!path)
+			exit(0);
 		execve(path, s->words, *envp);
 		if (s->words[0][0] == '/')
 			ft_putstr_fd(" Is a directory\n", 2);
@@ -167,7 +139,6 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 		error(minishell);
 		//FREE EVERYTHING HERE
 		exit(126);
-		
 	}
 }
 
@@ -305,11 +276,12 @@ int	execution(t_ast *s, char ***envp)
 	n = 0;
 	if (minishell.p.count == 0 && is_builtin(s->words))
 	{
-			if (!execute_builtin(s->words, envp, &minishell))
+			if (!execute_builtin(s, s->words, envp, &minishell, n))
 			{	
 				error(&minishell);
 				return (1);
 			}
+			exit(0);
 	}
 	else
 	{

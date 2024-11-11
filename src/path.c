@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:52:03 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/11 13:27:12 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/11 19:37:42 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,19 +31,22 @@ static void	check_cmd(char **cmd, t_minishell *minishell, char **envp)
 		error2(minishell, "command not found\n");
 		exit (127);
 	}
-	if (cmd[0][0] == '.')
+	if (cmd[0])
 	{
-		if (cmd[0][ft_strlen(cmd[0]) - 1] == '/')
+		if (cmd[0][0] == '.')
 		{
-			free_2d_array((void ***)&envp);
-			error2(minishell, "Is a directroy\n");
-			exit (126);
-		}
-		else if (access(cmd[0], X_OK) == -1)
-		{
-			free_2d_array((void ***)&envp);
-			error2(minishell, "command not found\n");
-			exit (126);
+			if (cmd[0][ft_strlen(cmd[0]) - 1] == '/')
+			{
+				free_2d_array((void ***)&envp);
+				error2(minishell, "Is a directroy\n");
+				exit (126);
+			}
+			else if (access(cmd[0], X_OK) == -1)
+			{
+				free_2d_array((void ***)&envp);
+				error2(minishell, "command not found\n");
+				exit (126);
+			}
 		}
 	}
 }
@@ -76,6 +79,8 @@ char	*get_path(char **cmd, char **envp, t_minishell *minishell)
 	char	*result;
 
 	check_cmd(cmd, minishell, envp);
+	if (!cmd[0])
+		return (NULL);
 	i = 0;
 	//split error??
 	all_paths = paths(envp);
