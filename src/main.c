@@ -6,6 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
+/*   Updated: 2024/11/11 15:53:48 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/11 15:15:17 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/11/07 10:35:14 by upolat           ###   ########.fr       */
 /*                                                                            */
@@ -41,7 +42,7 @@ int	execute_shell(char *input, int *code, char **new_envp)
 	else
 		*code = 2;
 	free_void((void **)&input, NULL);
-	return (0);
+	return (*code);
 }
 
 int	check_exit(char *temp)
@@ -68,24 +69,32 @@ int	preliminary_input_check(char **input, int *code)
 
 	*input = readline("minishell> ");
 	//if (*input == NULL)
-	//	return (-2); // Commenting this back in kills the tester, why?
+	//	return (-2); // Commenting this back in kills the tester, why? Is the test passing a null pointer?
 	temp = *input;
 	while (ft_strchr(" \t\n", *temp) && *temp)
 		temp++;
 	if (!ft_strncmp(temp, "\0", 1))
-	{
-		free_void((void **)input, NULL);
-		return (-2);
-	}
+		return (free_void((void **)input, NULL), -2);
 	if (check_exit(temp) == -1)
 	{
 		*code = 0;
 		free_void((void **)input, NULL);
 		return (printf("exit\n"), -1);
 	}
-	if (*input)
+	if (**input)
 		add_history(*input);
 	return (0);
+}
+
+void	display_welcome_message(int *code, char **new_envp)
+{
+	char	*payload;
+
+	payload = "echo \"\033[1;34m+--------------------\
+--+\033[0m\n\033[1;34m| \033[1;37mWelcome to Minishell\
+\033[0m\033[1;34m |\033[0m\n\033[1;34m+----------------------+\033[0m\"";
+	*code = execute_shell(ft_strdup("clear"), code, new_envp);
+	*code = execute_shell(ft_strdup(payload), code, new_envp);
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -103,6 +112,7 @@ int	main(int argc, char **argv, char **envp)
 	init_signal();
 	signal(SIGINT, handle_sigint);
 	signal(SIGQUIT, handle_sigquit);
+	//display_welcome_message(&code, new_envp);
 	while (1)
 	{
 		input_res = preliminary_input_check(&input, &code);
@@ -112,20 +122,7 @@ int	main(int argc, char **argv, char **envp)
 			break ;
 		if (*input)
 			add_history(input);
-		tokens = ft_tokenizer(input, &capacity, new_envp, code);
-		if (tokens)
-		{
-			ast = build_ast(tokens, 0, capacity.current_size - 1, 0);
-			//if (ast)
-				//print_ast(ast, 0);		
-		}
-		else
-			continue ;
-		if (ast)
-			code = execution(ast, &new_envp);
-		free_ast(&ast);
-		free_tokens(tokens, &capacity);
-		execute_shell(input, &code, new_envp);
+		code = execute_shell(input, &code, new_envp);
 	}
 	free_2d_array((void ***)&new_envp);
 	return (code);

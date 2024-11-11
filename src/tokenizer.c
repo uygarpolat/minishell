@@ -6,8 +6,8 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/11 15:15:38 by hpirkola         ###   ########.fr       */
-/*   Updated: 2024/11/07 10:37:41 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/11 15:39:21 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -379,8 +379,6 @@ int	length_of_var(int **int_array, char **envp)
 	len = 0;
 	i = 0;
 	n = -1;
-	//while (ft_isalnum((*int_array)[i]) || (*int_array)[i] == '_')
-	//	i++;
 	while ((ft_isalnum((*int_array)[i] & 0xFF) || ((*int_array)[i] & 0xFF) == '_') && !(((*int_array)[i] >> 8) & 1))
 		i++;
 
@@ -415,11 +413,8 @@ int	str_of_var(int **int_array_old, int **int_array_new, char **envp)
 
 	i = 0;
 	n = -1;
-	//while (((*int_array & 0xFF) == '$') && ((*int_array >> 8) & 1) && *(int_array + 1))
 	while ((ft_isalnum((*int_array_old)[i] & 0xFF) || ((*int_array_old)[i] & 0xFF) == '_') && !(((*int_array_old)[i] >> 8) & 1))
 		i++;
-	//while (ft_isalnum((*int_array_old)[i]) || (*int_array_old)[i] == '_')
-	//	i++;
 	str = malloc(sizeof(char) * (i + 1));
 	if (str == NULL)
 		return (-1);
@@ -477,6 +472,8 @@ int	finalize_dollar_expansion(int *int_array_old,
 				str_of_var(&int_array_old, int_array_new, envp);
 			}
 		}
+		//else if (((*int_array_old & 0xFF) == '$') && !((*(int_array_old + 1) >> 8) & 1))
+		//	int_array_old++;
 		else
 		{
 			**int_array_new = *int_array_old;
@@ -488,6 +485,49 @@ int	finalize_dollar_expansion(int *int_array_old,
 	return (0);
 }
 
+int	*expand_dollar(int *int_array, char **envp, int len, int num, int code)
+{
+	int		*arr;
+
+	while (*int_array)
+	{
+		if (((*int_array & 0xFF) == '$') && ((*int_array >> 8) & 1) && *(int_array + 1))
+		{
+			if (*(int_array + 1) == '?')
+			{
+				char	*str_num;
+
+				str_num = ft_itoa(code);
+				num = ft_strlen(str_num);
+				len = len + num;
+				int_array += 2;
+				free_void((void **)&str_num, NULL);
+			}
+			else
+			{
+				int_array++;
+				num = length_of_var(&int_array, envp);
+				if (num == -1)
+					return (NULL); // Handle better.
+				len = len + num;
+			}
+		}
+		//else if (((*int_array & 0xFF) == '$') && !((*(int_array + 1) >> 8) & 1))
+		//	int_array++;
+		else
+		{
+			len++;
+			int_array++;
+		}
+	}
+	arr = malloc(sizeof(int) * (len + 1));
+	if (arr == NULL)
+		return (NULL);
+	arr[len] = '\0';
+	return (arr);
+}
+
+/*
 int	*expand_dollar(int *int_array, char **envp, int len, int num, int code)
 {
 	int		*arr;
@@ -527,57 +567,6 @@ int	*expand_dollar(int *int_array, char **envp, int len, int num, int code)
 	arr[len] = '\0';
 	return (arr);
 }
-/*
-int	finalize_dollar_expansion(int *int_array_old,
-		int **int_array_new, char **envp, int code)
-{
-	int	*temp;
-
-	temp = *int_array_new;
-	while (*int_array_old)
-	{
-		if (((*int_array_old & 0xFF) == '$') && ((*int_array_old >> 8) & 1) && *(int_array_old + 1))
-		{
-			int_array_old++;
-			str_of_var(&int_array_old, int_array_new, envp);
-		}
-		else
-		{
-			**int_array_new = *int_array_old;
-			(*int_array_new)++;
-			int_array_old++;
-		}
-	}
-	*int_array_new = temp;
-	return (0);
-}
-
-int	*expand_dollar(int *int_array, char **envp, int len, int num, int code)
-{
-	int		*arr;
-
-	while (*int_array)
-	{
-		if (((*int_array & 0xFF) == '$') && ((*int_array >> 8) & 1) && *(int_array + 1))
-		{
-			int_array++;
-			num = length_of_var(&int_array, envp);
-			if (num == -1)
-				return (NULL); // Handle better.
-			len = len + num;
-		}
-		else
-		{
-			len++;
-			int_array++;
-		}
-	}
-	arr = malloc(sizeof(int) * (len + 1));
-	if (arr == NULL)
-		return (NULL);
-	arr[len] = '\0';
-	return (arr);
-}
 */
 void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 {
@@ -603,7 +592,7 @@ void	assign_quote(char **str, int *int_array, t_quote *q, int *m, int flag)
 		q->double_q_count++;
 	else
 		q->single_q_count++;
-	if (ft_isalnum(*(*str + 1)) || *(*str + 1) == '_')
+	if (ft_isalnum(*(*str + 1) & 0xFF) || (*(*str + 1) & 0xFF) == '_') // Added 0xFF check. Before that it was working fine. Remove them if things break.
 	{
 		int_array[*m] = encode_char_with_flag(*(*str + 1));
 		(*m)++;
@@ -637,9 +626,9 @@ int	populate_tokens(char *str, int *int_array)
 	}
 	int_array[m] = '\0';
 	if (q.double_q_count % 2 != 0)
-		return (error_handler("unexpected EOF while looking for matching `\"'\n", NULL), -1);
+		return (error_handler(NULL, "unexpected EOF while looking for matching `\"'"), -1);
 	if (q.single_q_count % 2 != 0)
-		return (error_handler("unexpected EOF while looking for matching `''\n", NULL), -1);
+		return (error_handler(NULL, "unexpected EOF while looking for matching `''"), -1);
 	return (0);
 }
 
@@ -726,8 +715,8 @@ int	tokens_error_checker(t_tokens *tokens, t_capacity *capacity)
 			|| (tokens[i].type == TOKEN_AND && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
 			|| (tokens[i].type == TOKEN_OR && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
 			|| (tokens[i].type == TOKEN_OPEN_PAREN && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
-			|| (tokens[i].type == TOKEN_CLOSE_PAREN && tokens[i + 1].type == TOKEN_AND && tokens[i + 1].type == TOKEN_OR && tokens[i + 1].type != TOKEN_PIPE && tokens[i + 1].type != TOKEN_CLOSE_PAREN)
-			)
+			|| (tokens[i].type == TOKEN_CLOSE_PAREN && tokens[i + 1].type != TOKEN_AND && tokens[i + 1].type != TOKEN_OR && tokens[i + 1].type != TOKEN_PIPE && tokens[i + 1].type != TOKEN_CLOSE_PAREN)
+			) // The last line changed and wasn't tested thoroughly afterwards. It was == TOKEN_AND and == TOKEN_OR. I think this version is correct, but do test!
 		{
 			syntax_error_near(tokens, i + 1);
 			return (-1);
