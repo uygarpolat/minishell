@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/10 23:47:18 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/11 00:26:31 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -637,9 +637,9 @@ int	populate_tokens(char *str, int *int_array)
 	}
 	int_array[m] = '\0';
 	if (q.double_q_count % 2 != 0)
-		return (error_handler("unexpected EOF while looking for matching `\"'\n", NULL), -1);
+		return (error_handler(NULL, "unexpected EOF while looking for matching `\"'"), -1);
 	if (q.single_q_count % 2 != 0)
-		return (error_handler("unexpected EOF while looking for matching `''\n", NULL), -1);
+		return (error_handler(NULL, "unexpected EOF while looking for matching `''"), -1);
 	return (0);
 }
 
