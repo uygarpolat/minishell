@@ -16,7 +16,10 @@
 #include "../includes/ast.h"
 #include "termios.h"
 
-char	*expand_wildcard(int *int_array);
+int		populate_command_node_error_check(t_tokens *tokens, int start, int *end);
+int		identify_token(t_token_type type);
+void	syntax_error_near(t_tokens *tokens, int loc);
+char	*expand_wildcard(int *int_array, t_tokens *tokens, int loc, int flag);
 
 void	init_signal(void)
 {
@@ -82,7 +85,20 @@ void	print_ast(t_ast *node, int level)
 	if (node->type == AST_COMMAND)
 	{
 		temp_double_arr = node->words;
-		printf("AST_COMMAND [TOKEN: %s]\n", node->token->value);
+		//indent_level = -1;
+		while (++indent_level < level + 1)
+			printf("  ");
+		printf("AST_COMMAND [TOKEN: ");
+		while (*node->words)
+		{
+			//indent_level = -1;
+			//while (++indent_level < level + 1)
+			//	printf("  ");
+			printf("%s ", *(node->words));
+			(node->words)++;
+		}
+		printf("]\n");
+		node->words = temp_double_arr;
 		while (*node->words)
 		{
 			indent_level = -1;
@@ -91,6 +107,7 @@ void	print_ast(t_ast *node, int level)
 			printf("[TOKEN: %s]\n", *(node->words));
 			(node->words)++;
 		}
+
 		node->words = temp_double_arr;
 	}
 	else if (node->type == AST_PIPE)
@@ -136,13 +153,6 @@ void	print_ast(t_ast *node, int level)
 	}
 }
 
-int	is_space(char c)
-{
-	if (c == ' ')
-		return (1);
-	return (0);
-}
-
 int	is_seperator(char c, char c_plus_one)
 {
 	if (c == '<' || c == '>' || (c == '&' && c_plus_one == '&')
@@ -151,51 +161,56 @@ int	is_seperator(char c, char c_plus_one)
 	return (0);
 }
 
-void	free_tokens(t_tokens *tokens, t_capacity *capacity)
+void *free_tokens(t_tokens *tokens, t_capacity *capacity)
 {
 	int	i;
 
 	i = 0;
 	if (!tokens)
-		return ;
+		return (tokens);
 	while (i < capacity->max_size)
 	{
-		if (tokens[i].value)
-			free(tokens[i].value);
-		tokens[i].value = NULL;
+		free_void((void **)&tokens[i].value, NULL);
+		free_2d_array((void ***)&tokens[i].globbed);
 		i++;
 	}
-	if (tokens)
-	{
-		free(tokens);
-		tokens = NULL;
-	}
+	free_void((void **)&tokens, NULL);
+	return ((void *)tokens);
+
 }
 
-t_tokens	*ft_realloc_tokens_when_full(t_tokens *tokens,
+void	realloc_error(t_tokens *tokens, t_tokens *new_tokens, t_capacity *capacity, int i)
+{
+	free_tokens(tokens, capacity);
+	capacity->max_size *= 2;
+	while (++i < capacity->max_size)
+		new_tokens[i].value = NULL;
+	free_tokens(new_tokens, capacity);
+}
+
+t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
 		t_capacity *capacity, int i)
 {
 	t_tokens	*new_tokens;
 
 	new_tokens = malloc(sizeof(t_tokens) * (capacity->max_size * 2));
 	if (new_tokens == NULL)
-		return (free_tokens(tokens, capacity), NULL);
-	while (i < capacity->max_size * 2)
+		return ((t_tokens *)free_tokens(tokens, capacity));
+	while (++i < capacity->max_size * 2)
 	{
 		if (i < capacity->current_size)
 		{
 			new_tokens[i].value = ft_strdup(tokens[i].value);
 			if (new_tokens[i].value == NULL)
-			{
-				free_tokens(tokens, capacity);
-				capacity->max_size *= 2;
-				return (free_tokens(new_tokens, capacity), NULL);
-			}
+				return (realloc_error(tokens, new_tokens, capacity, i), NULL);
+			new_tokens[i].globbed = NULL;
 			new_tokens[i].type = tokens[i].type;
 		}
 		else
+		{
 			new_tokens[i].value = NULL;
-		i++;
+			new_tokens[i].globbed = NULL;
+		}
 	}
 	free_tokens(tokens, capacity);
 	capacity->max_size *= 2;
@@ -254,7 +269,7 @@ int	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 		return (-1);
 	return (0);
 }
-
+/*
 char	*skip_a_char(char *str, char c)
 {
 	str++;
@@ -262,7 +277,7 @@ char	*skip_a_char(char *str, char c)
 		str++;
 	return (str);
 }
-/*
+*/
 char	*skip_a_char(char *str, char c)
 {
 	char	*temp;
@@ -282,10 +297,11 @@ char	*skip_a_char(char *str, char c)
 	}
 	if (*str)
 		return (str);
-	else
+	else if (temp != NULL)
 		return (temp);
+	return (str);
 }
-*/
+
 int	skip_quotes(char **temp)
 {
 	if (ft_strchr(" \n\t<>|&()\"'", **temp))
@@ -608,15 +624,9 @@ int	populate_tokens(char *str, int *int_array)
 	while (*str)
 	{
 		if (*str == '"' && q.single_q_count % 2 == 0)
-		{
 			assign_quote(&str, int_array, &q, &m, 1);
-			//q.double_q_count++;
-		}
 		else if (*str == '\'' && q.double_q_count % 2 == 0)
-		{
 			assign_quote(&str, int_array, &q, &m, 0);
-			//q.single_q_count++;
-		}
 		else if (*str == '$')
 			assign_dollar(str, int_array, &q, &m);
 		else if (*str == '*')
@@ -626,8 +636,10 @@ int	populate_tokens(char *str, int *int_array)
 		str++;
 	}
 	int_array[m] = '\0';
-	if (q.single_q_count % 2 != 0 || q.double_q_count % 2 != 0)
-		return (ft_putstr_fd("Unmatched quotes error!\n", 2), -1);
+	if (q.double_q_count % 2 != 0)
+		return (error_handler("unexpected EOF while looking for matching `\"'\n", NULL), -1);
+	if (q.single_q_count % 2 != 0)
+		return (error_handler("unexpected EOF while looking for matching `''\n", NULL), -1);
 	return (0);
 }
 
@@ -652,12 +664,104 @@ int	handle_expansion_and_wildcard(t_tokens *tokens,
 		int_array_new = expand_dollar(int_array, envp, 0, 0, code);
 		finalize_dollar_expansion(int_array, &int_array_new, envp, code);
 		free_void((void **)&tokens[i].value, NULL);
-		tokens[i].value = expand_wildcard(int_array_new);
+		tokens[i].value = expand_wildcard(int_array_new, tokens, i, 0);
+		
 		if (tokens[i].value == NULL)
-			return (-1); // Handle better.
+		{
+			free_void((void **)&int_array, NULL);
+			free_void((void **)&int_array_new, NULL);
+			return (-1);
+		}
 		free_void((void **)&int_array, NULL);
 		free_void((void **)&int_array_new, NULL);
 	}
+	return (0);
+}
+/*
+
+   "word", "(", ")", "<", ">", "|",
+		"<<", ">>", "||", "&&"
+
+
+first: word, open_paren, redir
+
+before word: word, open_paren, redir, pipe, logic
+after word: word, close_paren, redir, pipe, logic
+
+before redir: word, open_paren, pipe, logic
+after redir: word
+
+before pipe: word, close_paren
+after pipe: word, open_paren, redir
+
+before logic: word, close_paren
+after logic: word, open_paren, redir
+
+before open paren: open_paren, logic, pipe
+after open paren: word, open_paren, redir
+
+before close_paren: word, close_paren
+after close_paren: close_paren, pipe, logic
+
+last: word, close_paren
+
+*/
+
+int	tokens_error_checker(t_tokens *tokens, t_capacity *capacity)
+{
+	int	i;
+
+	if (tokens[0].type != TOKEN_WORD && !identify_token(tokens[0].type) && tokens[0].type != TOKEN_OPEN_PAREN)
+	{
+		syntax_error_near(tokens, 0);
+		return (-1);
+	}
+
+	i = 0;
+	while (i < capacity->current_size - 1)
+	{
+		if ((identify_token(tokens[i].type) && tokens[i + 1].type != TOKEN_WORD)
+			|| (tokens[i].type == TOKEN_WORD && tokens[i + 1].type == TOKEN_OPEN_PAREN)
+			|| (tokens[i].type == TOKEN_PIPE && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
+			|| (tokens[i].type == TOKEN_AND && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
+			|| (tokens[i].type == TOKEN_OR && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
+			|| (tokens[i].type == TOKEN_OPEN_PAREN && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
+			|| (tokens[i].type == TOKEN_CLOSE_PAREN && tokens[i + 1].type == TOKEN_AND && tokens[i + 1].type == TOKEN_OR && tokens[i + 1].type != TOKEN_PIPE && tokens[i + 1].type != TOKEN_CLOSE_PAREN)
+			)
+		{
+			syntax_error_near(tokens, i + 1);
+			return (-1);
+		} 
+		i++;
+	}
+	if (tokens[capacity->current_size - 1].type != TOKEN_WORD && tokens[capacity->current_size - 1].type != TOKEN_CLOSE_PAREN)
+	{
+		syntax_error_near(tokens, -1);
+		return (-1);
+	}
+	i = 0;
+	int k = 0;
+	while (i < capacity->current_size)
+	{
+		if (tokens[i].type == TOKEN_OPEN_PAREN || tokens[i].type == TOKEN_CLOSE_PAREN)
+			k = find_matching_paren(tokens, i, capacity->current_size - 1);
+		if (k < 0)
+			return (syntax_error_near(tokens, i), -1);
+		if (k > i)
+			i = k;
+		i++;
+	}
+	return (0);
+}
+
+int	init_tokenizer(t_tokens **tokens, t_capacity *capacity)
+{
+	capacity->max_size = 1;
+	capacity->current_size = 0;
+	*tokens = malloc(sizeof(t_tokens) * capacity->max_size);
+	if (*tokens == NULL)
+		return (-1);
+	(*tokens)->globbed = NULL;
 	return (0);
 }
 
@@ -666,17 +770,15 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code)
 	t_tokens	*tokens;
 	int			error_code;
 
-	capacity->max_size = 1;
-	capacity->current_size = 0;
-	tokens = malloc(sizeof(t_tokens) * capacity->max_size);
-	if (tokens == NULL)
+	tokens = NULL;
+	if (init_tokenizer(&tokens, capacity) == -1)
 		return (NULL);
 	while (*input)
 	{
 		while (ft_strchr(" \t\n", *input) && *input)
 			input++;
 		if (capacity->max_size <= capacity->current_size)
-			tokens = ft_realloc_tokens_when_full(tokens, capacity, 0);
+			tokens = realloc_tokens_when_full(tokens, capacity, -1);
 		if (tokens == NULL)
 			return (NULL);
 		if (*input && is_seperator(*input, *(input + 1)))
@@ -687,7 +789,7 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code)
 			return (NULL);
 	}
 	//print_tokens(tokens, capacity);
-	if (handle_expansion_and_wildcard(tokens, capacity, envp, code) == -1)
-		return (free_tokens(tokens, capacity), NULL);
+	if (tokens_error_checker(tokens, capacity) == -1 || handle_expansion_and_wildcard(tokens, capacity, envp, code) == -1)
+		return ((t_tokens *)free_tokens(tokens, capacity));
 	return (tokens);
 }

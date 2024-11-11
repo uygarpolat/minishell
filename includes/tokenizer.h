@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/06 15:52:55 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/10 20:48:52 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,12 @@
 # include <stdlib.h>
 # include <signal.h>
 # include <unistd.h>
+# include <dirent.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <readline/history.h>
 # include <string.h>
+# include <errno.h>
 
 typedef enum	e_token_type
 {
@@ -42,6 +44,7 @@ typedef struct	s_tokens
 {
 	enum e_token_type	type;
 	char				*value;
+	char				**globbed;
 }						t_tokens;
 
 typedef struct	s_capacity
@@ -56,8 +59,20 @@ typedef struct	s_quote
 	int			double_q_count;
 }				t_quote;
 
+typedef struct	s_globber
+{
+	DIR				*dir;
+	struct dirent	*entry;
+	int				loc;
+	int				flag;
+}					t_globber;
+
 t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code);
-void		free_tokens(t_tokens *tokens, t_capacity *capacity);
+void		*free_tokens(t_tokens *tokens, t_capacity *capacity);
 char		*ft_strjoin_free(char *s1, char *s2);
+int			identify_token(t_token_type type);
+char		*back_to_char(int *int_array);
+void		error_handler(char *cause_str, char *error_str);
+int			find_matching_paren(t_tokens *tokens, int start, int end);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/11 13:02:05 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/08 15:18:36 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ typedef struct	s_minishell
 t_ast	*build_ast(t_tokens *tokens, int start, int end, int code);
 
 //execution.c
-int	execution(t_ast *s, char ***envp);
+int		execution(t_ast *s, char ***envp);
 void	close_and_free(t_pipes *p);
 
 //path.c
