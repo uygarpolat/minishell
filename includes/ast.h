@@ -24,6 +24,7 @@
 # include <string.h>
 # include <sys/wait.h>
 # include <limits.h>
+# include <errno.h>
 # include "../library/libft/libft.h"
 # include "tokenizer.h"
 
@@ -105,7 +106,8 @@ char	**ft_strdup2(char **str);
 char	**ft_strdup3(char **str, char *dir);
 
 //errors.c
-void	error(t_minishell *minishell, char *str);
+void	error(t_minishell *minishell);
+void	error2(t_minishell *minishell, char *str);
 
 //parser.c
 void	free_ast(t_ast **node);

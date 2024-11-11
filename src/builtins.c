@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/07 11:40:40 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/11 14:52:42 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -119,9 +119,8 @@ void	print_env(char **envp)
 
 int	execute_builtin(char **cmd, char ***envp, t_minishell *minishell)
 {
-	//char	buf[PATH_MAX];
 	int	i;
-	//char	**pwd;
+	char	**str;
 
 	if (!ft_strncmp(cmd[0], "echo", 5))
 	{
@@ -161,25 +160,29 @@ int	execute_builtin(char **cmd, char ***envp, t_minishell *minishell)
 		}
 	}
 	else if (!ft_strncmp(cmd[0], "pwd", 4))
-	{
-		/*i = 0;
-		while (envp[i])
-		{
-			if (!ft_strncmp("PWD=", envp[i], 4))
-			{
-				pwd = ft_split(envp[i], '=');
-				printf("%s\n", pwd[1]);
-			}
-			i++;
-		}*/
 		printf("%s\n", minishell->pwd);
-		//if (getcwd(buf, sizeof(buf)))
-			//printf("%s\n", buf);
-		//else
-			//perror("getcwd error\n");
-	}
 	else if (!ft_strncmp(cmd[0], "export", 7))
 	{
+		if (cmd[1][0] != '_' && !ft_isalpha(cmd[1][0]))
+		{
+			ft_putstr_fd("not a valid identifier\n", 2);
+			return (0);
+		}
+		str = ft_split(cmd[1], '=');
+		if (!str)
+		{
+			ft_putstr_fd("not a valid identifier\n", 2);
+			return (0);
+		}
+		i = -1;
+		while (str[0][++i])
+		{
+			if (str[0][i] != '_' && !ft_isalpha(str[0][i]) && !ft_isdigit(str[0][i]))
+			{
+				ft_putstr_fd("not a valid identifier\n", 2);
+				return (0);
+			}
+		}
 		*envp = add_env(*envp, cmd[1]);
 		if (!envp)
 			return (0);
