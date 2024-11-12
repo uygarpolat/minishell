@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/12 17:27:09 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/12 22:27:49 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -344,7 +344,7 @@ int	encode_char_with_flag(char c)
 	encoded_value = (1 << 8) | c;
 	return (encoded_value);
 }
-
+/*
 char	*get_var(char *str, char **envp)
 {
 	if (!envp)
@@ -475,10 +475,14 @@ int	finalize_dollar_expansion(int *int_array_old,
 	return (0);
 }
 
-int	*expand_dollar(int *int_array, char **envp, int len, int num, int code)
+int	*expand_dollar(int *int_array, char **envp, int code)
 {
+	int		len;
+	int		num;
 	int		*arr;
 
+	len = 0;
+	num = 0;
 	while (*int_array)
 	{
 		if (((*int_array & 0xFF) == '$')
@@ -515,7 +519,7 @@ int	*expand_dollar(int *int_array, char **envp, int len, int num, int code)
 	arr[len] = '\0';
 	return (arr);
 }
-
+*/
 void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 {
 	if (q->single_q_count % 2 != 1)
@@ -595,25 +599,25 @@ int	handle_expansion_and_wildcard(t_tokens *tokens,
 		t_capacity *capacity, char **envp, int code)
 {
 	int		i;
-	int		*int_array;
+	int		*int_array_old;
 	int		*int_array_new;
 
-	int_array = NULL;
+	int_array_old = NULL;
 	int_array_new = NULL;
 	i = -1;
 	while (++i < capacity->current_size)
 	{
-		int_array = malloc(sizeof(int) * (ft_strlen(tokens[i].value) + 1));
-		if (int_array == NULL)
+		int_array_old = malloc(sizeof(int) * (ft_strlen(tokens[i].value) + 1));
+		if (int_array_old == NULL)
 			return (-1);
-		int_array[ft_strlen(tokens[i].value)] = 0;
-		if (populate_tokens(tokens[i].value, int_array))
-			return (free_void((void **)&int_array, NULL), -1);
-		int_array_new = expand_dollar(int_array, envp, 0, 0, code);
-		finalize_dollar_expansion(int_array, &int_array_new, envp, code);
+		int_array_old[ft_strlen(tokens[i].value)] = 0;
+		if (populate_tokens(tokens[i].value, int_array_old))
+			return (free_void((void **)&int_array_old, NULL), -1);
+		int_array_new = ultimate_dollar_expansion(int_array_old, NULL, envp, code, 0);
+		ultimate_dollar_expansion(int_array_old, int_array_new, envp, code, 1);
 		free_void((void **)&tokens[i].value, NULL);
 		tokens[i].value = expand_wildcard(int_array_new, tokens, i, 0);
-		free_void((void **)&int_array, NULL);
+		free_void((void **)&int_array_old, NULL);
 		free_void((void **)&int_array_new, NULL);
 		if (tokens[i].value == NULL)
 			return (-1);
