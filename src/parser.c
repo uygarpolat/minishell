@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/11 13:15:52 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/12 00:45:08 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -20,7 +20,7 @@ int	get_precedence(t_token_type type)
 	if (type == TOKEN_AND)
 		return (1);
 	else if (type == TOKEN_OR)
-		return (1); // Is thos correct?
+		return (1);
 	else if (type == TOKEN_PIPE)
 		return (3);
 	return (-1);
@@ -252,7 +252,6 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 	root->words = ft_calloc(malloc_counter + 1, sizeof(char *));
 	if (root->words == NULL)
 		return (-1);
-	root->words[malloc_counter] = 0;
 	temp = root->words;
 	error_code = 0;
 	str = NULL;
@@ -313,7 +312,7 @@ int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 			|| tokens[p->i].type == TOKEN_CLOSE_PAREN)
 			p->i = find_matching_paren(tokens, p->i, p->end);
 		if (p->i < 0)
-			return (error_handler(NULL, "parenthesis mismatch"), -1);
+			return (-1);
 		p->prec = get_precedence(tokens[p->i].type);
 		if (p->prec != -1 && p->prec < p->lowest_prec)
 		{

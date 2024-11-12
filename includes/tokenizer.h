@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/10 20:48:52 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/12 00:36:39 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@
 # include <readline/history.h>
 # include <string.h>
 # include <errno.h>
+
+extern int	g_signal;
 
 typedef enum	e_token_type
 {

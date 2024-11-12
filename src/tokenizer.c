@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/11 18:41:18 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/12 02:39:52 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -21,29 +21,33 @@ int		identify_token(t_token_type type);
 void	syntax_error_near(t_tokens *tokens, int loc);
 char	*expand_wildcard(int *int_array, t_tokens *tokens, int loc, int flag);
 
-void	init_signal(void)
+void	handle_sigint(int signum)
+{
+	(void)signum;
+	g_signal = 1;
+	ft_putstr_fd("\n", STDOUT_FILENO);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
+}
+
+void	handle_sigquit(int signum)
+{
+	(void)signum;
+}
+
+int	init_signal(int argc, char **argv)
 {
 	struct termios	term;
 
-	// Is error handling necessary in any of this?
+	(void)argc;
+	(void)argv;
 	tcgetattr(STDIN_FILENO, &term);
 	term.c_lflag &= ~ECHOCTL;
 	tcsetattr(STDIN_FILENO, TCSANOW, &term);
-}
-
-void	handle_sigint(void)
-{
-	write(STDOUT_FILENO, "\n", 1);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
-}
-
-void	handle_sigquit(void)
-{
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
+	signal(SIGINT, handle_sigint);
+	signal(SIGQUIT, handle_sigquit);
+	return (0);
 }
 
 void	print_tokens(t_tokens *tokens, t_capacity *capacity)
@@ -330,8 +334,6 @@ int	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 			if (*temp)
 				temp++;
 		}
-		//if (!*temp)
-		//	break ;
 		if (*temp == '&')
 		{
 			if (*(temp + 1) == '&')
@@ -523,48 +525,6 @@ int	*expand_dollar(int *int_array, char **envp, int len, int num, int code)
 	return (arr);
 }
 
-/*
-int	*expand_dollar(int *int_array, char **envp, int len, int num, int code)
-{
-	int		*arr;
-
-	while (*int_array)
-	{
-		if (((*int_array & 0xFF) == '$') && ((*int_array >> 8) & 1) && *(int_array + 1))
-		{
-			if (*(int_array + 1) == '?')
-			{
-				char	*str_num;
-
-				str_num = ft_itoa(code);
-				num = ft_strlen(str_num);
-				len = len + num;
-				int_array += 2;
-				free_void((void **)&str_num, NULL);
-			}
-			else
-			{
-				int_array++;
-				num = length_of_var(&int_array, envp);
-				if (num == -1)
-					return (NULL); // Handle better.
-				len = len + num;
-			}
-		}
-		else
-		{
-			len++;
-			int_array++;
-		}
-	}
-	arr = malloc(sizeof(int) * (len + 1));
-	if (arr == NULL)
-		return (NULL);
-	arr[len] = '\0';
-	return (arr);
-}
-*/
-
 void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 {
 	if (q->single_q_count % 2 != 1)
@@ -580,16 +540,7 @@ void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 		int_array[*m] = *str;
 	(*m)++;
 }
-/*
-void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
-{
-	if (q->single_q_count % 2 != 1 && (ft_isalnum(*(str + 1)) || (*(str + 1) == '_') || (*(str + 1) == '?')))
-		int_array[*m] = encode_char_with_flag(*str);
-	else
-		int_array[*m] = *str;
-	(*m)++;
-}
-*/
+
 void	assign_asterisk(char *str, int *int_array, t_quote *q, int *m)
 {
 	if (q->single_q_count % 2 == 0 && q->double_q_count % 2 == 0)
@@ -605,7 +556,7 @@ void	assign_quote(char **str, int *int_array, t_quote *q, int *m, int flag)
 		q->double_q_count++;
 	else
 		q->single_q_count++;
-	if (ft_isalnum(*(*str + 1) & 0xFF) || (*(*str + 1) & 0xFF) == '_') // Added 0xFF check. Before that it was working fine. Remove them if things break.
+	if (ft_isalnum(*(*str + 1) & 0xFF) || (*(*str + 1) & 0xFF) == '_')
 	{
 		int_array[*m] = encode_char_with_flag(*(*str + 1));
 		(*m)++;
@@ -667,15 +618,10 @@ int	handle_expansion_and_wildcard(t_tokens *tokens,
 		finalize_dollar_expansion(int_array, &int_array_new, envp, code);
 		free_void((void **)&tokens[i].value, NULL);
 		tokens[i].value = expand_wildcard(int_array_new, tokens, i, 0);
-		
-		if (tokens[i].value == NULL)
-		{
-			free_void((void **)&int_array, NULL);
-			free_void((void **)&int_array_new, NULL);
-			return (-1);
-		}
 		free_void((void **)&int_array, NULL);
 		free_void((void **)&int_array_new, NULL);
+		if (tokens[i].value == NULL)
+			return (-1);
 	}
 	return (0);
 }
@@ -709,15 +655,36 @@ last: word, close_paren
 
 */
 
-int	tokens_error_checker(t_tokens *tokens, t_capacity *capacity)
+int	tokens_grammar(t_tokens *tokens, t_capacity *capacity, int i)
 {
-	int	i;
-
-	if (tokens[0].type != TOKEN_WORD && !identify_token(tokens[0].type) && tokens[0].type != TOKEN_OPEN_PAREN)
+	while (++i < capacity->current_size - 1)
 	{
-		syntax_error_near(tokens, 0);
-		return (-1);
+		if ((identify_token(tokens[i].type) && tokens[i + 1].type
+				!= TOKEN_WORD)
+			|| (tokens[i].type == TOKEN_WORD && tokens[i + 1].type
+				== TOKEN_OPEN_PAREN) || (tokens[i].type == TOKEN_PIPE
+				&& !identify_token(tokens[i + 1].type) && tokens[i + 1].type
+				!= TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
+			|| (tokens[i].type
+				== TOKEN_AND && !identify_token(tokens[i + 1].type)
+				&& tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type
+				!= TOKEN_OPEN_PAREN) || (tokens[i].type == TOKEN_OR
+				&& !identify_token(tokens[i + 1].type) && tokens[i + 1].type
+				!= TOKEN_WORD && tokens[i + 1].type
+				!= TOKEN_OPEN_PAREN) || (tokens[i].type == TOKEN_OPEN_PAREN
+				&& !identify_token(tokens[i + 1].type) && tokens[i + 1].type
+				!= TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
+			|| (tokens[i].type == TOKEN_CLOSE_PAREN
+				&& tokens[i + 1].type != TOKEN_AND && tokens[i + 1].type
+				!= TOKEN_OR && tokens[i + 1].type != TOKEN_PIPE
+				&& tokens[i + 1].type != TOKEN_CLOSE_PAREN))
+			return (syntax_error_near(tokens, i + 1), -1);
 	}
+	return (0);
+}
+
+/*	
+	int	i;
 
 	i = 0;
 	while (i < capacity->current_size - 1)
@@ -729,23 +696,34 @@ int	tokens_error_checker(t_tokens *tokens, t_capacity *capacity)
 			|| (tokens[i].type == TOKEN_OR && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
 			|| (tokens[i].type == TOKEN_OPEN_PAREN && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
 			|| (tokens[i].type == TOKEN_CLOSE_PAREN && tokens[i + 1].type != TOKEN_AND && tokens[i + 1].type != TOKEN_OR && tokens[i + 1].type != TOKEN_PIPE && tokens[i + 1].type != TOKEN_CLOSE_PAREN)
-			) // The last line changed and wasn't tested thoroughly afterwards. It was == TOKEN_AND and == TOKEN_OR. I think this version is correct, but do test!
+			)
 		{
 			syntax_error_near(tokens, i + 1);
 			return (-1);
 		} 
 		i++;
 	}
-	if (tokens[capacity->current_size - 1].type != TOKEN_WORD && tokens[capacity->current_size - 1].type != TOKEN_CLOSE_PAREN)
-	{
-		syntax_error_near(tokens, -1);
+ */
+
+int	tokens_error_checker(t_tokens *tokens, t_capacity *capacity)
+{
+	int	i;
+	int	k;
+
+	if (tokens[0].type != TOKEN_WORD && !identify_token(tokens[0].type)
+		&& tokens[0].type != TOKEN_OPEN_PAREN)
+		return (syntax_error_near(tokens, 0), -1);
+	if (tokens_grammar(tokens, capacity, -1) == -1)
 		return (-1);
-	}
+	if (tokens[capacity->current_size - 1].type != TOKEN_WORD
+		&& tokens[capacity->current_size - 1].type != TOKEN_CLOSE_PAREN)
+		return (syntax_error_near(tokens, -1), -1);
 	i = 0;
-	int k = 0;
+	k = 0;
 	while (i < capacity->current_size)
 	{
-		if (tokens[i].type == TOKEN_OPEN_PAREN || tokens[i].type == TOKEN_CLOSE_PAREN)
+		if (tokens[i].type == TOKEN_OPEN_PAREN
+			|| tokens[i].type == TOKEN_CLOSE_PAREN)
 			k = find_matching_paren(tokens, i, capacity->current_size - 1);
 		if (k < 0)
 			return (syntax_error_near(tokens, i), -1);
