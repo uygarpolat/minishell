@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/12 02:39:52 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/12 12:30:40 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -529,9 +529,11 @@ void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 {
 	if (q->single_q_count % 2 != 1)
 	{
-		if (ft_isalnum(*(str + 1)) || (*(str + 1) == '_') || (*(str + 1) == '?'))
+		if (ft_isalnum(*(str + 1)) || (*(str + 1) == '_')
+			|| (*(str + 1) == '?'))
 			int_array[*m] = encode_char_with_flag(*str);
-		else if ((*(str + 1) == '"' || *(str + 1) == '\'') && q->double_q_count % 2 != 1)
+		else if ((*(str + 1) == '"' || *(str + 1) == '\'')
+			&& q->double_q_count % 2 != 1)
 			return ;
 		else
 			int_array[*m] = *str;
