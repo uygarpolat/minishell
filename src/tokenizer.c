@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/12 12:30:40 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/12 17:27:09 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -20,35 +20,6 @@ int		populate_command_node_error_check(t_tokens *tokens, int start, int *end);
 int		identify_token(t_token_type type);
 void	syntax_error_near(t_tokens *tokens, int loc);
 char	*expand_wildcard(int *int_array, t_tokens *tokens, int loc, int flag);
-
-void	handle_sigint(int signum)
-{
-	(void)signum;
-	g_signal = 1;
-	ft_putstr_fd("\n", STDOUT_FILENO);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
-}
-
-void	handle_sigquit(int signum)
-{
-	(void)signum;
-}
-
-int	init_signal(int argc, char **argv)
-{
-	struct termios	term;
-
-	(void)argc;
-	(void)argv;
-	tcgetattr(STDIN_FILENO, &term);
-	term.c_lflag &= ~ECHOCTL;
-	tcsetattr(STDIN_FILENO, TCSANOW, &term);
-	signal(SIGINT, handle_sigint);
-	signal(SIGQUIT, handle_sigquit);
-	return (0);
-}
 
 void	print_tokens(t_tokens *tokens, t_capacity *capacity)
 {
@@ -78,26 +49,22 @@ void	print_tokens(t_tokens *tokens, t_capacity *capacity)
 
 void	print_ast(t_ast *node, int level)
 {
-	int	indent_level;
+	int		indent_level;
+	char	**temp_double_arr;
 
 	if (node == NULL)
 		return ;
 	indent_level = -1;
 	while (++indent_level < level)
 		printf("  ");
-	char	**temp_double_arr;
 	if (node->type == AST_COMMAND)
 	{
 		temp_double_arr = node->words;
-		//indent_level = -1;
 		while (++indent_level < level + 1)
 			printf("  ");
 		printf("AST_COMMAND [TOKEN: ");
 		while (*node->words)
 		{
-			//indent_level = -1;
-			//while (++indent_level < level + 1)
-			//	printf("  ");
 			printf("%s ", *(node->words));
 			(node->words)++;
 		}
@@ -157,6 +124,35 @@ void	print_ast(t_ast *node, int level)
 	}
 }
 
+void	handle_sigint(int signum)
+{
+	(void)signum;
+	g_signal = 1;
+	ft_putstr_fd("\n", STDOUT_FILENO);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
+}
+
+void	handle_sigquit(int signum)
+{
+	(void)signum;
+}
+
+int	init_signal(int argc, char **argv)
+{
+	struct termios	term;
+
+	(void)argc;
+	(void)argv;
+	tcgetattr(STDIN_FILENO, &term);
+	term.c_lflag &= ~ECHOCTL;
+	tcsetattr(STDIN_FILENO, TCSANOW, &term);
+	signal(SIGINT, handle_sigint);
+	signal(SIGQUIT, handle_sigquit);
+	return (0);
+}
+
 int	is_seperator(char c, char c_plus_one)
 {
 	if (c == '<' || c == '>' || (c == '&' && c_plus_one == '&')
@@ -165,7 +161,7 @@ int	is_seperator(char c, char c_plus_one)
 	return (0);
 }
 
-void *free_tokens(t_tokens *tokens, t_capacity *capacity)
+void	*free_tokens(t_tokens *tokens, t_capacity *capacity)
 {
 	int	i;
 
@@ -180,10 +176,10 @@ void *free_tokens(t_tokens *tokens, t_capacity *capacity)
 	}
 	free_void((void **)&tokens, NULL);
 	return ((void *)tokens);
-
 }
 
-void	realloc_error(t_tokens *tokens, t_tokens *new_tokens, t_capacity *capacity, int i)
+void	realloc_error(t_tokens *tokens, t_tokens *new_tokens,
+			t_capacity *capacity, int i)
 {
 	free_tokens(tokens, capacity);
 	capacity->max_size *= 2;
@@ -273,15 +269,7 @@ int	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 		return (-1);
 	return (0);
 }
-/*
-char	*skip_a_char(char *str, char c)
-{
-	str++;
-	while (*str && *str != c)
-		str++;
-	return (str);
-}
-*/
+
 char	*skip_a_char(char *str, char c)
 {
 	char	*temp;
@@ -381,9 +369,9 @@ int	length_of_var(int **int_array, char **envp)
 	len = 0;
 	i = 0;
 	n = -1;
-	while ((ft_isalnum((*int_array)[i] & 0xFF) || ((*int_array)[i] & 0xFF) == '_') && !(((*int_array)[i] >> 8) & 1))
+	while ((ft_isalnum((*int_array)[i] & 0xFF)
+		|| ((*int_array)[i] & 0xFF) == '_') && !(((*int_array)[i] >> 8) & 1))
 		i++;
-
 	str = malloc(sizeof(char) * (i + 1));
 	if (str == NULL)
 		return (-1);
@@ -415,7 +403,8 @@ int	str_of_var(int **int_array_old, int **int_array_new, char **envp)
 
 	i = 0;
 	n = -1;
-	while ((ft_isalnum((*int_array_old)[i] & 0xFF) || ((*int_array_old)[i] & 0xFF) == '_') && !(((*int_array_old)[i] >> 8) & 1))
+	while ((ft_isalnum((*int_array_old)[i] & 0xFF) || ((*int_array_old)[i]
+		& 0xFF) == '_') && !(((*int_array_old)[i] >> 8) & 1))
 		i++;
 	str = malloc(sizeof(char) * (i + 1));
 	if (str == NULL)
@@ -450,15 +439,16 @@ int	finalize_dollar_expansion(int *int_array_old,
 	temp = *int_array_new;
 	while (*int_array_old)
 	{
-		if (((*int_array_old & 0xFF) == '$') && ((*int_array_old >> 8) & 1) && *(int_array_old + 1))
+		if (((*int_array_old & 0xFF) == '$')
+			&& ((*int_array_old >> 8) & 1) && *(int_array_old + 1))
 		{
 			if (*(int_array_old + 1) == '?')
 			{
 				char	*str_num;
-
+				int		num;
 				str_num = ft_itoa(code);
-				int num = ft_strlen(str_num);
-				while(*str_num)
+				num = ft_strlen(str_num);
+				while (*str_num)
 				{
 					**int_array_new = *str_num;
 					(*int_array_new)++;
@@ -491,7 +481,8 @@ int	*expand_dollar(int *int_array, char **envp, int len, int num, int code)
 
 	while (*int_array)
 	{
-		if (((*int_array & 0xFF) == '$') && ((*int_array >> 8) & 1) && *(int_array + 1))
+		if (((*int_array & 0xFF) == '$')
+			&& ((*int_array >> 8) & 1) && *(int_array + 1))
 		{
 			if (*(int_array + 1) == '?')
 			{
@@ -552,9 +543,9 @@ void	assign_asterisk(char *str, int *int_array, t_quote *q, int *m)
 	(*m)++;
 }
 
-void	assign_quote(char **str, int *int_array, t_quote *q, int *m, int flag)
+void	assign_quote(char **str, int *int_array, t_quote *q, int *m)
 {
-	if (flag == 1)
+	if (**str == '"')
 		q->double_q_count++;
 	else
 		q->single_q_count++;
@@ -562,8 +553,8 @@ void	assign_quote(char **str, int *int_array, t_quote *q, int *m, int flag)
 	{
 		int_array[*m] = encode_char_with_flag(*(*str + 1));
 		(*m)++;
-	if (*(*str + 1) & 0xFF)
-		(*str)++;
+		if (*(*str + 1) & 0xFF)
+			(*str)++;
 	}
 }
 
@@ -579,9 +570,9 @@ int	populate_tokens(char *str, int *int_array)
 	while (*str)
 	{
 		if (*str == '"' && q.single_q_count % 2 == 0)
-			assign_quote(&str, int_array, &q, &m, 1);
+			assign_quote(&str, int_array, &q, &m);
 		else if (*str == '\'' && q.double_q_count % 2 == 0)
-			assign_quote(&str, int_array, &q, &m, 0);
+			assign_quote(&str, int_array, &q, &m);
 		else if (*str == '$')
 			assign_dollar(str, int_array, &q, &m);
 		else if (*str == '*')
@@ -592,9 +583,11 @@ int	populate_tokens(char *str, int *int_array)
 	}
 	int_array[m] = '\0';
 	if (q.double_q_count % 2 != 0)
-		return (error_handler(NULL, "unexpected EOF while looking for matching `\"'"), -1);
+		return (error_handler(NULL, "unexpected EOF "
+				"while looking for matching `\"'"), -1);
 	if (q.single_q_count % 2 != 0)
-		return (error_handler(NULL, "unexpected EOF while looking for matching `''"), -1);
+		return (error_handler(NULL, "unexpected EOF "
+				"while looking for matching `''"), -1);
 	return (0);
 }
 
@@ -685,28 +678,6 @@ int	tokens_grammar(t_tokens *tokens, t_capacity *capacity, int i)
 	return (0);
 }
 
-/*	
-	int	i;
-
-	i = 0;
-	while (i < capacity->current_size - 1)
-	{
-		if ((identify_token(tokens[i].type) && tokens[i + 1].type != TOKEN_WORD)
-			|| (tokens[i].type == TOKEN_WORD && tokens[i + 1].type == TOKEN_OPEN_PAREN)
-			|| (tokens[i].type == TOKEN_PIPE && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
-			|| (tokens[i].type == TOKEN_AND && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
-			|| (tokens[i].type == TOKEN_OR && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
-			|| (tokens[i].type == TOKEN_OPEN_PAREN && !identify_token(tokens[i + 1].type) && tokens[i + 1].type != TOKEN_WORD && tokens[i + 1].type != TOKEN_OPEN_PAREN)
-			|| (tokens[i].type == TOKEN_CLOSE_PAREN && tokens[i + 1].type != TOKEN_AND && tokens[i + 1].type != TOKEN_OR && tokens[i + 1].type != TOKEN_PIPE && tokens[i + 1].type != TOKEN_CLOSE_PAREN)
-			)
-		{
-			syntax_error_near(tokens, i + 1);
-			return (-1);
-		} 
-		i++;
-	}
- */
-
 int	tokens_error_checker(t_tokens *tokens, t_capacity *capacity)
 {
 	int	i;
@@ -747,7 +718,8 @@ int	init_tokenizer(t_tokens **tokens, t_capacity *capacity)
 	return (0);
 }
 
-t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code)
+t_tokens	*ft_tokenizer(char *input, t_capacity *capacity,
+				char **envp, int code)
 {
 	t_tokens	*tokens;
 	int			error_code;
@@ -771,7 +743,8 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code)
 			return (NULL);
 	}
 	//print_tokens(tokens, capacity);
-	if (tokens_error_checker(tokens, capacity) == -1 || handle_expansion_and_wildcard(tokens, capacity, envp, code) == -1)
+	if (tokens_error_checker(tokens, capacity) == -1
+		|| handle_expansion_and_wildcard(tokens, capacity, envp, code) == -1)
 		return ((t_tokens *)free_tokens(tokens, capacity));
 	return (tokens);
 }

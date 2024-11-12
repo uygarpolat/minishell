@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/12 13:29:04 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/12 15:24:41 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -176,12 +176,11 @@ int	identify_token(t_token_type type)
 	return (0);
 }
 
-int	cleanup_populate_command_node(t_ast **root, char **str, int *error_code)
+int	cleanup_populate_command_node(t_ast **root, int *error_code)
 {
 	if (!*error_code)
 		return (0);
 	free_ast(root);
-	free_void((void **)str, error_code);
 	return (-1);
 }
 
@@ -223,21 +222,15 @@ int	populate_command_node_error_check(t_tokens *tokens, int start, int *end)
 	return (0);
 }
 
-int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
+int	populate_command_node_malloc_counter(t_tokens *tokens,
+		t_ast **root, int start, int *end)
 {
-	int		i;
-	char	*str;
-	char	**temp;
-	int		error_code;
-
-	if (populate_command_node_error_check(tokens, start, end))
-	{
-		error_code = -1;
-		return (error_code);
-	}
-	int	j = start - 1;
+	int	j;
 	int	k;
-	int	malloc_counter = 0;
+	int	malloc_counter;
+
+	malloc_counter = 0;
+	j = start - 1;
 	while (++j <= *end)
 	{
 		k = 0;
@@ -249,15 +242,54 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 		else
 			malloc_counter++;
 	}
-	root->words = ft_calloc(malloc_counter + 1, sizeof(char *));
-	if (root->words == NULL)
+	(*root)->words = ft_calloc(malloc_counter + 1, sizeof(char *));
+	if ((*root)->words == NULL)
+		return (error_handler(NULL, NULL), -1);
+	return (malloc_counter);
+}
+
+int	populate_command_node_globbing(t_tokens *tokens, t_ast *root, int i)
+{
+	char	**temp_double_pointer;
+
+	while (*root->words)
+		root->words++;
+	temp_double_pointer = tokens[i].globbed;
+	while (*(tokens[i].globbed))
+	{
+		*root->words = ft_strdup(*(tokens[i].globbed));
+		if (*root->words == NULL)
+			return (error_handler(NULL, NULL), -1);
+		tokens[i].globbed++;
+		root->words++;
+	}
+	tokens[i].globbed = temp_double_pointer;
+	return (0);
+}
+
+int	populate_command_node_empty_check(t_tokens *tokens, t_ast *root, int i)
+{
+	while (*root->words)
+		root->words++;
+	*root->words = ft_strdup(tokens[i].value);
+	if (*root->words == NULL)
+		return (error_handler(NULL, NULL), -1);
+	return (0);
+}
+
+int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
+{
+	int		i;
+	char	**temp;
+	int		error_code;
+
+	if (populate_command_node_error_check(tokens, start, end)
+		|| populate_command_node_malloc_counter(tokens, &root, start, end) < 0)
 		return (-1);
 	temp = root->words;
 	error_code = 0;
-	str = NULL;
 	i = start - 1;
 	root->type = AST_COMMAND;
-	// while takes in: i, end, error_code, tokens, root, str
 	while (++i <= *end && !error_code)
 	{
 		if (tokens[i].type == TOKEN_OPEN_PAREN
@@ -266,36 +298,12 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 		if (identify_token(tokens[i].type))
 			error_code = redirection_node_creator(tokens, root, &i);
 		else if (tokens[i].globbed)
-		{
-			while (*root->words)
-				root->words++;
-			char **temp_double_pointer = tokens[i].globbed;
-			while (*(tokens[i].globbed))
-			{
-				*root->words = ft_strdup(*(tokens[i].globbed));
-				tokens[i].globbed++;
-				root->words++;
-			}
-			tokens[i].globbed = temp_double_pointer;
-		}
+			error_code = populate_command_node_globbing(tokens, root, i);
 		else if (ft_strlen(tokens[i].value) > 0)
-		{
-			while (*root->words)
-				root->words++;
-			*root->words = ft_strdup(tokens[i].value);
-			error_code = concatenate_commands(&str, tokens, &i);
-		}
+			error_code = populate_command_node_empty_check(tokens, root, i);
 	}
 	root->words = temp;
-	if (str && !error_code)
-	{
-		free_void((void **)&root->token->value, NULL);
-		root->token->value = ft_strdup(str);
-		if (root->token->value == NULL)
-			error_code = -1;
-		free_void((void **)&str, NULL);
-	}
-	return (cleanup_populate_command_node(&root, &str, &error_code));
+	return (cleanup_populate_command_node(&root, &error_code));
 }
 
 int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
