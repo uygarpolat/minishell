@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:52:03 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/11 19:37:42 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/13 15:59:58 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ static void	check_cmd(char **cmd, t_minishell *minishell, char **envp)
 			else if (access(cmd[0], X_OK) == -1)
 			{
 				free_2d_array((void ***)&envp);
-				error2(minishell, "command not found\n");
+				error2(minishell, "Permission denied\n");
 				exit (126);
 			}
 		}

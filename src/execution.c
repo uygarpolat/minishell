@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/13 14:51:10 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/13 18:03:31 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,10 @@ int	open_files(t_put *cmd)
 			close(cmd->in);
 		cmd->in = open(cmd->infile, O_RDONLY);
 		if (cmd->in < 0)
+		{
+			perror(strerror(errno));
 			return (0);
+		}
 	}
 	if (cmd->outfile)
 	{
@@ -60,7 +63,10 @@ int	open_files(t_put *cmd)
 		else
 			cmd->out = open(cmd->outfile, O_APPEND | O_CREAT | O_WRONLY, 0644);
 		if (cmd->out < 0)
+		{
+			perror(strerror(errno));
 			return (0);
+		}
 	}
 	return (1);
 }
@@ -86,7 +92,7 @@ void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell)
 		}
 		if (!open_files(cmd))
 		{
-			error2(minishell, "Permission denied\n");
+			error(minishell);
 			exit (1);
 		}
 		temp = temp->redir_target;
@@ -106,7 +112,15 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 	{
 		/*if (is_builtin(s->words))
 		{
-			execute_builtin(s, s->words, envp, minishell, n);
+			i = 0;
+			while (i < minishell->p.count)
+			{
+				close(minishell->p.pipes[i][0]);
+				close(minishell->p.pipes[i][1]);
+				i++;
+			}
+			if (!execute_builtin(s, s->words, envp, minishell, n))
+				exit(1);
 			exit(0);
 		}*/
 		get_in_out(s, &cmd, minishell);
@@ -125,7 +139,8 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 		}
 		if (is_builtin(s->words))
 		{
-			execute_builtin(s, s->words, envp, minishell, n);
+			if (!execute_builtin(s, s->words, envp, minishell, n))
+				exit(1);
 			exit(0);
 		}
 		path = get_path(s->words, *envp, minishell);
@@ -276,12 +291,13 @@ int	execution(t_ast *s, char ***envp)
 	n = 0;
 	if (minishell.p.count == 0 && is_builtin(s->words))
 	{
-			if (!execute_builtin(s, s->words, envp, &minishell, n))
-			{	
+			execute_builtin(s, s->words, envp, &minishell, n);
+			/*{	
 				error(&minishell);
 				return (1);
-			}
-			exit(0);
+			{*/
+			//close_and_free(&minishell.p);
+			//return (waiting(minishell.p.pids[0]));
 	}
 	else
 	{
@@ -297,11 +313,11 @@ int	execution(t_ast *s, char ***envp)
 			n++;
 			minishell.ast = minishell.ast->right;
 		}
-		close_and_free(&minishell.p);
-		j = 0;
-		while (j <= minishell.p.count)
-			s->code = waiting(minishell.p.pids[j++]);
 	}
+	close_and_free(&minishell.p);
+	j = 0;
+	while (j <= minishell.p.count)
+		s->code = waiting(minishell.p.pids[j++]);
 	//i = -1;
 	//free(minishell.pwd);
 	if (minishell.p.pids)
