@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 18:33:55 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/13 10:25:53 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/13 12:13:20 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ int	finalize_dollar_expansion(int *int_array_old,
 }
 */
 
-int	when_dollar_received(int **int_array_old, int **int_array_new, int *len, int code, int flag)
+int	when_q_mark_received(int **int_array_old, int **int_array_new, int *len, int code, int flag)
 {
 	int		num;
 	char	*str_num;
@@ -119,6 +119,33 @@ int	when_dollar_received(int **int_array_old, int **int_array_new, int *len, int
 	free_void((void **)&str_num, NULL);
 	return (0);
 }
+/*
+int	malloc_array(int len, int flag)
+{
+	int	*arr;
+
+	arr = NULL;
+	if (!flag)
+	{	
+		int	*arr = malloc(sizeof(int) * (len + 1));
+		if (arr == NULL)
+			return (error_handler(NULL, NULL), NULL);
+		arr[len] = '\0';
+		return (arr);
+	}
+	return (0); // This is probably wrong
+}
+*/
+void	when_non_dollar_received(int **int_array_old, int **int_array_new, int *len, int flag)
+{
+	(*len)++;
+	if (flag)
+	{	
+		**int_array_new = **int_array_old;
+		(*int_array_new)++;
+	}
+	(*int_array_old)++;
+}
 
 int	*ultimate_dollar_expansion(int *int_array_old,
 		int *int_array_new, char **envp, int code, int flag)
@@ -134,7 +161,7 @@ int	*ultimate_dollar_expansion(int *int_array_old,
 		{
 			if (*(int_array_old + 1) == '?')
 			{
-				if (when_dollar_received(&int_array_old, &int_array_new, &len, code, flag))
+				if (when_q_mark_received(&int_array_old, &int_array_new, &len, code, flag))
 					return (NULL);
 			}
 			else
@@ -147,15 +174,7 @@ int	*ultimate_dollar_expansion(int *int_array_old,
 			}
 		}
 		else
-		{
-			len++;
-			if (flag)
-			{	
-				*int_array_new = *int_array_old;
-				int_array_new++;
-			}
-			int_array_old++;
-		}
+			when_non_dollar_received(&int_array_old, &int_array_new, &len, flag);
 	}
 	if (!flag)
 	{	
