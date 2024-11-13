@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/12 22:27:49 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/13 15:46:47 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -344,182 +344,7 @@ int	encode_char_with_flag(char c)
 	encoded_value = (1 << 8) | c;
 	return (encoded_value);
 }
-/*
-char	*get_var(char *str, char **envp)
-{
-	if (!envp)
-		return (NULL);
-	while (*envp)
-	{
-		if (ft_strncmp(*envp, str, ft_strlen(str)) == 0
-			&& *(*envp + ft_strlen(str)) == '=')
-			return (*envp + ft_strlen(str) + 1);
-		envp++;
-	}
-	return (NULL);
-}
 
-int	length_of_var(int **int_array, char **envp)
-{
-	int		i;
-	int		n;
-	int		len;
-	char	*str;
-
-	len = 0;
-	i = 0;
-	n = -1;
-	while ((ft_isalnum((*int_array)[i] & 0xFF)
-		|| ((*int_array)[i] & 0xFF) == '_') && !(((*int_array)[i] >> 8) & 1))
-		i++;
-	str = malloc(sizeof(char) * (i + 1));
-	if (str == NULL)
-		return (-1);
-	while (++n < i)
-		str[n] = (*int_array)[n];
-	str[n] = '\0';
-	if (get_var(str, envp) == NULL)
-	{
-		*int_array = *int_array + i;
-		free_void((void **)&str, NULL);
-		return (0);
-	}
-	len = ft_strlen(get_var(str, envp));
-	*int_array = *int_array + i;
-	if (str)
-	{
-		free(str);
-		str = NULL;
-	}
-	return (len);
-}
-
-int	str_of_var(int **int_array_old, int **int_array_new, char **envp)
-{
-	int		i;
-	int		n;
-	char	*str;
-	char	*var;
-
-	i = 0;
-	n = -1;
-	while ((ft_isalnum((*int_array_old)[i] & 0xFF) || ((*int_array_old)[i]
-		& 0xFF) == '_') && !(((*int_array_old)[i] >> 8) & 1))
-		i++;
-	str = malloc(sizeof(char) * (i + 1));
-	if (str == NULL)
-		return (-1);
-	while (++n < i)
-		str[n] = (*int_array_old)[n];
-	str[n] = '\0';
-	if (get_var(str, envp) == NULL)
-	{
-		*int_array_old = *int_array_old + i;
-		free(str);
-		str = NULL;
-		return (1);
-	}
-	*int_array_old = *int_array_old + i;
-	var = get_var(str, envp);
-	free_void((void **)&str, NULL);
-	while (*var)
-	{
-		**int_array_new = *var;
-		(*int_array_new)++;
-		var++;
-	}
-	return (0);
-}
-
-int	finalize_dollar_expansion(int *int_array_old,
-		int **int_array_new, char **envp, int code)
-{
-	int	*temp;
-
-	temp = *int_array_new;
-	while (*int_array_old)
-	{
-		if (((*int_array_old & 0xFF) == '$')
-			&& ((*int_array_old >> 8) & 1) && *(int_array_old + 1))
-		{
-			if (*(int_array_old + 1) == '?')
-			{
-				char	*str_num;
-				int		num;
-				str_num = ft_itoa(code);
-				num = ft_strlen(str_num);
-				while (*str_num)
-				{
-					**int_array_new = *str_num;
-					(*int_array_new)++;
-					str_num++;
-				}
-				int_array_old += 2;
-				str_num = str_num - num;
-				free_void((void **)&str_num, NULL);
-			}
-			else
-			{
-				int_array_old++;
-				str_of_var(&int_array_old, int_array_new, envp);
-			}
-		}
-		else
-		{
-			**int_array_new = *int_array_old;
-			(*int_array_new)++;
-			int_array_old++;
-		}
-	}
-	*int_array_new = temp;
-	return (0);
-}
-
-int	*expand_dollar(int *int_array, char **envp, int code)
-{
-	int		len;
-	int		num;
-	int		*arr;
-
-	len = 0;
-	num = 0;
-	while (*int_array)
-	{
-		if (((*int_array & 0xFF) == '$')
-			&& ((*int_array >> 8) & 1) && *(int_array + 1))
-		{
-			if (*(int_array + 1) == '?')
-			{
-				char	*str_num;
-
-				str_num = ft_itoa(code);
-				num = ft_strlen(str_num);
-				len = len + num;
-				int_array += 2;
-				free_void((void **)&str_num, NULL);
-			}
-			else
-			{
-				int_array++;
-				num = length_of_var(&int_array, envp);
-				if (num == -1)
-					return (NULL); // Handle better.
-				len = len + num;
-			}
-		}
-		else
-		{
-			len++;
-			int_array++;
-		}
-	}
-	arr = malloc(sizeof(int) * (len + 1));
-	if (arr == NULL)
-		return (NULL);
-	arr[len] = '\0';
-	return (arr);
-}
-*/
 void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 {
 	if (q->single_q_count % 2 != 1)
@@ -595,30 +420,36 @@ int	populate_tokens(char *str, int *int_array)
 	return (0);
 }
 
+void	init_arrays(t_arrays *a, char **envp, int code)
+{
+	a->int_array_new = NULL;
+	a->int_array_old = NULL;
+	a->envp = envp;
+	a->code = code;
+}
+
 int	handle_expansion_and_wildcard(t_tokens *tokens,
 		t_capacity *capacity, char **envp, int code)
 {
-	int		i;
-	int		*int_array_old;
-	int		*int_array_new;
-
-	int_array_old = NULL;
-	int_array_new = NULL;
+	int			i;
+	t_arrays	a;
+	
+	init_arrays(&a, envp, code);
 	i = -1;
 	while (++i < capacity->current_size)
 	{
-		int_array_old = malloc(sizeof(int) * (ft_strlen(tokens[i].value) + 1));
-		if (int_array_old == NULL)
+		a.int_array_old = malloc(sizeof(int) * (ft_strlen(tokens[i].value) + 1));
+		if (a.int_array_old == NULL)
 			return (-1);
-		int_array_old[ft_strlen(tokens[i].value)] = 0;
-		if (populate_tokens(tokens[i].value, int_array_old))
-			return (free_void((void **)&int_array_old, NULL), -1);
-		int_array_new = ultimate_dollar_expansion(int_array_old, NULL, envp, code, 0);
-		ultimate_dollar_expansion(int_array_old, int_array_new, envp, code, 1);
+		a.int_array_old[ft_strlen(tokens[i].value)] = 0;
+		if (populate_tokens(tokens[i].value, a.int_array_old))
+			return (free_void((void **)&a.int_array_old, NULL), -1);
+		a.int_array_new = ultimate_dollar_expansion(&a, 0);
+		ultimate_dollar_expansion(&a, 1);
 		free_void((void **)&tokens[i].value, NULL);
-		tokens[i].value = expand_wildcard(int_array_new, tokens, i, 0);
-		free_void((void **)&int_array_old, NULL);
-		free_void((void **)&int_array_new, NULL);
+		tokens[i].value = expand_wildcard(a.int_array_new, tokens, i, 0);
+		free_void((void **)&a.int_array_old, NULL);
+		free_void((void **)&a.int_array_new, NULL);
 		if (tokens[i].value == NULL)
 			return (-1);
 	}

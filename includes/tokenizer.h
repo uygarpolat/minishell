@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/12 22:02:01 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/13 15:46:06 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,14 @@ typedef struct	s_globber
 	int				flag;
 }					t_globber;
 
+typedef struct p_arrays
+{
+	int		*int_array_new;
+	int		*int_array_old;
+	char	**envp;
+	int		code;
+}			t_arrays;
+
 t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code);
 void		*free_tokens(t_tokens *tokens, t_capacity *capacity);
 char		*ft_strjoin_free(char *s1, char *s2);
@@ -76,6 +84,6 @@ int			identify_token(t_token_type type);
 char		*back_to_char(int *int_array);
 void		error_handler(char *cause_str, char *error_str);
 int			find_matching_paren(t_tokens *tokens, int start, int end);
-int			*ultimate_dollar_expansion(int *int_array_old, int *int_array_new, char **envp, int code, int flag);
+int			*ultimate_dollar_expansion(t_arrays *a, int flag);
 
 #endif
