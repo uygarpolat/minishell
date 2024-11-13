@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/13 15:46:47 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/13 18:00:53 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -431,6 +431,36 @@ void	init_arrays(t_arrays *a, char **envp, int code)
 int	handle_expansion_and_wildcard(t_tokens *tokens,
 		t_capacity *capacity, char **envp, int code)
 {
+	int		i;
+	int		*int_array_old;
+	int		*int_array_new;
+
+	int_array_old = NULL;
+	int_array_new = NULL;
+	i = -1;
+	while (++i < capacity->current_size)
+	{
+		int_array_old = malloc(sizeof(int) * (ft_strlen(tokens[i].value) + 1));
+		if (int_array_old == NULL)
+			return (-1);
+		int_array_old[ft_strlen(tokens[i].value)] = 0;
+		if (populate_tokens(tokens[i].value, int_array_old))
+			return (free_void((void **)&int_array_old, NULL), -1);
+		int_array_new = ultimate_dollar_expansion(int_array_old, NULL, envp, code, 0);
+		ultimate_dollar_expansion(int_array_old, int_array_new, envp, code, 1);
+		free_void((void **)&tokens[i].value, NULL);
+		tokens[i].value = expand_wildcard(int_array_new, tokens, i, 0);
+		free_void((void **)&int_array_old, NULL);
+		free_void((void **)&int_array_new, NULL);
+		if (tokens[i].value == NULL)
+			return (-1);
+	}
+	return (0);
+}
+/*
+int	handle_expansion_and_wildcard(t_tokens *tokens,
+		t_capacity *capacity, char **envp, int code)
+{
 	int			i;
 	t_arrays	a;
 	
@@ -455,8 +485,8 @@ int	handle_expansion_and_wildcard(t_tokens *tokens,
 	}
 	return (0);
 }
+*/
 /*
-
    "word", "(", ")", "<", ">", "|",
 		"<<", ">>", "||", "&&"
 

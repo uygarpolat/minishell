@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 18:33:55 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/13 15:51:06 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/13 17:00:46 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,21 +57,21 @@ int	str_combined(int **int_array_old, int **int_array_new, char **envp, int flg)
 	return (len);
 }
 
-int	when_q_mark_received(t_arrays *a, int *len, int flag)
+int	when_q_mark_received(t_arrays **a, int *len, int flag)
 {
 	int		num;
 	char	*str_num;
 
-	str_num = ft_itoa(a->code);
+	str_num = ft_itoa((*a)->code);
 	if (str_num == NULL)
 		return (error_handler(NULL, NULL), -1);
 	num = ft_strlen(str_num);
 	*len = *len + num;
-	a->int_array_old += 2;
+	(*a)->int_array_old += 2;
 	if (flag)
 	{
 		while (*str_num)
-			*a->int_array_new++ = *str_num++;
+			*((*a)->int_array_new)++ = *str_num++;
 		str_num = str_num - num;
 	}
 	free_void((void **)&str_num, NULL);
@@ -93,23 +93,23 @@ int	*malloc_array(int len, int flag)
 	return (0); // This is probably wrong
 }
 
-void	when_non_dollar_received(t_arrays *a, int *len, int flag)
+void	when_non_dollar_received(t_arrays **a, int *len, int flag)
 {
 	(*len)++;
 	if (flag)
 	{	
-		*(a->int_array_new) = *(a->int_array_old);
-		(a->int_array_new)++;
+		*((*a)->int_array_new) = *((*a)->int_array_old);
+		((*a)->int_array_new)++;
 	}
-	(a->int_array_old)++;
+	((*a)->int_array_old)++;
 }
 
-int	when_non_q_received(t_arrays *a, int *len, int flag)
+int	when_non_q_received(t_arrays **a, int *len, int flag)
 {
 	int	num;
 
-	(*a->int_array_old)++;
-	num = str_combined(&a->int_array_old, &a->int_array_new, a->envp, flag);
+	(*((*a)->int_array_old))++;
+	num = str_combined(&((*a)->int_array_old), &((*a)->int_array_new), (*a)->envp, flag);
 	if (num == -1)
 		return (-1);
 	*len = *len + num;
@@ -128,17 +128,17 @@ int	*ultimate_dollar_expansion(t_arrays *a, int flag)
 		{
 			if (*(a->int_array_old + 1) == '?')
 			{
-				if (when_q_mark_received(a, &len, flag))
+				if (when_q_mark_received(&a, &len, flag))
 					return (NULL);
 			}
 			else
 			{
-				if (when_non_q_received(a, &len, flag))
+				if (when_non_q_received(&a, &len, flag))
 					return (NULL);
 			}
 		}
 		else
-			when_non_dollar_received(a, &len, flag);
+			when_non_dollar_received(&a, &len, flag);
 	}
 	return (malloc_array(len, flag));
 }
