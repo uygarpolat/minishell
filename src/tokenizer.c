@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/13 20:28:06 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/13 22:35:28 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -433,13 +433,16 @@ void	init_arrays(t_arrays *a, char **envp, int code)
 int	handle_expansion_and_wildcard(t_tokens *tokens,
 		t_capacity *capacity, char **envp, int code)
 {
-	int			i;
-	t_arrays	a;
+	int				i;
+	t_token_type	type;
+	t_arrays		a;
 
 	init_arrays(&a, envp, code);
 	i = -1;
 	while (++i < capacity->current_size)
 	{
+		type = TOKEN_UNKNOWN;
+
 		a.int_array_old = malloc(sizeof(int) * (ft_strlen(tokens[i].value) + 1));
 		if (a.int_array_old == NULL)
 			return (-1);
@@ -450,7 +453,10 @@ int	handle_expansion_and_wildcard(t_tokens *tokens,
 		// Save the starting point of int_array_old
 		a.int_array_old_start = a.int_array_old;
 
-		a.int_array_new = ultimate_dollar_expansion(&a, 0);
+		if (i > 0 && identify_token(tokens[i - 1].type))
+			type = tokens[i - 1].type;
+
+		a.int_array_new = ultimate_dollar_expansion(&a, type, 0);
 		if (a.int_array_new == NULL)
 		{
 			free_void((void **)&a.int_array_old_start, NULL);
@@ -464,7 +470,7 @@ int	handle_expansion_and_wildcard(t_tokens *tokens,
 		a.int_array_old = a.int_array_old_start;
 		//a.int_array_new = a.int_array_new_start;
 
-		ultimate_dollar_expansion(&a, 1);
+		ultimate_dollar_expansion(&a, type, 1);
 
 		// Reset int_array_new to start for expand_wildcard
 		a.int_array_new = a.int_array_new_start;
