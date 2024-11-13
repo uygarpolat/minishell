@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/11 17:07:44 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/12 17:08:58 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/11 15:15:17 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/11/07 10:35:14 by upolat           ###   ########.fr       */
 /*                                                                            */
@@ -16,10 +16,12 @@
 #include "../includes/tokenizer.h"
 #include "../includes/ast.h"
 
-void	handle_sigint();
-void	handle_sigquit();
+void	handle_sigint(int signum);
+void	handle_sigquit(int signum);
 void	print_ast(t_ast *node, int level);
-void	init_signal();
+int		init_signal(int argc, char **argv);
+
+int	g_signal = 0;
 
 int	execute_shell(char *input, int *code, char **new_envp)
 {
@@ -68,8 +70,8 @@ int	preliminary_input_check(char **input, int *code)
 	char	*temp;
 
 	*input = readline("minishell> ");
-	//if (*input == NULL)
-	//	return (-2); // Commenting this back in kills the tester, why? Is the test passing a null pointer?
+	if (*input == NULL)
+		return (-1);
 	temp = *input;
 	while (ft_strchr(" \t\n", *temp) && *temp)
 		temp++;
@@ -104,14 +106,12 @@ int	main(int argc, char **argv, char **envp)
 	int		code;
 	int		input_res;
 
-	((void)argc, (void)argv);
 	new_envp = ft_strdup2(envp);
 	if (!new_envp)
 		return (1);
 	code = 0;
-	init_signal();
-	signal(SIGINT, handle_sigint);
-	signal(SIGQUIT, handle_sigquit);
+	if (init_signal(argc, argv))
+		return (code);
 	//display_welcome_message(&code, new_envp);
 	while (1)
 	{
