@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/13 18:00:53 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/13 20:28:06 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -424,6 +424,8 @@ void	init_arrays(t_arrays *a, char **envp, int code)
 {
 	a->int_array_new = NULL;
 	a->int_array_old = NULL;
+	a->int_array_new_start = NULL;
+	a->int_array_old_start = NULL;
 	a->envp = envp;
 	a->code = code;
 }
@@ -431,39 +433,9 @@ void	init_arrays(t_arrays *a, char **envp, int code)
 int	handle_expansion_and_wildcard(t_tokens *tokens,
 		t_capacity *capacity, char **envp, int code)
 {
-	int		i;
-	int		*int_array_old;
-	int		*int_array_new;
-
-	int_array_old = NULL;
-	int_array_new = NULL;
-	i = -1;
-	while (++i < capacity->current_size)
-	{
-		int_array_old = malloc(sizeof(int) * (ft_strlen(tokens[i].value) + 1));
-		if (int_array_old == NULL)
-			return (-1);
-		int_array_old[ft_strlen(tokens[i].value)] = 0;
-		if (populate_tokens(tokens[i].value, int_array_old))
-			return (free_void((void **)&int_array_old, NULL), -1);
-		int_array_new = ultimate_dollar_expansion(int_array_old, NULL, envp, code, 0);
-		ultimate_dollar_expansion(int_array_old, int_array_new, envp, code, 1);
-		free_void((void **)&tokens[i].value, NULL);
-		tokens[i].value = expand_wildcard(int_array_new, tokens, i, 0);
-		free_void((void **)&int_array_old, NULL);
-		free_void((void **)&int_array_new, NULL);
-		if (tokens[i].value == NULL)
-			return (-1);
-	}
-	return (0);
-}
-/*
-int	handle_expansion_and_wildcard(t_tokens *tokens,
-		t_capacity *capacity, char **envp, int code)
-{
 	int			i;
 	t_arrays	a;
-	
+
 	init_arrays(&a, envp, code);
 	i = -1;
 	while (++i < capacity->current_size)
@@ -474,18 +446,42 @@ int	handle_expansion_and_wildcard(t_tokens *tokens,
 		a.int_array_old[ft_strlen(tokens[i].value)] = 0;
 		if (populate_tokens(tokens[i].value, a.int_array_old))
 			return (free_void((void **)&a.int_array_old, NULL), -1);
+
+		// Save the starting point of int_array_old
+		a.int_array_old_start = a.int_array_old;
+
 		a.int_array_new = ultimate_dollar_expansion(&a, 0);
+		if (a.int_array_new == NULL)
+		{
+			free_void((void **)&a.int_array_old_start, NULL);
+			return (-1);
+		}
+
+		// Save the starting point of int_array_new
+		a.int_array_new_start = a.int_array_new;
+
+		// Reset int_array_old
+		a.int_array_old = a.int_array_old_start;
+		//a.int_array_new = a.int_array_new_start;
+
 		ultimate_dollar_expansion(&a, 1);
+
+		// Reset int_array_new to start for expand_wildcard
+		a.int_array_new = a.int_array_new_start;
+
 		free_void((void **)&tokens[i].value, NULL);
 		tokens[i].value = expand_wildcard(a.int_array_new, tokens, i, 0);
-		free_void((void **)&a.int_array_old, NULL);
-		free_void((void **)&a.int_array_new, NULL);
+
+		// Are the pointer for these 2 at the right place???
+		free_void((void **)&a.int_array_old_start, NULL);
+		free_void((void **)&a.int_array_new_start, NULL);
+
 		if (tokens[i].value == NULL)
 			return (-1);
 	}
 	return (0);
 }
-*/
+
 /*
    "word", "(", ")", "<", ">", "|",
 		"<<", ">>", "||", "&&"

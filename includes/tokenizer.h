@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/13 17:59:13 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/13 19:26:41 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,8 @@ typedef struct p_arrays
 {
 	int		*int_array_new;
 	int		*int_array_old;
+	int		*int_array_new_start;
+	int		*int_array_old_start;
 	char	**envp;
 	int		code;
 }			t_arrays;
@@ -84,7 +86,7 @@ int			identify_token(t_token_type type);
 char		*back_to_char(int *int_array);
 void		error_handler(char *cause_str, char *error_str);
 int			find_matching_paren(t_tokens *tokens, int start, int end);
-//int			*ultimate_dollar_expansion(t_arrays *a, int flag);
-int			*ultimate_dollar_expansion(int *int_array_old, int *int_array_new, char ** envp, int code, int flag);
+int			*ultimate_dollar_expansion(t_arrays *a, int flag);
+//int			*ultimate_dollar_expansion(int *int_array_old, int *int_array_new, char ** envp, int code, int flag);
 
 #endif
