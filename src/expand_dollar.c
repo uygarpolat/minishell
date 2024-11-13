@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 18:33:55 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/12 23:21:58 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/13 10:25:53 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,7 @@ int	when_dollar_received(int **int_array_old, int **int_array_new, int *len, int
 		while (*str_num)
 			*(*int_array_new)++ = *str_num++;
 		str_num = str_num - num;
+
 	}
 	free_void((void **)&str_num, NULL);
 	return (0);
@@ -131,25 +132,10 @@ int	*ultimate_dollar_expansion(int *int_array_old,
 		if (((*int_array_old & 0xFF) == '$')
 			&& ((*int_array_old >> 8) & 1) && *(int_array_old + 1))
 		{
-			//if (*(int_array_old + 1) == '?' && when_dollar_received(&int_array_old, &int_array_new, &len, code, flag))
 			if (*(int_array_old + 1) == '?')
 			{
-				//return (NULL);
-				char	*str_num;
-				
-				str_num = ft_itoa(code);
-				if (str_num == NULL)
-					return (error_handler(NULL, NULL), NULL);
-				num = ft_strlen(str_num);
-				len = len + num;
-				int_array_old += 2;
-				if (flag)
-				{
-					while (*str_num)
-						*int_array_new++ = *str_num++;
-					str_num = str_num - num;
-				}
-				free_void((void **)&str_num, NULL);
+				if (when_dollar_received(&int_array_old, &int_array_new, &len, code, flag))
+					return (NULL);
 			}
 			else
 			{
