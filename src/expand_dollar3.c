@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 18:33:55 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/13 22:46:19 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/13 22:53:13 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int	str_combined(t_arrays *a, t_token_type type, int *len, int flag)
 	a->int_array_old += var_len;
 	var = get_var(str, a->envp);
 	if (identify_token(type) && ft_strchr(var, ' '))
-		return (error_handler(str, "ambiguous redirect"), -1);
+		return (error_handler(str, "ambiguous redirect"), -1); // Add dollar sign in the front. Also exclude heredoc.
 	free_void((void **)&str, NULL);
 	if (var == NULL)
 		return (0);
