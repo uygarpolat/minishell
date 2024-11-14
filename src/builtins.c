@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/13 17:19:38 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/14 13:32:12 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -147,7 +147,7 @@ int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, 
 			if (!cmd[1])
 			{
 				printf("\n");
-				return (1);
+				exit (0);
 			}
 			if (cmd[2] && !ft_strncmp(cmd[1], "-n", 3))
 			{
@@ -170,12 +170,13 @@ int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, 
 				}
 				printf("\n");
 			}
+			exit(0);
 		}
 		else if (!ft_strncmp(cmd[0], "cd", 3))
 		{
 			if (!cmd[1])
 			{
-				//change to home directory
+				//change to home directory?
 				exit (0);
 			}
 			if (cmd[2])
@@ -224,6 +225,7 @@ int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, 
 			*envp = add_env(*envp, cmd[1]);
 			if (!envp)
 				exit (1);
+			exit(0);
 		}
 		else if (!ft_strncmp(cmd[0], "unset", 6))
 		{
@@ -231,9 +233,13 @@ int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, 
 				*envp = rm_envp(*envp, cmd[1]);
 			if (!envp)
 				exit (1);
+			exit(0);
 		}
 		else if (!ft_strncmp(cmd[0], "env", 4))
+		{
 			print_env(*envp);
+			exit(0);
+		}
 		else if (!ft_strncmp(cmd[0], "exit", 5))
 		{
 			if (cmd[2])
@@ -257,7 +263,7 @@ int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, 
 	else if (minishell->p.pids < 0)
 		exit(1);
 	else
-		return (1);
+		return (0);
 }
 
 int	is_builtin(char **cmd)
