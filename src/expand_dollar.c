@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 18:33:55 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/13 17:00:46 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/14 12:53:18 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int	str_combined(int **int_array_old, int **int_array_new, char **envp, int flg)
 
 	len = 0;
 	while ((ft_isalnum((*int_array_old)[len] & 0xFF) || ((*int_array_old)[len]
-		& 0xFF) == '_') && !(((*int_array_old)[len] >> 8) & 1))
+		& 0xFF) == '_') && !(((*int_array_old)[len] >> 9) & 1))
 		len++;
 	str = ft_calloc((len + 1), sizeof(char));
 	if (str == NULL)
@@ -124,7 +124,7 @@ int	*ultimate_dollar_expansion(t_arrays *a, int flag)
 	while (*a->int_array_old)
 	{
 		if (((*a->int_array_old & 0xFF) == '$')
-			&& ((*a->int_array_old >> 8) & 1) && *(a->int_array_old + 1))
+			&& ((*a->int_array_old >> 9) & 1) && *(a->int_array_old + 1))
 		{
 			if (*(a->int_array_old + 1) == '?')
 			{

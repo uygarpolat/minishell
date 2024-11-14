@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/26 00:45:16 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/10 17:43:44 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/14 12:51:57 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	match_pattern(char *filename, int *pattern)
 {
 	if (*pattern == '\0' && *filename == '\0')
 		return (1);
-	if (((*pattern & 0xFF) == '*') && ((*pattern >> 8) & 1))
+	if (((*pattern & 0xFF) == '*') && ((*pattern >> 9) & 1))
 	{
 		while (*filename)
 		{
@@ -34,7 +34,7 @@ int	match_pattern(char *filename, int *pattern)
 		}
 		return (match_pattern(filename, pattern + 1));
 	}
-	if (((*pattern & 0xFF) == '*') && !((*pattern >> 8) & 1))
+	if (((*pattern & 0xFF) == '*') && !((*pattern >> 9) & 1))
 	{
 		if (*pattern == *filename)
 			return (match_pattern(filename + 1, pattern + 1));

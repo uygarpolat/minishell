@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/13 22:35:28 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/14 14:05:00 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -341,10 +341,18 @@ int	encode_char_with_flag(char c)
 {
 	int	encoded_value;
 
-	encoded_value = (1 << 8) | c;
+	encoded_value = (1 << 9) | c;
 	return (encoded_value);
 }
 
+int	encode_char_with_flag_8(char c)
+{
+	int	encoded_value;
+
+	encoded_value = (1 << 8) | c;
+	return (encoded_value);
+}
+/*
 void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 {
 	if (q->single_q_count % 2 != 1)
@@ -352,6 +360,31 @@ void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 		if (ft_isalnum(*(str + 1)) || (*(str + 1) == '_')
 			|| (*(str + 1) == '?'))
 			int_array[*m] = encode_char_with_flag(*str);
+		else if ((*(str + 1) == '"' || *(str + 1) == '\'')
+			&& q->double_q_count % 2 != 1)
+			return ;
+		else
+			int_array[*m] = *str;
+	}
+	else
+		int_array[*m] = *str;
+	(*m)++;
+}
+*/
+void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
+{
+	if (q->single_q_count % 2 != 1)
+	{
+		if (ft_isalnum(*(str + 1)) || (*(str + 1) == '_') || (*(str + 1) == '?'))
+		{
+			int_array[*m] = encode_char_with_flag(*str);
+	/*		printf("Bitshifted number is %d\n", int_array[*m] >> 8);
+			if (q->double_q_count % 2 == 1)
+			{
+				int_array[*m] = encode_char_with_flag_8(int_array[*m]);
+				printf("Bitshifted number is %d\n", int_array[*m] >> 8);
+			}*/
+		}
 		else if ((*(str + 1) == '"' || *(str + 1) == '\'')
 			&& q->double_q_count % 2 != 1)
 			return ;

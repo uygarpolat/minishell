@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 18:33:55 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/13 22:53:13 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/14 12:37:56 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int	str_combined(t_arrays *a, t_token_type type, int *len, int flag)
 
 	var_len = 0;
 	while ((ft_isalnum(a->int_array_old[var_len] & 0xFF) || (a->int_array_old[var_len]
-		& 0xFF) == '_') && !((a->int_array_old[var_len] >> 8) & 1))
+		& 0xFF) == '_') && !((a->int_array_old[var_len] >> 9) & 1))
 		var_len++;
 	str = ft_calloc((var_len + 1), sizeof(char));
 	if (str == NULL)
@@ -126,7 +126,7 @@ int	*ultimate_dollar_expansion(t_arrays *a, t_token_type type, int flag)
 	while (*(a->int_array_old))
 	{
 		if (((*(a->int_array_old) & 0xFF) == '$')
-			&& ((*(a->int_array_old) >> 8) & 1) && *(a->int_array_old + 1))
+			&& ((*(a->int_array_old) >> 9) & 1) && *(a->int_array_old + 1))
 		{
 			if (*(a->int_array_old + 1) == '?')
 			{
