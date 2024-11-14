@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/11 19:03:12 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/14 13:38:47 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <readline/history.h>
 # include <string.h>
 # include <sys/wait.h>
+# include <sys/stat.h>
 # include <limits.h>
 # include <errno.h>
 # include "../library/libft/libft.h"
