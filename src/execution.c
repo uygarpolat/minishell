@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/14 13:40:08 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/14 14:03:41 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,10 +128,13 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 		if (is_builtin(s->words))
 		{
 			if (!execute_builtin(s, s->words, envp, minishell, n))
+			{
+				error(minishell);
 				exit(1);
+			}
 			exit(0);
 		}
-		if (!ft_strncmp(s->words[0], " ", 2))
+		if (!*s->words)
 			exit(0);
 		path = get_path(s->words, *envp, minishell);
 		if (!path)
@@ -305,13 +308,13 @@ int	execution(t_ast *s, char ***envp)
 	n = 0;
 	if (minishell.p.count == 0 && is_builtin(s->words))
 	{
-			execute_builtin(s, s->words, envp, &minishell, n);
-			/*{	
+			if (!execute_builtin(s, s->words, envp, &minishell, n))
+			{	
 				error(&minishell);
 				return (1);
-			{*/
-			//close_and_free(&minishell.p);
-			//return (waiting(minishell.p.pids[0]));
+			}
+			close_and_free(&minishell.p);
+			return (0);
 	}
 	else
 	{
