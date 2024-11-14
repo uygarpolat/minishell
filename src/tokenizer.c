@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/14 14:05:00 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/14 17:57:01 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -337,53 +337,23 @@ int	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 	return (0);
 }
 
-int	encode_char_with_flag(char c)
+int	encode_char_with_flag(int c, int shift_amount)
 {
 	int	encoded_value;
 
-	encoded_value = (1 << 9) | c;
+	encoded_value = (1 << shift_amount) | c;
 	return (encoded_value);
 }
 
-int	encode_char_with_flag_8(char c)
-{
-	int	encoded_value;
-
-	encoded_value = (1 << 8) | c;
-	return (encoded_value);
-}
-/*
-void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
-{
-	if (q->single_q_count % 2 != 1)
-	{
-		if (ft_isalnum(*(str + 1)) || (*(str + 1) == '_')
-			|| (*(str + 1) == '?'))
-			int_array[*m] = encode_char_with_flag(*str);
-		else if ((*(str + 1) == '"' || *(str + 1) == '\'')
-			&& q->double_q_count % 2 != 1)
-			return ;
-		else
-			int_array[*m] = *str;
-	}
-	else
-		int_array[*m] = *str;
-	(*m)++;
-}
-*/
 void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 {
 	if (q->single_q_count % 2 != 1)
 	{
 		if (ft_isalnum(*(str + 1)) || (*(str + 1) == '_') || (*(str + 1) == '?'))
 		{
-			int_array[*m] = encode_char_with_flag(*str);
-	/*		printf("Bitshifted number is %d\n", int_array[*m] >> 8);
+			int_array[*m] = encode_char_with_flag(*str, 9);
 			if (q->double_q_count % 2 == 1)
-			{
-				int_array[*m] = encode_char_with_flag_8(int_array[*m]);
-				printf("Bitshifted number is %d\n", int_array[*m] >> 8);
-			}*/
+				int_array[*m] = encode_char_with_flag(int_array[*m], 8);
 		}
 		else if ((*(str + 1) == '"' || *(str + 1) == '\'')
 			&& q->double_q_count % 2 != 1)
@@ -399,7 +369,7 @@ void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 void	assign_asterisk(char *str, int *int_array, t_quote *q, int *m)
 {
 	if (q->single_q_count % 2 == 0 && q->double_q_count % 2 == 0)
-		int_array[*m] = encode_char_with_flag(*str);
+		int_array[*m] = encode_char_with_flag(*str, 9);
 	else
 		int_array[*m] = *str;
 	(*m)++;
@@ -413,7 +383,7 @@ void	assign_quote(char **str, int *int_array, t_quote *q, int *m)
 		q->single_q_count++;
 	if (ft_isalnum(*(*str + 1) & 0xFF) || (*(*str + 1) & 0xFF) == '_')
 	{
-		int_array[*m] = encode_char_with_flag(*(*str + 1));
+		int_array[*m] = encode_char_with_flag(*(*str + 1), 9);
 		(*m)++;
 		if (*(*str + 1) & 0xFF)
 			(*str)++;
