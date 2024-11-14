@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/13 18:03:31 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/14 14:11:01 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,25 +104,13 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 	int	i;
 	char	*path;
 	t_put	cmd;
+	struct stat	buf;
 
 	cmd.infile = NULL;
 	cmd.outfile = NULL;
 	minishell->p.pids[n] = fork();
 	if (minishell->p.pids[n] == 0)
 	{
-		/*if (is_builtin(s->words))
-		{
-			i = 0;
-			while (i < minishell->p.count)
-			{
-				close(minishell->p.pipes[i][0]);
-				close(minishell->p.pipes[i][1]);
-				i++;
-			}
-			if (!execute_builtin(s, s->words, envp, minishell, n))
-				exit(1);
-			exit(0);
-		}*/
 		get_in_out(s, &cmd, minishell);
 		if (minishell->p.pipes || cmd.infile || cmd.outfile)
 		{
@@ -143,17 +131,43 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 				exit(1);
 			exit(0);
 		}
+		if (!ft_strncmp(s->words[0], " ", 2))
+			exit(0);
 		path = get_path(s->words, *envp, minishell);
 		if (!path)
-			exit(0);
+		{
+			if (!ft_strchr(s->words[0], '/'))
+			{
+				ft_putstr_fd(" command not found\n", 2);
+				exit(127);
+			}
+			else if (stat(s->words[0], &buf) ==0 && access(s->words[0], X_OK) != 0)
+			{
+				ft_putstr_fd(" Permission denied\n", 2);
+				exit(126);
+			}
+			else if (ft_strchr(s->words[0], '/'))
+			{	
+				ft_putstr_fd(" No such file or directory\n", 2);
+				exit(127);
+			}
+		}
+		if (stat(path, &buf) == 0)
+		{
+			if (S_ISDIR(buf.st_mode))
+			{
+				ft_putstr_fd(" Is a directory\n", 2);
+				exit (126);
+			}
+			if (access(path, X_OK) != 0)
+			{
+				ft_putstr_fd(" Permission denied\n", 2);
+				exit(127);
+			}
+		}
 		execve(path, s->words, *envp);
-		if (s->words[0][0] == '/')
-			ft_putstr_fd(" Is a directory\n", 2);
-		else
-			perror(strerror(126));
-		error(minishell);
-		//FREE EVERYTHING HERE
-		exit(126);
+		ft_putstr_fd(strerror(errno), 2);
+		exit(errno);
 	}
 }
 
