@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/15 15:09:55 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 01:46:55 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,30 +29,31 @@
 # include "../library/libft/libft.h"
 # include "tokenizer.h"
 
-typedef enum    e_ast_node_type {
-    AST_COMMAND,
-    AST_PIPE,
-    AST_REDIR_OUT,
-    AST_REDIR_APPEND,
-    AST_REDIR_IN,
-    AST_HEREDOC,
-    AST_AND,
-    AST_OR
+typedef enum e_ast_node_type
+{
+	AST_COMMAND,
+	AST_PIPE,
+	AST_REDIR_OUT,
+	AST_REDIR_APPEND,
+	AST_REDIR_IN,
+	AST_HEREDOC,
+	AST_AND,
+	AST_OR
 }	t_ast_node_type;
 
-typedef struct	s_ast
+typedef struct s_ast
 {
 	t_ast_node_type	type;
 	t_tokens		*token;
 	char			**words;
-	struct s_ast    *left;
-	struct s_ast    *right;
-	struct s_ast    *redir_target;
+	struct s_ast	*left;
+	struct s_ast	*right;
+	struct s_ast	*redir_target;
 	int				code;
 	int				*code_parser;
 }					t_ast;
 
-typedef struct	s_precedence
+typedef struct s_precedence
 {
 	int	i;
 	int	start;
@@ -71,18 +72,18 @@ typedef struct s_pipe
 	int	o;
 }	t_pipes;
 
-typedef struct	s_put
+typedef struct s_put
 {
 	//char	**args;
 	//char	*path;
 	char	*infile;
 	char	*outfile;
 	char	o_type;
-	int	in;
-	int	out;
+	int		in;
+	int		out;
 }	t_put;
 
-typedef struct	s_minishell
+typedef struct s_minishell
 {
 	t_ast	*ast;
 	t_pipes	p;
@@ -95,7 +96,7 @@ t_ast	*build_ast(t_tokens *tokens, int start, int end, int code);
 int		execution(t_ast *s, char ***envp);
 void	close_and_free(t_pipes *p);
 void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell);
-int	open_files(t_put *cmd);
+int		open_files(t_put *cmd);
 void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
 
 //path.c
@@ -103,8 +104,8 @@ char	*get_path(char **cmd, char **envp, t_minishell *minishell);
 char	**paths(char **envp);
 
 //builtins.c
-int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n);
-int	is_builtin(char **cmd);
+int		execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n);
+int		is_builtin(char **cmd);
 
 //ft_strdup2.c
 char	**ft_strdup2(char **str);

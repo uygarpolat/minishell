@@ -6,15 +6,16 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/15 19:57:58 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 01:30:22 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/11 15:15:17 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/11/07 10:35:14 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../library/libft/libft.h"
+#include "../library/libft/libft.h"
 #include "../includes/tokenizer.h"
 #include "../includes/ast.h"
+#include "../includes/signals.h"
 
 void	handle_sigint(int signum);
 void	handle_sigquit(int signum);
@@ -22,14 +23,6 @@ void	print_ast(t_ast *node, int level, int debug_flag);
 int		init_signal(int argc, char **argv);
 
 int	g_signal = 0;
-
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      DELETE BEFORE PRODUCTION          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// 0 for no debugging
-// 1 for exit code debugging
-// 2 for tokenizer, parser, exit code debugging.
-
-int	debug_flag = 0;
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!      DELETE BEFORE PRODUCTION          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 int	execute_shell(char *input, int *code, char **new_envp)
 {
@@ -43,17 +36,13 @@ int	execute_shell(char *input, int *code, char **new_envp)
 		ast = build_ast(tokens, 0, capacity.current_size - 1, 0);
 		if (ast)
 		{
-			print_ast(ast, 0, debug_flag);
-			if (debug_flag > 0)
-				printf("----------\nExit code (after parser): %d\n", *code);
+			//print_ast(ast, 0);
 			*code = execution(ast, &new_envp);
 			free_ast(&ast);
 		}
 		free_tokens(tokens, &capacity);
 	}
 	free_void((void **)&input, NULL);
-	if (debug_flag > 0)
-		printf("\nExit code (at exit): %d\n----------\n", *code);
 	return (*code);
 }
 

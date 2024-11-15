@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2024/11/15 20:38:02 by upolat           ###   ########.fr        #
+#    Updated: 2024/11/16 01:21:58 by upolat           ###   ########.fr        #
 #    Updated: 2024/11/11 16:52:17 by hpirkola         ###   ########.fr        #
 #    Updated: 2024/11/07 10:34:01 by upolat           ###   ########.fr        #
 #                                                                              #
@@ -16,11 +16,21 @@ NAME = minishell
 
 SRC_DIR = src
 SRC_BONUS_DIR = src
+TOKENIZER_DIR = src/01-tokenizer
+PARSER_DIR = src/02-parser
+SIGNALS_DIR = src/03-signals
 
-SOURCES = 	$(SRC_DIR)/main.c $(SRC_DIR)/tokenizer.c $(SRC_DIR)/parser.c \
-			$(SRC_DIR)/execution.c $(SRC_DIR)/path.c $(SRC_DIR)/globbing.c \
-			$(SRC_DIR)/tokenization_utils.c $(SRC_DIR)/builtins.c \
-		 	$(SRC_DIR)/ft_strdup2.c $(SRC_DIR)/errors.c $(SRC_DIR)/expand_dollar.c \
+SOURCES = 	$(SRC_DIR)/main.c $(SRC_DIR)/print_ast_and_tokens.c \
+			$(TOKENIZER_DIR)/tokenizer.c $(TOKENIZER_DIR)/tokenization_utils.c \
+			$(TOKENIZER_DIR)/error_and_grammar.c $(TOKENIZER_DIR)/malloc_and_free.c \
+			$(TOKENIZER_DIR)/expansion_and_wildcard.c $(TOKENIZER_DIR)/handle_word_and_separator.c \
+			$(TOKENIZER_DIR)/expand_dollar.c $(TOKENIZER_DIR)/expand_dollar_2.c \
+			$(TOKENIZER_DIR)/populate_tokens.c $(TOKENIZER_DIR)/globbing.c \
+			$(PARSER_DIR)/parser.c \
+			$(SIGNALS_DIR)/signals.c \
+			$(SRC_DIR)/execution.c $(SRC_DIR)/path.c \
+			$(SRC_DIR)/builtins.c \
+		 	$(SRC_DIR)/ft_strdup2.c $(SRC_DIR)/errors.c \
 
 SOURCES_BONUS = $(SRC_DIR)/readline_test.c
 

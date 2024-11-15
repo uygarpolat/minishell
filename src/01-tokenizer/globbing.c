@@ -6,19 +6,13 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/26 00:45:16 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/15 22:52:03 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 01:25:51 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <dirent.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include "../../library/libft/libft.h"
-#include "../includes/tokenizer.h"
-#include "../includes/ast.h"
+#include "../../includes/tokenizer.h"
+#include "../../includes/ast.h"
 
 int	match_pattern(char *filename, int *pattern)
 {

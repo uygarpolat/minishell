@@ -6,14 +6,14 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/15 19:11:43 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 01:26:23 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../library/libft/libft.h"
-#include "../includes/tokenizer.h"
-#include "../includes/ast.h"
+#include "../../includes/tokenizer.h"
+#include "../../includes/ast.h"
 
 int	get_precedence(t_token_type type)
 {
