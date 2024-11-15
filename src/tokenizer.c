@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/15 15:55:23 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/15 23:28:15 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -188,11 +188,15 @@ void	*free_tokens(t_tokens *tokens, t_capacity *capacity)
 void	realloc_error(t_tokens *tokens, t_tokens *new_tokens,
 			t_capacity *capacity, int i)
 {
+	error_handler(NULL, NULL, tokens->code, 1);
 	free_tokens(tokens, capacity);
-	capacity->max_size *= 2;
-	while (++i < capacity->max_size)
-		new_tokens[i].value = NULL;
-	free_tokens(new_tokens, capacity);
+	if (new_tokens != NULL)
+	{
+		capacity->max_size *= 2;
+		while (++i < capacity->max_size)
+			new_tokens[i].value = NULL;
+		free_tokens(new_tokens, capacity);
+	}
 }
 
 t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
@@ -202,7 +206,7 @@ t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
 
 	new_tokens = malloc(sizeof(t_tokens) * (capacity->max_size * 2));
 	if (new_tokens == NULL)
-		return ((t_tokens *)free_tokens(tokens, capacity));
+		return (realloc_error(tokens, new_tokens, capacity, i), NULL);
 	while (++i < capacity->max_size * 2)
 	{
 		if (i < capacity->current_size)
@@ -244,7 +248,11 @@ int	malloc_individual_tokens(t_tokens *tokens, char **input,
 	tokens[capacity->current_size].value
 		= malloc(sizeof(char) * (temp - *input + 1));
 	if (tokens[capacity->current_size].value == NULL)
-		return (free_void((void **)&tokens, NULL), -1);
+	{
+		error_handler(NULL, NULL, tokens->code, 1);
+		free_tokens(tokens, capacity);
+		return (-1);
+	}
 	ft_strlcpy(tokens[capacity->current_size].value, *input, temp - *input + 1);
 	capacity->current_size++;
 	*input = temp;
@@ -464,6 +472,23 @@ void	free_int_arrays(t_arrays *a)
 	free_void((void **)&a->int_array_new_start, NULL);
 }
 
+int	calloc_and_populate(t_tokens *tokens,
+		t_arrays *a, t_token_type *type, int i)
+{
+	if (i < 1)
+		*type = TOKEN_UNKNOWN;
+	else if (identify_token(tokens[i - 1].type))
+		*type = tokens[i - 1].type;
+	a->int_array_old = ft_calloc((ft_strlen(tokens[i].value)
+				+ 1), sizeof(int));
+	if (a->int_array_old == NULL)
+		return (error_handler(NULL, NULL, tokens->code, 1), -1);
+	if (populate_tokens(tokens[i].value, tokens->code, a->int_array_old, 0))
+		return (free_void((void **)&a->int_array_old, NULL), -1);
+	a->int_array_old_start = a->int_array_old;
+	return (0);
+}
+
 int	handle_expansion_and_wildcard(t_tokens *tokens,
 		t_capacity *capacity, char **envp)
 {
@@ -475,16 +500,8 @@ int	handle_expansion_and_wildcard(t_tokens *tokens,
 	i = -1;
 	while (++i < capacity->current_size)
 	{
-		type = TOKEN_UNKNOWN;
-		a.int_array_old = ft_calloc((ft_strlen(tokens[i].value)
-					+ 1), sizeof(int));
-		if (a.int_array_old == NULL)
+		if (calloc_and_populate(tokens, &a, &type, i) == -1)
 			return (-1);
-		if (populate_tokens(tokens[i].value, tokens->code, a.int_array_old, 0))
-			return (free_void((void **)&a.int_array_old, NULL), -1);
-		a.int_array_old_start = a.int_array_old;
-		if (i > 0 && identify_token(tokens[i - 1].type))
-			type = tokens[i - 1].type;
 		a.int_array_new = ultimate_dollar_expansion(&a, type, 0, 0);
 		if (a.int_array_new == NULL)
 			return (free_int_arrays(&a), -1);
@@ -565,7 +582,7 @@ int	init_tokenizer(t_tokens **tokens, t_capacity *capacity, int *code)
 	capacity->current_size = 0;
 	*tokens = malloc(sizeof(t_tokens) * capacity->max_size);
 	if (*tokens == NULL)
-		return (-1); // User error handler here
+		return (error_handler(NULL, NULL, (*tokens)->code, 1), -1);
 	(*tokens)->globbed = NULL;
 	(*tokens)->code = code;
 	return (0);

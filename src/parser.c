@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/15 16:05:30 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/15 19:11:43 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -162,16 +162,16 @@ int	concatenate_commands(char **str, t_tokens *tokens, int *i)
 	{
 		*str = ft_strjoin_free(*str, " ");
 		if (*str == NULL)
-			return (-1);
+			return (error_handler(NULL, NULL, tokens->code, 1), -1);
 		*str = ft_strjoin_free(*str, tokens[*i].value);
 		if (*str == NULL)
-			return (-1);
+			return (error_handler(NULL, NULL, tokens->code, 1), -1);
 	}
 	else
 	{
 		*str = ft_strdup(tokens[*i].value);
 		if (*str == NULL)
-			return (-1);
+			return (error_handler(NULL, NULL, tokens->code, 1), -1);
 	}
 	return (0);
 }

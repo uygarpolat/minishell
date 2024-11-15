@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 18:33:55 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/15 03:00:04 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/15 23:45:56 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,12 +54,11 @@ int	handle_ambi_redir_in_dollar(t_arrays *a, char **str, char *var, int type)
 	return (0);
 }
 
-int	str_combined(t_arrays *a, t_token_type type, int *len, int flag)
+char	*calloc_and_generate_env_variable_name(t_arrays *a)
 {
 	int		n;
-	char	*str;
-	char	*var;
 	int		vlen;
+	char	*str;
 
 	vlen = 0;
 	while ((ft_isalnum(a->int_array_old[vlen] & 0xFF) || (a->int_array_old[vlen]
@@ -67,11 +66,22 @@ int	str_combined(t_arrays *a, t_token_type type, int *len, int flag)
 		vlen++;
 	str = ft_calloc((vlen + 1), sizeof(char));
 	if (str == NULL)
-		return (error_handler(NULL, NULL, a->code, 1), -1);
+		return (error_handler(NULL, NULL, a->code, 1), NULL);
 	n = -1;
 	while (++n < vlen)
 		str[n] = a->int_array_old[n];
 	a->int_array_old += vlen;
+	return (str);
+}
+
+int	str_combined(t_arrays *a, t_token_type type, int *len, int flag)
+{
+	char	*str;
+	char	*var;
+
+	str = calloc_and_generate_env_variable_name(a);
+	if (str == NULL)
+		return (-1);
 	if (type == TOKEN_HEREDOC)
 		var = str;
 	else

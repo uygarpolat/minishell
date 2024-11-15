@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/26 00:45:16 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/15 02:43:09 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/15 22:52:03 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,8 @@ int	populate_res(t_tokens **tokens, t_globber *g, int *int_array, int counter)
 		return (-1);
 	}
 	(*tokens)[g->loc].globbed[counter] = ft_strdup(g->entry->d_name);
+	if ((*tokens)[g->loc].globbed[counter] == NULL)
+		return (error_handler(NULL, NULL, (*tokens)->code, 1), -1);
 	return (0);
 }
 
