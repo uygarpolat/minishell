@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/14 17:57:01 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/15 02:59:00 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -205,6 +205,7 @@ t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
 				return (realloc_error(tokens, new_tokens, capacity, i), NULL);
 			new_tokens[i].globbed = NULL;
 			new_tokens[i].type = tokens[i].type;
+			new_tokens[i].code = tokens[i].code;
 		}
 		else
 		{
@@ -349,7 +350,8 @@ void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 {
 	if (q->single_q_count % 2 != 1)
 	{
-		if (ft_isalnum(*(str + 1)) || (*(str + 1) == '_') || (*(str + 1) == '?'))
+		if (ft_isalnum(*(str + 1)) || (*(str + 1) == '_')
+			|| (*(str + 1) == '?'))
 		{
 			int_array[*m] = encode_char_with_flag(*str, 9);
 			if (q->double_q_count % 2 == 1)
@@ -378,9 +380,21 @@ void	assign_asterisk(char *str, int *int_array, t_quote *q, int *m)
 void	assign_quote(char **str, int *int_array, t_quote *q, int *m)
 {
 	if (**str == '"')
+	{
+		if (q->double_q_count % 2 == 0)
+			q->double_first_unclosed = *str;
+		else
+			q->double_first_unclosed = q->str_initial;
 		q->double_q_count++;
+	}
 	else
+	{
+		if (q->single_q_count % 2 == 0)
+			q->single_first_unclosed = *str;
+		else
+			q->single_first_unclosed = q->str_initial;
 		q->single_q_count++;
+	}
 	if (ft_isalnum(*(*str + 1) & 0xFF) || (*(*str + 1) & 0xFF) == '_')
 	{
 		int_array[*m] = encode_char_with_flag(*(*str + 1), 9);
@@ -390,15 +404,20 @@ void	assign_quote(char **str, int *int_array, t_quote *q, int *m)
 	}
 }
 
-int	populate_tokens(char *str, int *int_array)
+void	init_populate_tokens(t_quote *q, char *str)
+{
+	q->single_q_count = 0;
+	q->double_q_count = 0;
+	q->single_first_unclosed = &str[ft_strlen(str)];
+	q->double_first_unclosed = &str[ft_strlen(str)];
+	q->str_initial = &str[ft_strlen(str)];
+}
+
+int	populate_tokens(char *str, int *code, int *int_array, int m)
 {
 	t_quote	q;
-	int		m;
 
-	m = 0;
-	q.single_q_count = 0;
-	q.double_q_count = 0;
-	int_array[ft_strlen(str)] = 0;
+	init_populate_tokens(&q, str);
 	while (*str)
 	{
 		if (*str == '"' && q.single_q_count % 2 == 0)
@@ -413,112 +432,68 @@ int	populate_tokens(char *str, int *int_array)
 			int_array[m++] = *str;
 		str++;
 	}
-	int_array[m] = '\0';
-	if (q.double_q_count % 2 != 0)
+	if (q.double_first_unclosed < q.single_first_unclosed)
 		return (error_handler(NULL, "unexpected EOF "
-				"while looking for matching `\"'"), -1);
-	if (q.single_q_count % 2 != 0)
+				"while looking for matching `\"'", code, 2), -1);
+	else if (q.double_first_unclosed > q.single_first_unclosed)
 		return (error_handler(NULL, "unexpected EOF "
-				"while looking for matching `''"), -1);
+				"while looking for matching `''", code, 2), -1);
 	return (0);
 }
 
-void	init_arrays(t_arrays *a, char **envp, int code)
+void	init_arrays(t_tokens *tokens, t_arrays *a, char **envp)
 {
 	a->int_array_new = NULL;
 	a->int_array_old = NULL;
 	a->int_array_new_start = NULL;
 	a->int_array_old_start = NULL;
 	a->envp = envp;
-	a->code = code;
+	a->code = tokens->code;
+}
+
+void	free_int_arrays(t_arrays *a)
+{
+	free_void((void **)&a->int_array_old_start, NULL);
+	free_void((void **)&a->int_array_new_start, NULL);
 }
 
 int	handle_expansion_and_wildcard(t_tokens *tokens,
-		t_capacity *capacity, char **envp, int code)
+		t_capacity *capacity, char **envp)
 {
 	int				i;
 	t_token_type	type;
 	t_arrays		a;
 
-	init_arrays(&a, envp, code);
+	init_arrays(tokens, &a, envp);
 	i = -1;
 	while (++i < capacity->current_size)
 	{
 		type = TOKEN_UNKNOWN;
-
-		a.int_array_old = malloc(sizeof(int) * (ft_strlen(tokens[i].value) + 1));
+		a.int_array_old = ft_calloc((ft_strlen(tokens[i].value)
+					+ 1), sizeof(int));
 		if (a.int_array_old == NULL)
 			return (-1);
-		a.int_array_old[ft_strlen(tokens[i].value)] = 0;
-		if (populate_tokens(tokens[i].value, a.int_array_old))
+		if (populate_tokens(tokens[i].value, tokens->code, a.int_array_old, 0))
 			return (free_void((void **)&a.int_array_old, NULL), -1);
-
-		// Save the starting point of int_array_old
 		a.int_array_old_start = a.int_array_old;
-
 		if (i > 0 && identify_token(tokens[i - 1].type))
 			type = tokens[i - 1].type;
-
-		a.int_array_new = ultimate_dollar_expansion(&a, type, 0);
+		a.int_array_new = ultimate_dollar_expansion(&a, type, 0, 0);
 		if (a.int_array_new == NULL)
-		{
-			free_void((void **)&a.int_array_old_start, NULL);
-			return (-1);
-		}
-
-		// Save the starting point of int_array_new
+			return (free_int_arrays(&a), -1);
 		a.int_array_new_start = a.int_array_new;
-
-		// Reset int_array_old
 		a.int_array_old = a.int_array_old_start;
-		//a.int_array_new = a.int_array_new_start;
-
-		ultimate_dollar_expansion(&a, type, 1);
-
-		// Reset int_array_new to start for expand_wildcard
+		if (ultimate_dollar_expansion(&a, type, 1, 0) == NULL)
+			return (free_int_arrays(&a), -1);
 		a.int_array_new = a.int_array_new_start;
-
 		free_void((void **)&tokens[i].value, NULL);
 		tokens[i].value = expand_wildcard(a.int_array_new, tokens, i, 0);
-
-		// Are the pointer for these 2 at the right place???
-		free_void((void **)&a.int_array_old_start, NULL);
-		free_void((void **)&a.int_array_new_start, NULL);
-
+		free_int_arrays(&a);
 		if (tokens[i].value == NULL)
 			return (-1);
 	}
 	return (0);
 }
-
-/*
-   "word", "(", ")", "<", ">", "|",
-		"<<", ">>", "||", "&&"
-
-
-first: word, open_paren, redir
-
-before word: word, open_paren, redir, pipe, logic
-after word: word, close_paren, redir, pipe, logic
-
-before redir: word, open_paren, pipe, logic
-after redir: word
-
-before pipe: word, close_paren
-after pipe: word, open_paren, redir
-
-before logic: word, close_paren
-after logic: word, open_paren, redir
-
-before open paren: open_paren, logic, pipe
-after open paren: word, open_paren, redir
-
-before close_paren: word, close_paren
-after close_paren: close_paren, pipe, logic
-
-last: word, close_paren
-
-*/
 
 int	tokens_grammar(t_tokens *tokens, t_capacity *capacity, int i)
 {
@@ -577,7 +552,7 @@ int	tokens_error_checker(t_tokens *tokens, t_capacity *capacity)
 	return (0);
 }
 
-int	init_tokenizer(t_tokens **tokens, t_capacity *capacity)
+int	init_tokenizer(t_tokens **tokens, t_capacity *capacity, int *code)
 {
 	capacity->max_size = 1;
 	capacity->current_size = 0;
@@ -585,17 +560,18 @@ int	init_tokenizer(t_tokens **tokens, t_capacity *capacity)
 	if (*tokens == NULL)
 		return (-1);
 	(*tokens)->globbed = NULL;
+	(*tokens)->code = code;
 	return (0);
 }
 
 t_tokens	*ft_tokenizer(char *input, t_capacity *capacity,
-				char **envp, int code)
+				char **envp, int *code)
 {
 	t_tokens	*tokens;
 	int			error_code;
 
 	tokens = NULL;
-	if (init_tokenizer(&tokens, capacity) == -1)
+	if (init_tokenizer(&tokens, capacity, code) == -1)
 		return (NULL);
 	while (*input)
 	{
@@ -614,7 +590,7 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity,
 	}
 	//print_tokens(tokens, capacity);
 	if (tokens_error_checker(tokens, capacity) == -1
-		|| handle_expansion_and_wildcard(tokens, capacity, envp, code) == -1)
+		|| handle_expansion_and_wildcard(tokens, capacity, envp) == -1)
 		return ((t_tokens *)free_tokens(tokens, capacity));
 	return (tokens);
 }

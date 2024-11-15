@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   expand_dollar3.c                                   :+:      :+:    :+:   */
+/*   expand_dollar.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 18:33:55 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/14 20:25:04 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/15 03:00:04 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,29 +28,11 @@ char	*get_var(char *str, char **envp)
 	}
 	return (NULL);
 }
-/*
-bash-3.2$ echo < $var
-bash: $var: ambiguous redirect
-bash-3.2$ echo > $var
-bash: $var: ambiguous redirect
-bash-3.2$ echo >> $var
-bash: $var: ambiguous redirect
-bash-3.2$ echo << $var
-> $var
 
-bash-3.2$ echo < "$var"
-bash: a and b and c: No such file or directory
-bash-3.2$ echo > "$var"
-bash-3.2$ echo >> "$var"
-bash-3.2$ echo << "$var"
-> a and b and c
-> $var
-*/
-
-int	handle_ambiguous_redirect_in_dollar(t_arrays *a, char **str, char *var, int type)
+int	handle_ambi_redir_in_dollar(t_arrays *a, char **str, char *var, int type)
 {
-	int 	c;
-	
+	int	c;
+
 	c = *(a->int_array_old - ft_strlen(*str) - 1);
 	if (var == NULL || type == TOKEN_HEREDOC)
 		return (0);
@@ -63,7 +45,8 @@ int	handle_ambiguous_redirect_in_dollar(t_arrays *a, char **str, char *var, int 
 				ft_putstr_fd("minishell: $", 2);
 				ft_putstr_fd(*str, 2);
 				ft_putstr_fd(": ambiguous redirect\n", 2);
-				free_void((void **)str, NULL); 
+				free_void((void **)str, NULL);
+				*a->code = 1;
 				return (-1);
 			}
 		}
@@ -76,24 +59,24 @@ int	str_combined(t_arrays *a, t_token_type type, int *len, int flag)
 	int		n;
 	char	*str;
 	char	*var;
-	int		var_len;
+	int		vlen;
 
-	var_len = 0;
-	while ((ft_isalnum(a->int_array_old[var_len] & 0xFF) || (a->int_array_old[var_len]
-		& 0xFF) == '_') && !((a->int_array_old[var_len] >> 9) & 1))
-		var_len++;
-	str = ft_calloc((var_len + 1), sizeof(char));
+	vlen = 0;
+	while ((ft_isalnum(a->int_array_old[vlen] & 0xFF) || (a->int_array_old[vlen]
+				& 0xFF) == '_') && !((a->int_array_old[vlen] >> 9) & 1))
+		vlen++;
+	str = ft_calloc((vlen + 1), sizeof(char));
 	if (str == NULL)
-		return (error_handler(NULL, NULL), -1);
+		return (error_handler(NULL, NULL, a->code, 1), -1);
 	n = -1;
-	while (++n < var_len)
+	while (++n < vlen)
 		str[n] = a->int_array_old[n];
-	a->int_array_old += var_len;
+	a->int_array_old += vlen;
 	if (type == TOKEN_HEREDOC)
 		var = str;
 	else
 		var = get_var(str, a->envp);
-	if (handle_ambiguous_redirect_in_dollar(a, &str, var, type) == -1)
+	if (handle_ambi_redir_in_dollar(a, &str, var, type) == -1)
 		return (-1);
 	if (var == NULL)
 		return (free_void((void **)&str, NULL), 0);
@@ -109,7 +92,7 @@ int	str_combined(t_arrays *a, t_token_type type, int *len, int flag)
 	return (0);
 }
 
-int	*malloc_array(int len, int flag)
+int	*malloc_array(t_arrays *a, int len, int flag)
 {
 	int	*arr;
 
@@ -118,10 +101,10 @@ int	*malloc_array(int len, int flag)
 	{
 		arr = ft_calloc((len + 1), sizeof(int));
 		if (arr == NULL)
-			return (error_handler(NULL, NULL), NULL);
+			return (error_handler(NULL, NULL, a->code, 1), NULL);
 		return (arr);
 	}
-	return (0); // This is probably wrong
+	return (arr);
 }
 
 int	when_q_mark_received(t_arrays *a, int *len, int flag)
@@ -129,9 +112,9 @@ int	when_q_mark_received(t_arrays *a, int *len, int flag)
 	int		num;
 	char	*str_num;
 
-	str_num = ft_itoa(a->code);
+	str_num = ft_itoa(*a->code);
 	if (str_num == NULL)
-		return (error_handler(NULL, NULL), -1);
+		return (error_handler(NULL, NULL, a->code, 1), -1);
 	num = ft_strlen(str_num);
 	*len += num;
 	a->int_array_old += 2;
@@ -164,11 +147,9 @@ int	when_non_q_received(t_arrays *a, t_token_type type, int *len, int flag)
 	return (0);
 }
 
-int	*ultimate_dollar_expansion(t_arrays *a, t_token_type type, int flag)
+int	*ultimate_dollar_expansion(t_arrays *a,
+		t_token_type type, int flag, int len)
 {
-	int	len;
-
-	len = 0;
 	while (*(a->int_array_old))
 	{
 		if (((*(a->int_array_old) & 0xFF) == '$')
@@ -188,5 +169,8 @@ int	*ultimate_dollar_expansion(t_arrays *a, t_token_type type, int flag)
 		else
 			when_non_dollar_received(a, &len, flag);
 	}
-	return (malloc_array(len, flag));
+	if (!flag)
+		return (malloc_array(a, len, flag));
+	else
+		return (a->int_array_old);
 }

@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/27 18:47:24 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/10 16:19:09 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/15 02:42:11 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 #include "../includes/tokenizer.h"
 #include "../includes/ast.h"
 
-void	error_handler(char *cause_str, char *error_str)
+void	error_handler(char *cause_str, char *error_str,
+			int *code_address, int exit_code)
 {
 	ft_putstr_fd("minishell: ", 2);
 	if (cause_str)
@@ -28,6 +29,7 @@ void	error_handler(char *cause_str, char *error_str)
 	else
 		ft_putstr_fd(strerror(errno), 2);
 	ft_putstr_fd("\n", 2);
+	*code_address = exit_code;
 }
 
 char	*ft_strjoin_free(char *s1, char *s2)
@@ -50,7 +52,7 @@ char	*ft_strjoin_free(char *s1, char *s2)
 	return (str);
 }
 
-char	*back_to_char(int *int_array)
+char	*back_to_char(t_tokens *tokens, int *int_array)
 {
 	int		i;
 	char	*str;
@@ -60,7 +62,7 @@ char	*back_to_char(int *int_array)
 		i++;
 	str = malloc(sizeof(char) * (i + 1));
 	if (str == NULL)
-		return (error_handler(NULL, NULL), NULL);
+		return (error_handler(NULL, NULL, tokens->code, 1), NULL);
 	str[i] = '\0';
 	while (--i >= 0)
 		str[i] = (char)int_array[i];

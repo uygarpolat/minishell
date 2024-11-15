@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/14 14:04:48 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/15 02:33:59 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -197,6 +197,7 @@ void	syntax_error_near(t_tokens *tokens, int loc)
 	ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
 	ft_putstr_fd(str, 2);
 	ft_putstr_fd("'\n", 2);
+	*tokens->code = 2;
 }
 
 int	populate_command_node_error_check(t_tokens *tokens, int start, int *end)
@@ -244,7 +245,7 @@ int	populate_command_node_malloc_counter(t_tokens *tokens,
 	}
 	(*root)->words = ft_calloc(malloc_counter + 1, sizeof(char *));
 	if ((*root)->words == NULL)
-		return (error_handler(NULL, NULL), -1);
+		return (error_handler(NULL, NULL, tokens->code, 1), -1);
 	return (malloc_counter);
 }
 
@@ -259,7 +260,7 @@ int	populate_command_node_globbing(t_tokens *tokens, t_ast *root, int i)
 	{
 		*root->words = ft_strdup(*(tokens[i].globbed));
 		if (*root->words == NULL)
-			return (error_handler(NULL, NULL), -1);
+			return (error_handler(NULL, NULL, tokens->code, 1), -1);
 		tokens[i].globbed++;
 		root->words++;
 	}
@@ -273,7 +274,7 @@ int	populate_command_node_empty_check(t_tokens *tokens, t_ast *root, int i)
 		root->words++;
 	*root->words = ft_strdup(tokens[i].value);
 	if (*root->words == NULL)
-		return (error_handler(NULL, NULL), -1);
+		return (error_handler(NULL, NULL, tokens->code, 1), -1);
 	return (0);
 }
 
