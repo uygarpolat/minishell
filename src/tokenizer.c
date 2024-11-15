@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/15 02:59:00 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/15 15:55:23 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -21,8 +21,12 @@ int		identify_token(t_token_type type);
 void	syntax_error_near(t_tokens *tokens, int loc);
 char	*expand_wildcard(int *int_array, t_tokens *tokens, int loc, int flag);
 
-void	print_tokens(t_tokens *tokens, t_capacity *capacity)
+extern int	debug_flag; // DELETE BEFORE PRODUCTION!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+void	print_tokens(t_tokens *tokens, t_capacity *capacity, int debug_flag)
 {
+	if (debug_flag < 2)
+		return ;
 	int		i;
 	char	formatted_token[100];
 	char	*token_type_str[] = {
@@ -45,10 +49,13 @@ void	print_tokens(t_tokens *tokens, t_capacity *capacity)
 		snprintf(formatted_token, sizeof(formatted_token), "token %d: %s", i, tokens[i].value);
 		printf("%-30s type: %s\n", formatted_token, token_type_str[tokens[i].type]);
 	}
+	printf("----------\n");
 }
 
-void	print_ast(t_ast *node, int level)
+void	print_ast(t_ast *node, int level, int debug_flag)
 {
+	if (debug_flag < 2)
+		return ;
 	int		indent_level;
 	char	**temp_double_arr;
 
@@ -98,9 +105,9 @@ void	print_ast(t_ast *node, int level)
 	else
 		printf("Unknown node type\n");
 	if (node->left != NULL)
-		print_ast(node->left, level + 1);
+		print_ast(node->left, level + 1, debug_flag);
 	if (node->right != NULL)
-		print_ast(node->right, level + 1);
+		print_ast(node->right, level + 1, debug_flag);
 	indent_level = -1;
 	t_ast	*redir_node = node->redir_target;
 	while (redir_node != NULL)
@@ -558,7 +565,7 @@ int	init_tokenizer(t_tokens **tokens, t_capacity *capacity, int *code)
 	capacity->current_size = 0;
 	*tokens = malloc(sizeof(t_tokens) * capacity->max_size);
 	if (*tokens == NULL)
-		return (-1);
+		return (-1); // User error handler here
 	(*tokens)->globbed = NULL;
 	(*tokens)->code = code;
 	return (0);
@@ -588,7 +595,7 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity,
 		if (error_code == -1)
 			return (NULL);
 	}
-	//print_tokens(tokens, capacity);
+	print_tokens(tokens, capacity, debug_flag);
 	if (tokens_error_checker(tokens, capacity) == -1
 		|| handle_expansion_and_wildcard(tokens, capacity, envp) == -1)
 		return ((t_tokens *)free_tokens(tokens, capacity));

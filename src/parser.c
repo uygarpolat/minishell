@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/15 02:33:59 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/15 16:05:30 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -76,11 +76,15 @@ t_tokens	*copy_token(t_tokens *token)
 
 	new_token = malloc(sizeof(t_tokens));
 	if (new_token == NULL)
-		return (NULL);
+		return (error_handler(NULL, NULL, token->code, 1), NULL);
 	new_token->value = ft_strdup(token->value);
 	if (new_token->value == NULL)
+	{
+		error_handler(NULL, NULL, token->code, 1);
 		return ((t_tokens *)free_void((void **)&new_token, NULL));
+	}
 	new_token->type = token->type;
+	new_token->code = token->code;
 	return (new_token);
 }
 
@@ -110,16 +114,20 @@ t_ast	*create_node(t_tokens *token)
 
 	node = malloc(sizeof(t_ast));
 	if (node == NULL)
-		return (NULL);
+		return (error_handler(NULL, NULL, token->code, 1), NULL);
 	assign_token_type(node, token);
 	node->token = copy_token(token);
 	if (node->token == NULL)
+	{
+		error_handler(NULL, NULL, token->code, 1);
 		return ((t_ast *)free_void((void **)&node, NULL));
+	}
 	node->words = NULL;
 	node->left = NULL;
 	node->right = NULL;
 	node->redir_target = NULL;
 	node->code = 0;
+	node->code_parser = node->token->code;
 	return (node);
 }
 
@@ -197,7 +205,8 @@ void	syntax_error_near(t_tokens *tokens, int loc)
 	ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
 	ft_putstr_fd(str, 2);
 	ft_putstr_fd("'\n", 2);
-	*tokens->code = 2;
+	if (tokens != NULL)
+		*tokens->code = 2;
 }
 
 int	populate_command_node_error_check(t_tokens *tokens, int start, int *end)
@@ -385,8 +394,8 @@ t_ast	*build_ast(t_tokens *tokens, int start, int end, int code)
 	t_ast			*root;
 	static int		error_code;
 
-	error_code = code;
 	root = NULL;
+	error_code = code;
 	p.start = start;
 	p.end = end;
 	if (build_ast_error_check(tokens, &p, &error_code) == -1)

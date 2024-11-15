@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/14 13:38:47 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/15 15:09:55 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,7 @@ typedef struct	s_ast
 	struct s_ast    *right;
 	struct s_ast    *redir_target;
 	int				code;
+	int				*code_parser;
 }					t_ast;
 
 typedef struct	s_precedence
