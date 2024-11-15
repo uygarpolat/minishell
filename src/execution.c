@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/14 14:11:01 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/15 03:05:28 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 				exit(1);
 			exit(0);
 		}
-		if (!ft_strncmp(s->words[0], " ", 2))
+		if (!*s->words)
 			exit(0);
 		path = get_path(s->words, *envp, minishell);
 		if (!path)
