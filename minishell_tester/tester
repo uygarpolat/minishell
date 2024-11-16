@@ -16,6 +16,7 @@ else
 		"dollar_expansion"
 		"syntax_self"
 		"wildcards"
+		"some_of_aarnis_tests"
 	)
 fi
 
