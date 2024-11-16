@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/16 01:46:55 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 02:02:05 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,4 +117,7 @@ void	error2(t_minishell *minishell, char *str);
 
 //parser.c
 void	free_ast(t_ast **node);
+
+//print_ast
+void	print_ast(t_ast *node, int level);
 #endif

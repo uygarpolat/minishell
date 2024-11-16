@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:28:07 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 01:41:32 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 01:59:50 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,15 +21,8 @@
 
 extern int	g_signal;
 
-/*
-# include <stdio.h>
-# include <stdlib.h>
-# include <unistd.h>
-# include <dirent.h>
-# include <readline/history.h>
-# include <string.h>
-# include <errno.h>
-# include <unistd.h>
-*/
+void	handle_sigint(int signum);
+void	handle_sigquit(int signum);
+int		init_signal(int argc, char **argv);
 
 #endif

@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2024/11/16 01:21:58 by upolat           ###   ########.fr        #
+#    Updated: 2024/11/16 02:34:20 by upolat           ###   ########.fr        #
 #    Updated: 2024/11/11 16:52:17 by hpirkola         ###   ########.fr        #
 #    Updated: 2024/11/07 10:34:01 by upolat           ###   ########.fr        #
 #                                                                              #
@@ -16,11 +16,12 @@ NAME = minishell
 
 SRC_DIR = src
 SRC_BONUS_DIR = src
-TOKENIZER_DIR = src/01-tokenizer
-PARSER_DIR = src/02-parser
-SIGNALS_DIR = src/03-signals
+TOKENIZER_DIR = $(SRC_DIR)/01-tokenizer
+PARSER_DIR = $(SRC_DIR)/02-parser
+SIGNALS_DIR = $(SRC_DIR)/03-signals
+VISUALIZATION_DIR = $(SRC_DIR)/04-visualization
 
-SOURCES = 	$(SRC_DIR)/main.c $(SRC_DIR)/print_ast_and_tokens.c \
+SOURCES = 	$(SRC_DIR)/main.c \
 			$(TOKENIZER_DIR)/tokenizer.c $(TOKENIZER_DIR)/tokenization_utils.c \
 			$(TOKENIZER_DIR)/error_and_grammar.c $(TOKENIZER_DIR)/malloc_and_free.c \
 			$(TOKENIZER_DIR)/expansion_and_wildcard.c $(TOKENIZER_DIR)/handle_word_and_separator.c \
@@ -28,6 +29,7 @@ SOURCES = 	$(SRC_DIR)/main.c $(SRC_DIR)/print_ast_and_tokens.c \
 			$(TOKENIZER_DIR)/populate_tokens.c $(TOKENIZER_DIR)/globbing.c \
 			$(PARSER_DIR)/parser.c \
 			$(SIGNALS_DIR)/signals.c \
+			$(VISUALIZATION_DIR)/print_ast.c $(VISUALIZATION_DIR)/print_tokens.c \
 			$(SRC_DIR)/execution.c $(SRC_DIR)/path.c \
 			$(SRC_DIR)/builtins.c \
 		 	$(SRC_DIR)/ft_strdup2.c $(SRC_DIR)/errors.c \

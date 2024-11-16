@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 01:30:22 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 02:28:25 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/11 15:15:17 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/11/07 10:35:14 by upolat           ###   ########.fr       */
 /*                                                                            */
@@ -16,11 +16,6 @@
 #include "../includes/tokenizer.h"
 #include "../includes/ast.h"
 #include "../includes/signals.h"
-
-void	handle_sigint(int signum);
-void	handle_sigquit(int signum);
-void	print_ast(t_ast *node, int level, int debug_flag);
-int		init_signal(int argc, char **argv);
 
 int	g_signal = 0;
 

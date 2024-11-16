@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 01:43:32 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 02:17:44 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,5 +109,6 @@ void		assign_token_types(char **temp, t_token_type *type,
 				t_token_type type1, t_token_type type2);
 int			str_combined(t_arrays *a, t_token_type type, int *len, int flag);
 int			encode_char_with_flag(int c, int shift_amount);
+void		print_tokens(t_tokens *tokens, t_capacity *capacity);
 
 #endif
