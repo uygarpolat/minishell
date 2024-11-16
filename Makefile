@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2024/11/16 23:34:09 by upolat           ###   ########.fr        #
+#    Updated: 2024/11/17 01:55:06 by upolat           ###   ########.fr        #
 #    Updated: 2024/11/11 16:52:17 by hpirkola         ###   ########.fr        #
 #    Updated: 2024/11/07 10:34:01 by upolat           ###   ########.fr        #
 #                                                                              #
@@ -15,7 +15,6 @@
 NAME = minishell
 
 SRC_DIR = 				src
-SRC_BONUS_DIR = 		src
 TOKENIZER_DIR =			$(SRC_DIR)/01-tokenizer
 PARSER_DIR =			$(SRC_DIR)/02-parser
 SIGNALS_DIR =			$(SRC_DIR)/03-signals
@@ -40,12 +39,9 @@ SOURCES = 	$(SRC_DIR)/main.c \
 			$(SRC_DIR)/builtins.c \
 		 	$(SRC_DIR)/ft_strdup2.c $(SRC_DIR)/errors.c \
 
-SOURCES_BONUS = $(SRC_DIR)/readline_test.c
-
 OBJECTS = $(SOURCES:.c=.o)
-OBJECTS_BONUS = $(SOURCES_BONUS:.c=.o)
 
-CFLAGS = -Wall -Wextra -Werror # -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror # -g
 
 libft_dir := library/libft
 libft := $(libft_dir)/libft.a
@@ -53,6 +49,8 @@ libft := $(libft_dir)/libft.a
 READLINE_DIR := $(shell brew --prefix readline)
 
 INCLUDES = -I./include -I$(libft_dir) -I$(READLINE_DIR)/include
+
+target san: CFLAGS += -fsanitize=address,undefined
 
 all: $(NAME)
 
@@ -62,21 +60,13 @@ $(NAME): $(OBJECTS) $(libft)
 $(libft):
 	$(MAKE) -C $(libft_dir)
 
-bonus: .bonus
-
-.bonus: $(OBJECTS_BONUS) $(libft)
-	cc $(CFLAGS) $(INCLUDES) $(OBJECTS_BONUS) \
-		-L$(libft_dir) -lft \
-		-L$(READLINE_DIR)/lib -lreadline \
-		-Wl,-rpath,$(READLINE_DIR)/lib \
-		-o $(NAME)
-	@touch .bonus
+bonus: $(NAME)
 
 %.o: %.c
 	cc $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
-	rm -f $(OBJECTS) $(OBJECTS_BONUS) .bonus
+	rm -f $(OBJECTS)
 	$(MAKE) -C $(libft_dir) clean
 
 fclean: clean
@@ -84,6 +74,8 @@ fclean: clean
 	$(MAKE) -C $(libft_dir) fclean
 
 re: fclean all
+
+san: re
 
 rebonus: fclean bonus
 
