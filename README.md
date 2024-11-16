@@ -1,6 +1,6 @@
 # Minishell
 
-Welcome to Minishell, a custom-built shell inspired by Bash, developed entirely in C by Uygar Polat ([@uygarpolat](https://github.com/uygarpolat/)) and Helmi Pirkola ([@hpirkola](https://github.com/hpirkola/)).
+Welcome to Minishell, a custom-built shell inspired by Bash, developed entirely in C by Uygar Polat ([@uygarpolat](https://github.com/uygarpolat/)) and Helmi Pirkola ([@hpirkola](https://github.com/hpirkola/)) as part of [Hive Helsinki](https://www.hive.fi/en/) (42) curriculum.
 
 ## What's in the Box?
 
