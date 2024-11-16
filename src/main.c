@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 02:28:25 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 14:36:25 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/11 15:15:17 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/11/07 10:35:14 by upolat           ###   ########.fr       */
 /*                                                                            */
@@ -31,7 +31,7 @@ int	execute_shell(char *input, int *code, char **new_envp)
 		ast = build_ast(tokens, 0, capacity.current_size - 1, 0);
 		if (ast)
 		{
-			//print_ast(ast, 0);
+			print_ast(ast, 0, 0);
 			*code = execution(ast, &new_envp);
 			free_ast(&ast);
 		}
@@ -82,10 +82,12 @@ int	preliminary_input_check(char **input, int *code)
 	return (0);
 }
 
-void	display_welcome_message(int *code, char **new_envp)
+void	display_welcome_message(int *code, char **new_envp, int flag)
 {
 	char	*payload;
 
+	if (!flag)
+		return ;
 	payload = "echo \"\033[1;34m+--------------------\
 --+\033[0m\n\033[1;34m| \033[1;37mWelcome to Minishell\
 \033[0m\033[1;34m |\033[0m\n\033[1;34m+----------------------+\033[0m\"";
@@ -106,7 +108,7 @@ int	main(int argc, char **argv, char **envp)
 	code = 0;
 	if (init_signal(argc, argv))
 		return (code);
-	//display_welcome_message(&code, new_envp);
+	display_welcome_message(&code, new_envp, 0);
 	while (1)
 	{
 		input_res = preliminary_input_check(&input, &code);

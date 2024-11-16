@@ -6,15 +6,13 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:23:17 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 01:22:20 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 14:09:42 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../library/libft/libft.h"
 #include "../../includes/tokenizer.h"
-#include "../../includes/ast.h"
 
-int	malloc_individual_tokens(t_tokens *tokens, char **input,
+static int	malloc_individual_tokens(t_tokens *tokens, char **input,
 		char *temp, t_capacity *capacity)
 {
 	tokens[capacity->current_size].value
@@ -58,7 +56,7 @@ int	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 	return (0);
 }
 
-char	*skip_a_char(char *str, char c)
+static char	*skip_a_char(char *str, char c)
 {
 	char	*temp;
 	int		flag;
@@ -82,7 +80,7 @@ char	*skip_a_char(char *str, char c)
 	return (str);
 }
 
-int	skip_quotes(char **temp)
+static int	skip_quotes(char **temp)
 {
 	if (ft_strchr(" \n\t<>|&()\"'", **temp))
 	{

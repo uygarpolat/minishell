@@ -6,13 +6,11 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/27 18:47:24 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 01:17:08 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 13:24:50 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../library/libft/libft.h"
 #include "../../includes/tokenizer.h"
-#include "../../includes/ast.h"
 
 int	is_seperator(char c, char c_plus_one)
 {

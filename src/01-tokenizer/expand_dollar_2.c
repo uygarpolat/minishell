@@ -6,15 +6,15 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:47:57 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 01:24:10 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 14:17:53 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../library/libft/libft.h"
 #include "../../includes/tokenizer.h"
-#include "../../includes/ast.h"
 
-char	*get_var(char *str, char **envp)
+int	identify_token(t_token_type type);
+
+static char	*get_var(char *str, char **envp)
 {
 	if (!envp)
 		return (NULL);
@@ -28,7 +28,8 @@ char	*get_var(char *str, char **envp)
 	return (NULL);
 }
 
-int	handle_ambi_redir_in_dollar(t_arrays *a, char **str, char *var, int type)
+static int	handle_ambi_redir_in_dollar(t_arrays *a, char **str,
+				char *var, int type)
 {
 	int	c;
 
@@ -53,7 +54,7 @@ int	handle_ambi_redir_in_dollar(t_arrays *a, char **str, char *var, int type)
 	return (0);
 }
 
-char	*calloc_and_generate_env_variable_name(t_arrays *a)
+static char	*calloc_and_generate_env_variable_name(t_arrays *a)
 {
 	int		n;
 	int		vlen;

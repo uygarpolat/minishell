@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 02:17:44 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 14:33:20 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <string.h>
 # include <errno.h>
 # include <unistd.h>
+# include "../library/libft/libft.h"
 
 typedef enum e_token_type
 {
@@ -81,34 +82,51 @@ typedef struct p_arrays
 	int		*code;
 }			t_arrays;
 
+// tokenizer.c
 t_tokens	*ft_tokenizer(char *input, t_capacity *capacity,
 				char **envp, int *code);
+
+// error_and_grammar.c
+int			tokens_error_checker(t_tokens *tokens, t_capacity *capacity, int i, int k);
+
+// expand_dollar.c
+int			*ultimate_dollar_expansion(t_arrays *a, t_token_type type,
+				int flag, int len);
+
+// expand_dollar_2.c
+int			str_combined(t_arrays *a, t_token_type type, int *len, int flag);
+
+// globbing.c
+char		*expand_wildcard(int *int_array, t_tokens *tokens,
+				int loc, int flag);
+
+// malloc_and_free.c
 void		*free_tokens(t_tokens *tokens, t_capacity *capacity);
-int			identify_token(t_token_type type);
+t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
+				t_capacity *capacity, int i);
+
+// tokenization_utils.c
+int			is_seperator(char c, char c_plus_one);
+void		assign_token_types(char **temp, t_token_type *type,
+				t_token_type type1, t_token_type type2);
+int			encode_char_with_flag(int c, int shift_amount);
 char		*back_to_char(t_tokens *tokens, int *int_array);
 void		error_handler(char *cause_str, char *error_str,
 				int *code_address, int exit_code);
-int			find_matching_paren(t_tokens *tokens, int start, int end);
-int			*ultimate_dollar_expansion(t_arrays *a, t_token_type type,
-				int flag, int len);
-t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
-				t_capacity *capacity, int i);
-int			is_seperator(char c, char c_plus_one);
-int			handle_seperator(char **input, t_tokens *tokens,
-				t_capacity *capacity);
-int			handle_word(char **input, t_tokens *tokens, t_capacity *capacity);
-void		print_tokens(t_tokens *tokens, t_capacity *capacity);
-int			tokens_error_checker(t_tokens *tokens, t_capacity *capacity);
+
+// expansion_and_wildcard.c
 int			handle_expansion_and_wildcard(t_tokens *tokens,
 				t_capacity *capacity, char **envp);
-void		syntax_error_near(t_tokens *tokens, int loc);
+
+// handle_word_and_separator.c
+int			handle_seperator(char **input,
+				t_tokens *tokens, t_capacity *capacity);
+int			handle_word(char **input, t_tokens *tokens, t_capacity *capacity);
+
+// populate_tokens.c
 int			populate_tokens(char *str, int *code, int *int_array, int m);
-char		*expand_wildcard(int *int_array, t_tokens *tokens,
-				int loc, int flag);
-void		assign_token_types(char **temp, t_token_type *type,
-				t_token_type type1, t_token_type type2);
-int			str_combined(t_arrays *a, t_token_type type, int *len, int flag);
-int			encode_char_with_flag(int c, int shift_amount);
-void		print_tokens(t_tokens *tokens, t_capacity *capacity);
+
+// print_tokens.c
+void		print_tokens(t_tokens *tokens, t_capacity *capacity, int flag);
 
 #endif

@@ -6,15 +6,15 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/26 00:45:16 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 01:25:51 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 14:18:12 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../library/libft/libft.h"
 #include "../../includes/tokenizer.h"
-#include "../../includes/ast.h"
 
-int	match_pattern(char *filename, int *pattern)
+int	identify_token(t_token_type type);
+
+static int	match_pattern(char *filename, int *pattern)
 {
 	if (*pattern == '\0' && *filename == '\0')
 		return (1);
@@ -40,7 +40,8 @@ int	match_pattern(char *filename, int *pattern)
 	return (0);
 }
 
-int	populate_res(t_tokens **tokens, t_globber *g, int *int_array, int counter)
+static int	populate_res(t_tokens **tokens, t_globber *g,
+				int *int_array, int counter)
 {
 	char	*exit_message;
 
@@ -60,7 +61,7 @@ int	populate_res(t_tokens **tokens, t_globber *g, int *int_array, int counter)
 	return (0);
 }
 
-int	init_expand_wildcard(t_tokens *tokens, t_globber *g, int loc)
+static int	init_expand_wildcard(t_tokens *tokens, t_globber *g, int loc)
 {
 	g->loc = loc;
 	g->dir = opendir(".");
@@ -75,7 +76,7 @@ int	init_expand_wildcard(t_tokens *tokens, t_globber *g, int loc)
 	return (0);
 }
 
-int	count_matching_entries(t_tokens **tokens, int *int_array,
+static int	count_matching_entries(t_tokens **tokens, int *int_array,
 		t_globber *g, int counter_flag)
 {
 	int	counter;

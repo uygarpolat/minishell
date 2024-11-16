@@ -6,15 +6,13 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 18:33:55 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 01:24:00 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 14:17:35 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../library/libft/libft.h"
 #include "../../includes/tokenizer.h"
-#include "../../includes/ast.h"
 
-int	*malloc_array(t_arrays *a, int len, int flag)
+static int	*malloc_array(t_arrays *a, int len, int flag)
 {
 	int	*arr;
 
@@ -29,7 +27,7 @@ int	*malloc_array(t_arrays *a, int len, int flag)
 	return (arr);
 }
 
-int	when_q_mark_received(t_arrays *a, int *len, int flag)
+static int	when_q_mark_received(t_arrays *a, int *len, int flag)
 {
 	int		num;
 	char	*str_num;
@@ -50,7 +48,7 @@ int	when_q_mark_received(t_arrays *a, int *len, int flag)
 	return (0);
 }
 
-void	when_non_dollar_received(t_arrays *a, int *len, int flag)
+static void	when_non_dollar_received(t_arrays *a, int *len, int flag)
 {
 	(*len)++;
 	if (flag)
@@ -61,7 +59,8 @@ void	when_non_dollar_received(t_arrays *a, int *len, int flag)
 	a->int_array_old++;
 }
 
-int	when_non_q_received(t_arrays *a, t_token_type type, int *len, int flag)
+static int	when_non_q_received(t_arrays *a, t_token_type type,
+				int *len, int flag)
 {
 	a->int_array_old++;
 	if (str_combined(a, type, len, flag) == -1)

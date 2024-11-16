@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/16 02:02:05 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 14:33:36 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # include <fcntl.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include <readline/history.h>
+# include <readline/history.h> // Remove this?
 # include <string.h>
 # include <sys/wait.h>
 # include <sys/stat.h>
@@ -61,7 +61,7 @@ typedef struct s_precedence
 	int	prec;
 	int	lowest_prec;
 	int	lowest_prec_pos;
-}	t_precedence;
+}		t_precedence;
 
 typedef struct s_pipe
 {
@@ -70,7 +70,7 @@ typedef struct s_pipe
 	int	count;
 	int	i;
 	int	o;
-}	t_pipes;
+}		t_pipes;
 
 typedef struct s_put
 {
@@ -81,43 +81,60 @@ typedef struct s_put
 	char	o_type;
 	int		in;
 	int		out;
-}	t_put;
+}			t_put;
 
 typedef struct s_minishell
 {
 	t_ast	*ast;
 	t_pipes	p;
 	char	pwd[PATH_MAX];
-}	t_minishell;
+}			t_minishell;
 
-t_ast	*build_ast(t_tokens *tokens, int start, int end, int code);
+// execution.c
+int			execution(t_ast *s, char ***envp);
+void		close_and_free(t_pipes *p);
+void		get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell);
+int			open_files(t_put *cmd);
+void		dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
 
-//execution.c
-int		execution(t_ast *s, char ***envp);
-void	close_and_free(t_pipes *p);
-void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell);
-int		open_files(t_put *cmd);
-void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
+// path.c
+char		*get_path(char **cmd, char **envp, t_minishell *minishell);
+char		**paths(char **envp);
 
-//path.c
-char	*get_path(char **cmd, char **envp, t_minishell *minishell);
-char	**paths(char **envp);
+// builtins.c
+int			execute_builtin(t_ast *s, char **cmd,
+				char ***envp, t_minishell *minishell, int n);
+int			is_builtin(char **cmd);
 
-//builtins.c
-int		execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n);
-int		is_builtin(char **cmd);
+// ft_strdup2.c
+char		**ft_strdup2(char **str);
+char		**ft_strdup3(char **str, char *dir);
 
-//ft_strdup2.c
-char	**ft_strdup2(char **str);
-char	**ft_strdup3(char **str, char *dir);
+// errors.c
+void		error(t_minishell *minishell);
+void		error2(t_minishell *minishell, char *str);
 
-//errors.c
-void	error(t_minishell *minishell);
-void	error2(t_minishell *minishell, char *str);
+// parser.c
+t_ast		*build_ast(t_tokens *tokens, int start, int end, int code);
+int			redirection_node_creator(t_tokens *tokens, t_ast *root, int *i);
 
-//parser.c
-void	free_ast(t_ast **node);
+// parser_utils.c
+void		assign_token_type(t_ast *node, t_tokens *token);
+int			establish_lowest_precedence(t_tokens *tokens, t_precedence *p);
+int			find_matching_paren(t_tokens *tokens, int start, int end);
+int			identify_token(t_token_type type);
 
-//print_ast
-void	print_ast(t_ast *node, int level);
+// memory_and_error.c
+void		free_ast(t_ast **node);
+t_tokens	*copy_token(t_tokens *token);
+int			cleanup_populate_command_node(t_ast **root, int *error_code);
+void		syntax_error_near(t_tokens *tokens, int loc);
+
+// populate_command_node.c
+int			populate_command_node(t_tokens *tokens,
+				t_ast *root, int start, int *end);
+
+// print_ast.c
+void		print_ast(t_ast *node, int level, int flag);
+
 #endif

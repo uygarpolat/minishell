@@ -6,17 +6,19 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:32:25 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 02:35:17 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 14:36:50 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/tokenizer.h"
 
-void	print_tokens(t_tokens *tokens, t_capacity *capacity)
+void	print_tokens(t_tokens *tokens, t_capacity *capacity, int flag)
 {
 	int		i;
 	char	*token_type_str[12];
 
+	if (!flag)
+		return ;
 	token_type_str[0] = "TOKEN_WORD";
 	token_type_str[1] = "TOKEN_REDIR_IN";
 	token_type_str[2] = "TOKEN_REDIR_OUT";

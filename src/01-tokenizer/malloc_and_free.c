@@ -6,13 +6,11 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:25:49 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 01:18:43 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 14:02:21 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../library/libft/libft.h"
 #include "../../includes/tokenizer.h"
-#include "../../includes/ast.h"
 
 void	*free_tokens(t_tokens *tokens, t_capacity *capacity)
 {
@@ -31,7 +29,7 @@ void	*free_tokens(t_tokens *tokens, t_capacity *capacity)
 	return ((void *)tokens);
 }
 
-void	realloc_error(t_tokens *tokens, t_tokens *new_tokens,
+static void	realloc_error(t_tokens *tokens, t_tokens *new_tokens,
 			t_capacity *capacity, int i)
 {
 	error_handler(NULL, NULL, tokens->code, 1);

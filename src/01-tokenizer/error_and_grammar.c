@@ -6,15 +6,17 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:07:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 01:17:46 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 14:32:12 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../library/libft/libft.h"
 #include "../../includes/tokenizer.h"
-#include "../../includes/ast.h"
 
-int	tokens_grammar(t_tokens *tokens, t_capacity *capacity, int i)
+int		identify_token(t_token_type type);
+void	syntax_error_near(t_tokens *tokens, int loc);
+int		find_matching_paren(t_tokens *tokens, int start, int end);
+
+static int	tokens_grammar(t_tokens *tokens, t_capacity *capacity, int i)
 {
 	while (++i < capacity->current_size - 1)
 	{
@@ -42,11 +44,9 @@ int	tokens_grammar(t_tokens *tokens, t_capacity *capacity, int i)
 	return (0);
 }
 
-int	tokens_error_checker(t_tokens *tokens, t_capacity *capacity)
+int	tokens_error_checker(t_tokens *tokens, t_capacity *capacity, int i, int k)
 {
-	int	i;
-	int	k;
-
+	print_tokens(tokens, capacity, 0);
 	if (tokens[0].type != TOKEN_WORD && !identify_token(tokens[0].type)
 		&& tokens[0].type != TOKEN_OPEN_PAREN)
 		return (syntax_error_near(tokens, 0), -1);

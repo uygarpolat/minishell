@@ -6,16 +6,14 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 02:27:13 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 14:32:27 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../library/libft/libft.h"
 #include "../../includes/tokenizer.h"
-#include "../../includes/ast.h"
 
-int	init_tokenizer(t_tokens **tokens, t_capacity *capacity, int *code)
+static int	init_tokenizer(t_tokens **tokens, t_capacity *capacity, int *code)
 {
 	capacity->max_size = 1;
 	capacity->current_size = 0;
@@ -51,8 +49,7 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity,
 		if (error_code == -1)
 			return (NULL);
 	}
-	//print_tokens(tokens, capacity);
-	if (tokens_error_checker(tokens, capacity) == -1
+	if (tokens_error_checker(tokens, capacity, 0, 0) == -1
 		|| handle_expansion_and_wildcard(tokens, capacity, envp) == -1)
 		return ((t_tokens *)free_tokens(tokens, capacity));
 	return (tokens);

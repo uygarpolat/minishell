@@ -6,109 +6,14 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 10:37:29 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 01:26:23 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 13:45:06 by upolat           ###   ########.fr       */
 /*   Updated: 2024/10/28 13:13:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../library/libft/libft.h"
-#include "../../includes/tokenizer.h"
 #include "../../includes/ast.h"
 
-int	get_precedence(t_token_type type)
-{
-	if (type == TOKEN_AND)
-		return (1);
-	else if (type == TOKEN_OR)
-		return (1);
-	else if (type == TOKEN_PIPE)
-		return (3);
-	return (-1);
-}
-
-int	find_matching_paren(t_tokens *tokens, int start, int end)
-{
-	int	paren_count;
-	int	i;
-
-	paren_count = 0;
-	i = start;
-	while (i <= end)
-	{
-		if (tokens[i].type == TOKEN_OPEN_PAREN)
-			paren_count++;
-		else if (tokens[i].type == TOKEN_CLOSE_PAREN)
-		{
-			paren_count--;
-			if (paren_count < 0)
-				return (-1);
-			if (paren_count == 0)
-				return (i);
-		}
-		i++;
-	}
-	return (-1);
-}
-
-void	free_ast(t_ast **node)
-{
-	if (node == NULL || *node == NULL)
-		return ;
-	if ((*node)->token)
-	{
-		free_void((void **)&(*node)->token->value, NULL);
-		free_void((void **)&(*node)->token, NULL);
-	}
-	if ((*node)->words)
-		free_2d_array((void ***)&(*node)->words);
-	if ((*node)->left)
-		free_ast(&(*node)->left);
-	if ((*node)->right)
-		free_ast(&(*node)->right);
-	if ((*node)->redir_target)
-		free_ast(&(*node)->redir_target);
-	free_void((void **)node, NULL);
-}
-
-t_tokens	*copy_token(t_tokens *token)
-{
-	t_tokens	*new_token;
-
-	new_token = malloc(sizeof(t_tokens));
-	if (new_token == NULL)
-		return (error_handler(NULL, NULL, token->code, 1), NULL);
-	new_token->value = ft_strdup(token->value);
-	if (new_token->value == NULL)
-	{
-		error_handler(NULL, NULL, token->code, 1);
-		return ((t_tokens *)free_void((void **)&new_token, NULL));
-	}
-	new_token->type = token->type;
-	new_token->code = token->code;
-	return (new_token);
-}
-
-void	assign_token_type(t_ast *node, t_tokens *token)
-{
-	if (token->type == TOKEN_PIPE)
-		node->type = AST_PIPE;
-	else if (token->type == TOKEN_AND)
-		node->type = AST_AND;
-	else if (token->type == TOKEN_OR)
-		node->type = AST_OR;
-	else if (token->type == TOKEN_REDIR_OUT)
-		node->type = AST_REDIR_OUT;
-	else if (token->type == TOKEN_APPEND)
-		node->type = AST_REDIR_APPEND;
-	else if (token->type == TOKEN_REDIR_IN)
-		node->type = AST_REDIR_IN;
-	else if (token->type == TOKEN_HEREDOC)
-		node->type = AST_HEREDOC;
-	else if (token->type == TOKEN_WORD)
-		node->type = AST_COMMAND;
-}
-
-t_ast	*create_node(t_tokens *token)
+static t_ast	*create_node(t_tokens *token)
 {
 	t_ast	*node;
 
@@ -156,194 +61,7 @@ int	redirection_node_creator(t_tokens *tokens, t_ast *root, int *i)
 	return (0);
 }
 
-int	concatenate_commands(char **str, t_tokens *tokens, int *i)
-{
-	if (*str != NULL)
-	{
-		*str = ft_strjoin_free(*str, " ");
-		if (*str == NULL)
-			return (error_handler(NULL, NULL, tokens->code, 1), -1);
-		*str = ft_strjoin_free(*str, tokens[*i].value);
-		if (*str == NULL)
-			return (error_handler(NULL, NULL, tokens->code, 1), -1);
-	}
-	else
-	{
-		*str = ft_strdup(tokens[*i].value);
-		if (*str == NULL)
-			return (error_handler(NULL, NULL, tokens->code, 1), -1);
-	}
-	return (0);
-}
-
-int	identify_token(t_token_type type)
-{
-	if ((type == TOKEN_REDIR_OUT) || (type == TOKEN_APPEND)
-		|| (type == TOKEN_REDIR_IN) || (type == TOKEN_HEREDOC))
-		return (1);
-	return (0);
-}
-
-int	cleanup_populate_command_node(t_ast **root, int *error_code)
-{
-	if (!*error_code)
-		return (0);
-	free_ast(root);
-	return (-1);
-}
-
-void	syntax_error_near(t_tokens *tokens, int loc)
-{
-	char	*str;
-
-	if (loc == -1)
-		str = "newline";
-	else if (tokens[loc].value == NULL)
-		str = "newline";
-	else
-		str = tokens[loc].value;
-	ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
-	ft_putstr_fd(str, 2);
-	ft_putstr_fd("'\n", 2);
-	if (tokens != NULL)
-		*tokens->code = 2;
-}
-
-int	populate_command_node_error_check(t_tokens *tokens, int start, int *end)
-{
-	int	i;
-	int	k;
-
-	i = start;
-	k = *end;
-	if (tokens[i].type != TOKEN_OPEN_PAREN)
-	{
-		while (++i <= *end)
-		{
-			if (tokens[i].type == TOKEN_OPEN_PAREN)
-				return (syntax_error_near(tokens, i), -1);
-		}
-	}
-	else
-	{
-		k = find_matching_paren(tokens, i, k);
-		return (syntax_error_near(tokens, k + 1), -1);
-	}
-	return (0);
-}
-
-int	populate_command_node_malloc_counter(t_tokens *tokens,
-		t_ast **root, int start, int *end)
-{
-	int	j;
-	int	k;
-	int	malloc_counter;
-
-	malloc_counter = 0;
-	j = start - 1;
-	while (++j <= *end)
-	{
-		k = 0;
-		if (tokens[j].globbed)
-		{
-			while (tokens[j].globbed[k++])
-				malloc_counter++;
-		}
-		else
-			malloc_counter++;
-	}
-	(*root)->words = ft_calloc(malloc_counter + 1, sizeof(char *));
-	if ((*root)->words == NULL)
-		return (error_handler(NULL, NULL, tokens->code, 1), -1);
-	return (malloc_counter);
-}
-
-int	populate_command_node_globbing(t_tokens *tokens, t_ast *root, int i)
-{
-	char	**temp_double_pointer;
-
-	while (*root->words)
-		root->words++;
-	temp_double_pointer = tokens[i].globbed;
-	while (*(tokens[i].globbed))
-	{
-		*root->words = ft_strdup(*(tokens[i].globbed));
-		if (*root->words == NULL)
-			return (error_handler(NULL, NULL, tokens->code, 1), -1);
-		tokens[i].globbed++;
-		root->words++;
-	}
-	tokens[i].globbed = temp_double_pointer;
-	return (0);
-}
-
-int	populate_command_node_empty_check(t_tokens *tokens, t_ast *root, int i)
-{
-	while (*root->words)
-		root->words++;
-	*root->words = ft_strdup(tokens[i].value);
-	if (*root->words == NULL)
-		return (error_handler(NULL, NULL, tokens->code, 1), -1);
-	return (0);
-}
-
-int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
-{
-	int		i;
-	char	**temp;
-	int		error_code;
-
-	if (populate_command_node_error_check(tokens, start, end)
-		|| populate_command_node_malloc_counter(tokens, &root, start, end) < 0)
-		return (-1);
-	temp = root->words;
-	error_code = 0;
-	i = start - 1;
-	root->type = AST_COMMAND;
-	while (++i <= *end && !error_code)
-	{
-		if (tokens[i].type == TOKEN_OPEN_PAREN
-			|| tokens[i].type == TOKEN_CLOSE_PAREN)
-			continue ;
-		if (identify_token(tokens[i].type))
-			error_code = redirection_node_creator(tokens, root, &i);
-		else if (tokens[i].globbed)
-			error_code = populate_command_node_globbing(tokens, root, i);
-		else if (ft_strlen(tokens[i].value) > 0)
-			error_code = populate_command_node_empty_check(tokens, root, i);
-	}
-	root->words = temp;
-	return (cleanup_populate_command_node(&root, &error_code));
-}
-
-int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
-{
-	while (p->i <= p->end)
-	{
-		while ((p->i == p->start) && (tokens[p->start].type == TOKEN_OPEN_PAREN)
-			&& (p->end == find_matching_paren(tokens, p->start, p->end)))
-		{
-			p->i++;
-			p->start++;
-			p->end--;
-		}
-		if (tokens[p->i].type == TOKEN_OPEN_PAREN
-			|| tokens[p->i].type == TOKEN_CLOSE_PAREN)
-			p->i = find_matching_paren(tokens, p->i, p->end);
-		if (p->i < 0)
-			return (-1);
-		p->prec = get_precedence(tokens[p->i].type);
-		if (p->prec != -1 && p->prec < p->lowest_prec)
-		{
-			p->lowest_prec = p->prec;
-			p->lowest_prec_pos = p->i;
-		}
-		p->i++;
-	}
-	return (0);
-}
-
-void	build_non_command_node(t_tokens *tokens, t_ast **root,
+static void	build_non_command_node(t_tokens *tokens, t_ast **root,
 			t_precedence *p, int *error_code)
 {
 	*root = create_node(&tokens[p->lowest_prec_pos]);
@@ -372,7 +90,8 @@ void	build_non_command_node(t_tokens *tokens, t_ast **root,
 	}
 }
 
-int	build_ast_error_check(t_tokens *tokens, t_precedence *p, int *error_code)
+static int	build_ast_error_check(t_tokens *tokens, t_precedence *p,
+				int *error_code)
 {
 	p->lowest_prec = 1000;
 	p->lowest_prec_pos = -1;

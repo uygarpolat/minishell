@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:54:46 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 02:35:05 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 14:34:38 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,8 +88,10 @@ void	print_redirections(t_ast *node, int level)
 	}
 }
 
-void	print_ast(t_ast *node, int level)
+void	print_ast(t_ast *node, int level, int flag)
 {
+	if (!flag)
+		return ;
 	if (node == NULL)
 		return ;
 	print_indent(level);
@@ -97,8 +99,8 @@ void	print_ast(t_ast *node, int level)
 	if (node->type == AST_COMMAND)
 		print_command_words(node, level);
 	if (node->left != NULL)
-		print_ast(node->left, level + 1);
+		print_ast(node->left, level + 1, flag);
 	if (node->right != NULL)
-		print_ast(node->right, level + 1);
+		print_ast(node->right, level + 1, flag);
 	print_redirections(node, level);
 }

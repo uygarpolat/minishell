@@ -6,15 +6,13 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:20:22 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 01:47:44 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 14:10:43 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../library/libft/libft.h"
 #include "../../includes/tokenizer.h"
-#include "../../includes/ast.h"
 
-void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
+static void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 {
 	if (q->single_q_count % 2 != 1)
 	{
@@ -36,7 +34,7 @@ void	assign_dollar(char *str, int *int_array, t_quote *q, int *m)
 	(*m)++;
 }
 
-void	assign_asterisk(char *str, int *int_array, t_quote *q, int *m)
+static void	assign_asterisk(char *str, int *int_array, t_quote *q, int *m)
 {
 	if (q->single_q_count % 2 == 0 && q->double_q_count % 2 == 0)
 		int_array[*m] = encode_char_with_flag(*str, 9);
@@ -45,7 +43,7 @@ void	assign_asterisk(char *str, int *int_array, t_quote *q, int *m)
 	(*m)++;
 }
 
-void	assign_quote(char **str, int *int_array, t_quote *q, int *m)
+static void	assign_quote(char **str, int *int_array, t_quote *q, int *m)
 {
 	if (**str == '"')
 	{
@@ -72,7 +70,7 @@ void	assign_quote(char **str, int *int_array, t_quote *q, int *m)
 	}
 }
 
-void	init_populate_tokens(t_quote *q, char *str)
+static void	init_populate_tokens(t_quote *q, char *str)
 {
 	q->single_q_count = 0;
 	q->double_q_count = 0;

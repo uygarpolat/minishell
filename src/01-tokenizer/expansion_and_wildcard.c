@@ -6,15 +6,15 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:10:10 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 01:19:02 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 14:06:02 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../library/libft/libft.h"
 #include "../../includes/tokenizer.h"
-#include "../../includes/ast.h"
 
-void	init_arrays(t_tokens *tokens, t_arrays *a, char **envp)
+int	identify_token(t_token_type type);
+
+static void	init_arrays(t_tokens *tokens, t_arrays *a, char **envp)
 {
 	a->int_array_new = NULL;
 	a->int_array_old = NULL;
@@ -24,13 +24,13 @@ void	init_arrays(t_tokens *tokens, t_arrays *a, char **envp)
 	a->code = tokens->code;
 }
 
-void	free_int_arrays(t_arrays *a)
+static void	free_int_arrays(t_arrays *a)
 {
 	free_void((void **)&a->int_array_old_start, NULL);
 	free_void((void **)&a->int_array_new_start, NULL);
 }
 
-int	calloc_and_populate(t_tokens *tokens,
+static int	calloc_and_populate(t_tokens *tokens,
 		t_arrays *a, t_token_type *type, int i)
 {
 	if (i < 1)
