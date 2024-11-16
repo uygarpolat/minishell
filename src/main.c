@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 18:09:49 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 23:35:04 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/11 15:15:17 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/11/07 10:35:14 by upolat           ###   ########.fr       */
 /*                                                                            */
@@ -19,20 +19,20 @@
 
 int	g_signal = 0;
 
-int	execute_shell(char *input, int *code, char **new_envp)
+int	execute_shell(char *input, int *code, char ***new_envp)
 {
 	t_tokens	*tokens;
 	t_capacity	capacity;
 	t_ast		*ast;
 
-	tokens = ft_tokenizer(input, &capacity, new_envp, code);
+	tokens = ft_tokenizer(input, &capacity, *new_envp, code);
 	if (tokens)
 	{
 		ast = build_ast(tokens, 0, capacity.current_size - 1, 0);
 		if (ast)
 		{
-			print_ast(ast, 0, 1);
-			*code = execution(ast, &new_envp);
+			print_ast(ast, 0, 0);
+			*code = execution(ast, new_envp);
 			free_ast(&ast);
 		}
 		free_tokens(tokens, &capacity);
@@ -91,8 +91,8 @@ void	display_welcome_message(int *code, char **new_envp, int flag)
 	payload = "echo \"\033[1;34m+--------------------\
 --+\033[0m\n\033[1;34m| \033[1;37mWelcome to Minishell\
 \033[0m\033[1;34m |\033[0m\n\033[1;34m+----------------------+\033[0m\"";
-	*code = execute_shell(ft_strdup("clear"), code, new_envp);
-	*code = execute_shell(ft_strdup(payload), code, new_envp);
+	*code = execute_shell(ft_strdup("clear"), code, &new_envp);
+	*code = execute_shell(ft_strdup(payload), code, &new_envp);
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -118,7 +118,7 @@ int	main(int argc, char **argv, char **envp)
 			break ;
 		if (*input)
 			add_history(input);
-		code = execute_shell(input, &code, new_envp);
+		code = execute_shell(input, &code, &new_envp);
 	}
 	free_2d_array((void ***)&new_envp);
 	return (code);

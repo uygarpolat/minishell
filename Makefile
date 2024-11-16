@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2024/11/16 18:08:57 by upolat           ###   ########.fr        #
+#    Updated: 2024/11/16 23:34:09 by upolat           ###   ########.fr        #
 #    Updated: 2024/11/11 16:52:17 by hpirkola         ###   ########.fr        #
 #    Updated: 2024/11/07 10:34:01 by upolat           ###   ########.fr        #
 #                                                                              #
@@ -57,11 +57,7 @@ INCLUDES = -I./include -I$(libft_dir) -I$(READLINE_DIR)/include
 all: $(NAME)
 
 $(NAME): $(OBJECTS) $(libft)
-	cc $(CFLAGS) $(INCLUDES) $(OBJECTS) \
-		-L$(libft_dir) -lft \
-		-L$(READLINE_DIR)/lib -lreadline \
-		-Wl,-rpath,$(READLINE_DIR)/lib \
-		-o $@
+	cc $(CFLAGS) $(INCLUDES) $(OBJECTS) -L$(libft_dir) -lft -L$(READLINE_DIR)/lib -lreadline -Wl,-rpath,$(READLINE_DIR)/lib -o $@
 
 $(libft):
 	$(MAKE) -C $(libft_dir)
