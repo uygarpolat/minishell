@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/17 15:28:16 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/17 18:58:51 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/11 15:15:17 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/11/07 10:35:14 by upolat           ###   ########.fr       */
 /*                                                                            */
@@ -18,6 +18,8 @@
 #include "../includes/signals.h"
 
 int	g_signal = 0;
+
+void	display_welcome_message(int *code, char **new_envp, int flag);
 
 int	execute_shell(char *input, int *code, char ***new_envp)
 {
@@ -82,19 +84,6 @@ int	preliminary_input_check(char **input, int *code)
 	return (0);
 }
 
-void	display_welcome_message(int *code, char **new_envp, int flag)
-{
-	char	*payload;
-
-	if (!flag)
-		return ;
-	payload = "echo \"\033[1;34m+--------------------\
---+\033[0m\n\033[1;34m| \033[1;37mWelcome to Minishell\
-\033[0m\033[1;34m |\033[0m\n\033[1;34m+----------------------+\033[0m\"";
-	*code = execute_shell(ft_strdup("clear"), code, &new_envp);
-	*code = execute_shell(ft_strdup(payload), code, &new_envp);
-}
-
 int	main(int argc, char **argv, char **envp)
 {
 	char	*input;
@@ -102,10 +91,10 @@ int	main(int argc, char **argv, char **envp)
 	int		code;
 	int		input_res;
 
+	code = 0;
 	new_envp = ft_strdup2(envp);
 	if (!new_envp)
-		return (1);
-	code = 0;
+		return (error_handler(NULL, NULL, &code, 1), code);
 	if (init_term_and_signal(argc, argv))
 		return (free_2d_array((void ***)&new_envp), EXIT_FAILURE);
 	display_welcome_message(&code, new_envp, 0);

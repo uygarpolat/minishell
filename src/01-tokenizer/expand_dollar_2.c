@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:47:57 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 14:17:53 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/17 18:58:04 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,13 +34,13 @@ static int	handle_ambi_redir_in_dollar(t_arrays *a, char **str,
 	int	c;
 
 	c = *(a->int_array_old - ft_strlen(*str) - 1);
-	if (var == NULL || type == TOKEN_HEREDOC)
+	if (type == TOKEN_HEREDOC)
 		return (0);
-	if (ft_strchr(var, ' '))
+	if (var == NULL || ft_strchr(var, ' '))
 	{
 		if (identify_token(type))
 		{
-			if (type != TOKEN_HEREDOC && (((c >> 9) & 1) && !((c >> 8) & 1)))
+			if (((c >> 9) & 1) && !((c >> 8) & 1))
 			{
 				ft_putstr_fd("minishell: $", 2);
 				ft_putstr_fd(*str, 2);
@@ -49,6 +49,9 @@ static int	handle_ambi_redir_in_dollar(t_arrays *a, char **str,
 				*a->code = 1;
 				return (-1);
 			}
+			else if (var == NULL)
+				return (error_handler("", "No such file or directory",
+						a->code, 1), -1);
 		}
 	}
 	return (0);
