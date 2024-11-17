@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:28:07 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 01:59:50 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/17 15:27:54 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,6 @@ extern int	g_signal;
 
 void	handle_sigint(int signum);
 void	handle_sigquit(int signum);
-int		init_signal(int argc, char **argv);
+int		init_term_and_signal(int argc, char **argv);
 
 #endif
