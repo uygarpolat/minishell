@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/12 22:02:01 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/16 23:39:43 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,12 @@
 # include <dirent.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include <readline/history.h>
 # include <string.h>
 # include <errno.h>
+# include <unistd.h>
+# include "../library/libft/libft.h"
 
-extern int	g_signal;
-
-typedef enum	e_token_type
+typedef enum e_token_type
 {
 	TOKEN_WORD,
 	TOKEN_REDIR_IN,
@@ -42,26 +41,30 @@ typedef enum	e_token_type
 	NUM_TYPES,
 }	t_token_type;
 
-typedef struct	s_tokens
+typedef struct s_tokens
 {
 	enum e_token_type	type;
 	char				*value;
 	char				**globbed;
+	int					*code;
 }						t_tokens;
 
-typedef struct	s_capacity
+typedef struct s_capacity
 {
 	int			max_size;
 	int			current_size;
 }				t_capacity;
 
-typedef struct	s_quote
+typedef struct s_quote
 {
 	int			single_q_count;
 	int			double_q_count;
+	char		*single_first_unclosed;
+	char		*double_first_unclosed;
+	char		*str_initial;
 }				t_quote;
 
-typedef struct	s_globber
+typedef struct s_globber
 {
 	DIR				*dir;
 	struct dirent	*entry;
@@ -69,13 +72,62 @@ typedef struct	s_globber
 	int				flag;
 }					t_globber;
 
-t_tokens	*ft_tokenizer(char *input, t_capacity *capacity, char **envp, int code);
+typedef struct p_arrays
+{
+	int		*int_array_new;
+	int		*int_array_old;
+	int		*int_array_new_start;
+	int		*int_array_old_start;
+	char	**envp;
+	int		*code;
+}			t_arrays;
+
+// tokenizer.c
+t_tokens	*ft_tokenizer(char *input, t_capacity *capacity,
+				char **envp, int *code);
+
+// error_and_grammar.c
+int			tokens_error_checker(t_tokens *tokens,
+				t_capacity *capacity, int i, int k);
+
+// expand_dollar.c
+int			*ultimate_dollar_expansion(t_arrays *a, t_token_type type,
+				int flag, int len);
+
+// expand_dollar_2.c
+int			str_combined(t_arrays *a, t_token_type type, int *len, int flag);
+
+// globbing.c
+char		*expand_wildcard(int *int_array, t_tokens *tokens,
+				int loc, int flag);
+
+// malloc_and_free.c
 void		*free_tokens(t_tokens *tokens, t_capacity *capacity);
-char		*ft_strjoin_free(char *s1, char *s2);
-int			identify_token(t_token_type type);
-char		*back_to_char(int *int_array);
-void		error_handler(char *cause_str, char *error_str);
-int			find_matching_paren(t_tokens *tokens, int start, int end);
-int			*ultimate_dollar_expansion(int *int_array_old, int *int_array_new, char **envp, int code, int flag);
+t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
+				t_capacity *capacity, int i);
+
+// tokenization_utils.c
+int			is_seperator(char c, char c_plus_one);
+void		assign_token_types(char **temp, t_token_type *type,
+				t_token_type type1, t_token_type type2);
+int			encode_char_with_flag(int c, int shift_amount);
+char		*back_to_char(t_tokens *tokens, int *int_array);
+void		error_handler(char *cause_str, char *error_str,
+				int *code_address, int exit_code);
+
+// expansion_and_wildcard.c
+int			handle_expansion_and_wildcard(t_tokens *tokens,
+				t_capacity *capacity, char **envp);
+
+// handle_word_and_separator.c
+int			handle_seperator(char **input,
+				t_tokens *tokens, t_capacity *capacity);
+int			handle_word(char **input, t_tokens *tokens, t_capacity *capacity);
+
+// populate_tokens.c
+int			populate_tokens(char *str, int *code, int *int_array, int m);
+
+// print_tokens.c
+void		print_tokens(t_tokens *tokens, t_capacity *capacity, int flag);
 
 #endif
