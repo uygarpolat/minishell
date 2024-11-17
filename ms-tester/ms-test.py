@@ -5,7 +5,7 @@ import sys
 import filecmp
 
 global ms_prompt
-ms_prompt = "@minishell:"
+ms_prompt = "minishell>"
 COUNTER = 0
 VALGRIND = 0
 OK = 0

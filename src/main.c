@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 23:35:04 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/17 02:31:15 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/11 15:15:17 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/11/07 10:35:14 by upolat           ###   ########.fr       */
 /*                                                                            */
@@ -63,7 +63,7 @@ int	preliminary_input_check(char **input, int *code)
 {
 	char	*temp;
 
-	*input = readline("@minishell: ");
+	*input = readline("minishell> ");
 	if (*input == NULL)
 		return (-1);
 	temp = *input;
