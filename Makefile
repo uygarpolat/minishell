@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2024/11/17 01:55:06 by upolat           ###   ########.fr        #
+#    Updated: 2024/11/17 02:09:03 by upolat           ###   ########.fr        #
 #    Updated: 2024/11/11 16:52:17 by hpirkola         ###   ########.fr        #
 #    Updated: 2024/11/07 10:34:01 by upolat           ###   ########.fr        #
 #                                                                              #
@@ -50,7 +50,7 @@ READLINE_DIR := $(shell brew --prefix readline)
 
 INCLUDES = -I./include -I$(libft_dir) -I$(READLINE_DIR)/include
 
-target san: CFLAGS += -fsanitize=address,undefined
+san: CFLAGS += -fsanitize=address,undefined
 
 all: $(NAME)
 
@@ -72,6 +72,9 @@ clean:
 fclean: clean
 	rm -f $(NAME) .here_doc
 	$(MAKE) -C $(libft_dir) fclean
+
+leaks: fclean $(NAME)
+	leaks -q --atExit ./$(NAME) --
 
 re: fclean all
 
