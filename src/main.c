@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/17 16:00:39 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/17 18:58:51 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/11 15:15:17 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/11/07 10:35:14 by upolat           ###   ########.fr       */
 /*                                                                            */
@@ -91,10 +91,10 @@ int	main(int argc, char **argv, char **envp)
 	int		code;
 	int		input_res;
 
+	code = 0;
 	new_envp = ft_strdup2(envp);
 	if (!new_envp)
-		return (1);
-	code = 0;
+		return (error_handler(NULL, NULL, &code, 1), code);
 	if (init_term_and_signal(argc, argv))
 		return (free_2d_array((void ***)&new_envp), EXIT_FAILURE);
 	display_welcome_message(&code, new_envp, 0);
