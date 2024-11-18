@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:35:18 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/18 11:07:28 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/18 11:12:07 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ void	handle_sigint(int signum)
 void	handle_sigquit(int signum)
 {
 	rl_on_new_line();
-	//rl_replace_line("", 0);
 	rl_redisplay();
 	(void)signum;
 }
