@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:52:03 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/14 12:52:28 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/14 14:58:32 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static int	path_error(char **cmd, char **all_paths, t_minishell *minishell)
 	free_2d_array((void ***)&all_paths);
 	return (127);
 }*/
-
+/*
 static void	check_cmd(char **cmd, t_minishell *minishell, char **envp)
 {
 	if (!cmd)
@@ -31,7 +31,7 @@ static void	check_cmd(char **cmd, t_minishell *minishell, char **envp)
 		error2(minishell, "command not found\n");
 		exit (127);
 	}
-	/*if (cmd[0])
+	if (cmd[0])
 	{
 		if (cmd[0][0] == '.' || cmd[0][0] == '/')
 		{
@@ -41,8 +41,8 @@ static void	check_cmd(char **cmd, t_minishell *minishell, char **envp)
 				exit(127);
 			}
 		}
-	}*/
-	/*{
+	}
+	{
 		if (cmd[0][0] == '.')
 		{
 			if (cmd[0][ft_strlen(cmd[0]) - 1] == '/')
@@ -58,9 +58,9 @@ static void	check_cmd(char **cmd, t_minishell *minishell, char **envp)
 				exit (126);
 			}
 		}
-	}*/
+	}
 }
-
+*/
 char	**paths(char **envp)
 {
 	char	*paths;
@@ -90,14 +90,14 @@ int	is_dir(char *cmd)
 	return (0);
 }*/
 
-char	*get_path(char **cmd, char **envp, t_minishell *minishell)
+char	*get_path(char **cmd, char **envp)
 {
 	int	i;
 	char	**all_paths;
 	char	*full_path;
 	char	*result;
 
-	check_cmd(cmd, minishell, envp);
+	//check_cmd(cmd, minishell, envp);
 	if (!cmd[0])
 		return (NULL);
 	i = 0;

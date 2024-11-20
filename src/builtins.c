@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/14 14:06:49 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/14 15:00:14 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -120,23 +120,20 @@ void	print_env(char **envp)
 		printf("%s\n", envp[i]);
 }
 
-int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n)
+int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n, t_put *file)
 {
 	int	i;
 	char	**str;
-	t_put	file;
 
-	file.infile = NULL;
-	file.outfile = NULL;
 	if (minishell->p.count == 0)
 	{
-		get_in_out(s, &file, minishell);
-		if (file.infile || file.outfile)
-			dupping(minishell, &minishell->p, &file, n);
-		if (file.infile)
-			close(file.in);
-		if (file.outfile)
-			close(file.out);
+		get_in_out(s, file, minishell);
+		if (file->infile || file->outfile)
+			dupping(minishell, &minishell->p, file, n);
+		if (file->infile)
+			close(file->in);
+		if (file->outfile)
+			close(file->out);
 	}
 	if (!ft_strncmp(cmd[0], "echo", 5))
 	{

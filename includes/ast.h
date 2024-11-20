@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/14 13:38:47 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/14 14:59:14 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,17 +92,17 @@ t_ast	*build_ast(t_tokens *tokens, int start, int end, int code);
 
 //execution.c
 int		execution(t_ast *s, char ***envp);
-void	close_and_free(t_pipes *p);
+void	close_and_free(t_pipes *p, t_put *cmd);
 void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell);
 int	open_files(t_put *cmd);
 void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
 
 //path.c
-char	*get_path(char **cmd, char **envp, t_minishell *minishell);
+char	*get_path(char **cmd, char **envp);
 char	**paths(char **envp);
 
 //builtins.c
-int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n);
+int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n, t_put *file);
 int	is_builtin(char **cmd);
 
 //ft_strdup2.c
@@ -110,8 +110,8 @@ char	**ft_strdup2(char **str);
 char	**ft_strdup3(char **str, char *dir);
 
 //errors.c
-void	error(t_minishell *minishell);
-void	error2(t_minishell *minishell, char *str);
+void	error(t_minishell *minishell, t_put *cmd);
+void	error2(t_minishell *minishell, char *str, t_put *cmd);
 
 //parser.c
 void	free_ast(t_ast **node);

@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/14 14:03:41 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/14 14:58:52 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,12 @@ void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 	if (n < minishell->p.count || cmd->outfile)
 	{
 		if (dup2(out, STDOUT_FILENO) == -1)
-			error2(minishell, "dup2 error\n");
+			error2(minishell, "dup2 error\n", cmd);
 	}
 	if (n > 0 || cmd->infile)
 	{
 		if (dup2(in, STDIN_FILENO) == -1)
-			error2(minishell, "dup2 error\n");
+			error2(minishell, "dup2 error\n", cmd);
 	}
 	close(in);
 	close(out);
@@ -92,31 +92,28 @@ void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell)
 		}
 		if (!open_files(cmd))
 		{
-			error(minishell);
+			error(minishell, cmd);
 			exit (1);
 		}
 		temp = temp->redir_target;
 	}
 }
 
-void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
+void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 {
 	int	i;
 	char	*path;
-	t_put	cmd;
 	struct stat	buf;
 
-	cmd.infile = NULL;
-	cmd.outfile = NULL;
 	minishell->p.pids[n] = fork();
 	if (minishell->p.pids[n] == 0)
 	{
-		get_in_out(s, &cmd, minishell);
-		if (minishell->p.pipes || cmd.infile || cmd.outfile)
+		get_in_out(s, cmd, minishell);
+		if (minishell->p.pipes || cmd->infile || cmd->outfile)
 		{
 			if (n == minishell->p.count)
 				minishell->p.o = minishell->p.count - 1;
-			dupping(minishell, &minishell->p, &cmd, n);
+			dupping(minishell, &minishell->p, cmd, n);
 		}
 		i = 0;
 		while (i < minishell->p.count)
@@ -127,16 +124,16 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 		}
 		if (is_builtin(s->words))
 		{
-			if (!execute_builtin(s, s->words, envp, minishell, n))
+			if (!execute_builtin(s, s->words, envp, minishell, n, cmd))
 			{
-				error(minishell);
+				error(minishell, cmd);
 				exit(1);
 			}
 			exit(0);
 		}
 		if (!*s->words)
 			exit(0);
-		path = get_path(s->words, *envp, minishell);
+		path = get_path(s->words, *envp);
 		if (!path)
 		{
 			if (!ft_strchr(s->words[0], '/'))
@@ -170,6 +167,7 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n)
 		}
 		execve(path, s->words, *envp);
 		ft_putstr_fd(strerror(errno), 2);
+		error(minishell, cmd);
 		exit(errno);
 	}
 }
@@ -242,7 +240,7 @@ int	mallocing(t_pipes *p)
 	return (1);
 }
 
-void	close_and_free(t_pipes *p)
+void	close_and_free(t_pipes *p, t_put *cmd)
 {
 	int	i;
 
@@ -258,6 +256,10 @@ void	close_and_free(t_pipes *p)
 		}
 		free(p->pipes);
 	}
+	if (cmd->infile)
+		close(cmd->in);
+	if (cmd->outfile)
+		close(cmd->out);
 }
 
 int	waiting(int pid)
@@ -296,24 +298,27 @@ int	execution(t_ast *s, char ***envp)
 	t_minishell	minishell;
 	int	n;
 	int	j;
+	t_put	cmd;
 
+	cmd.infile = NULL;
+	cmd.outfile = NULL;
 	minishell.ast = s;
 	getcwd(minishell.pwd, sizeof(minishell.pwd));
 	minishell.p.count = count_pipes(minishell.ast);
 	if (!mallocing(&minishell.p) || !pipeing(&minishell.p))
 	{
-		error2(&minishell, "malloc failed\n");
+		error2(&minishell, "malloc failed\n", &cmd);
 		return (1);
 	}
 	n = 0;
 	if (minishell.p.count == 0 && is_builtin(s->words))
 	{
-			if (!execute_builtin(s, s->words, envp, &minishell, n))
+			if (!execute_builtin(s, s->words, envp, &minishell, n, &cmd))
 			{	
-				error(&minishell);
+				error(&minishell, &cmd);
 				return (1);
 			}
-			close_and_free(&minishell.p);
+			close_and_free(&minishell.p, &cmd);
 			return (0);
 	}
 	else
@@ -321,9 +326,9 @@ int	execution(t_ast *s, char ***envp)
 		while (minishell.ast)
 		{
 			if (minishell.ast->type == AST_PIPE)
-				execute(minishell.ast->left, envp, &minishell, n);
+				execute(minishell.ast->left, envp, &minishell, n, &cmd);
 			else if (minishell.ast->type == AST_COMMAND)
-				execute(minishell.ast, envp, &minishell, n);
+				execute(minishell.ast, envp, &minishell, n, &cmd);
 			if (n > 0)
 				minishell.p.i++;
 			minishell.p.o++;
@@ -331,7 +336,7 @@ int	execution(t_ast *s, char ***envp)
 			minishell.ast = minishell.ast->right;
 		}
 	}
-	close_and_free(&minishell.p);
+	close_and_free(&minishell.p, &cmd);
 	j = 0;
 	while (j <= minishell.p.count)
 		s->code = waiting(minishell.p.pids[j++]);
