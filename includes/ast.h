@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/20 11:24:36 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/25 18:28:31 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,13 +74,13 @@ typedef struct s_pipe
 
 typedef struct s_put
 {
-	//char	**args;
-	//char	*path;
 	char	*infile;
 	char	*outfile;
 	char	o_type;
 	int		in;
 	int		out;
+	int		stdin2;
+	int		stdout2;
 }			t_put;
 
 typedef struct s_minishell
@@ -89,13 +89,6 @@ typedef struct s_minishell
 	t_pipes	p;
 	char	pwd[PATH_MAX];
 }			t_minishell;
-
-// execution.c
-int			execution(t_ast *s, char ***envp);
-void		close_and_free(t_pipes *p);
-void		get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell);
-int			open_files(t_put *cmd);
-void		dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
 
 //execution.c
 int		execution(t_ast *s, char ***envp);
@@ -111,15 +104,6 @@ char	**paths(char **envp);
 //builtins.c
 int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n, t_put *file);
 int	is_builtin(char **cmd);
-
-// path.c
-char		*get_path(char **cmd, char **envp, t_minishell *minishell);
-char		**paths(char **envp);
-
-// builtins.c
-int			execute_builtin(t_ast *s, char **cmd,
-				char ***envp, t_minishell *minishell, int n);
-int			is_builtin(char **cmd);
 
 // ft_strdup2.c
 char		**ft_strdup2(char **str);
@@ -152,4 +136,6 @@ int			populate_command_node(t_tokens *tokens,
 // print_ast.c
 void		print_ast(t_ast *node, int level, int flag);
 
+//ft_atol.c
+int	ft_atol(const char *str);
 #endif

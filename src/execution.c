@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/20 11:22:53 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/20 14:57:03 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,10 @@ void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 		if (dup2(in, STDIN_FILENO) == -1)
 			error2(minishell, "dup2 error\n", cmd);
 	}
+	if (cmd->infile)
+		close(cmd->in);
+	if (cmd->outfile)
+		close(cmd->out);
 	close(in);
 	close(out);
 }
@@ -50,7 +54,8 @@ int	open_files(t_put *cmd)
 		cmd->in = open(cmd->infile, O_RDONLY);
 		if (cmd->in < 0)
 		{
-			perror(strerror(errno));
+			ft_putchar_fd(' ', 2);
+			ft_putstr_fd(strerror(errno), 2);
 			return (0);
 		}
 	}
@@ -64,7 +69,8 @@ int	open_files(t_put *cmd)
 			cmd->out = open(cmd->outfile, O_APPEND | O_CREAT | O_WRONLY, 0644);
 		if (cmd->out < 0)
 		{
-			perror(strerror(errno));
+			ft_putchar_fd(' ', 2);
+			ft_putstr_fd(strerror(errno), 2);
 			return (0);
 		}
 	}
@@ -167,6 +173,7 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 		}
 		execve(path, s->words, *envp);
 		ft_putstr_fd(strerror(errno), 2);
+		//ft_putchar_fd('\n', 2);
 		error(minishell, cmd);
 		exit(errno);
 	}
@@ -302,6 +309,8 @@ int	execution(t_ast *s, char ***envp)
 
 	cmd.infile = NULL;
 	cmd.outfile = NULL;
+	cmd.stdin2 = -1;
+	cmd.stdout2 = -1;
 	minishell.ast = s;
 	getcwd(minishell.pwd, sizeof(minishell.pwd));
 	minishell.p.count = count_pipes(minishell.ast);
@@ -317,6 +326,18 @@ int	execution(t_ast *s, char ***envp)
 			{	
 				error(&minishell, &cmd);
 				return (1);
+			}
+			if (cmd.infile)
+			{
+				close(STDIN_FILENO);
+				dup2(cmd.stdin2, STDIN_FILENO);
+				close(cmd.stdin2);
+			}
+			if (cmd.outfile)
+			{
+				close(STDOUT_FILENO);
+				dup2(cmd.stdout2, STDOUT_FILENO);
+				close(cmd.stdout2);
 			}
 			close_and_free(&minishell.p, &cmd);
 			return (0);
