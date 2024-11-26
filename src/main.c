@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/17 18:58:51 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/26 14:35:50 by upolat           ###   ########.fr       */
 /*   Updated: 2024/11/11 15:15:17 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/11/07 10:35:14 by upolat           ###   ########.fr       */
 /*                                                                            */
@@ -61,7 +61,7 @@ int	check_exit(char *temp)
 	return (0);
 }
 
-int	preliminary_input_check(char **input, int *code)
+int	preliminary_input_check(char **input)
 {
 	char	*temp;
 
@@ -75,7 +75,6 @@ int	preliminary_input_check(char **input, int *code)
 		return (free_void((void **)input, NULL), -2);
 	if (check_exit(temp) == -1)
 	{
-		*code = 0;
 		free_void((void **)input, NULL);
 		return (printf("exit\n"), -1);
 	}
@@ -100,7 +99,7 @@ int	main(int argc, char **argv, char **envp)
 	display_welcome_message(&code, new_envp, 0);
 	while (1)
 	{
-		input_res = preliminary_input_check(&input, &code);
+		input_res = preliminary_input_check(&input);
 		if (input_res == -2)
 			continue ;
 		else if (input_res == -1)
