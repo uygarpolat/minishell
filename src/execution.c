@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/27 14:13:49 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/27 14:24:29 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -382,6 +382,8 @@ int	execution(t_ast *s, char ***envp)
 			}
 			if (access(".heredoc", F_OK) == 0)
 				unlink(".heredoc");
+			if (minishell.p.pids)
+				free(minishell.p.pids);
 			close_and_free(&minishell.p, &cmd);
 			return (0);
 	}
