@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/25 17:36:20 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/25 19:14:07 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -136,9 +136,9 @@ int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, 
 				file->stdout2 = dup(STDOUT_FILENO);
 			dupping(minishell, &minishell->p, file, n);
 		}
-		if (file->infile)
+		if (file->infile && file->in >= 0)
 			close(file->in);
-		if (file->outfile)
+		if (file->outfile && file->out >= 0)
 			close(file->out);
 	}
 	if (!ft_strncmp(cmd[0], "echo", 5))
