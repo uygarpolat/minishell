@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/27 14:24:29 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/28 14:54:11 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ int	open_files(t_put *cmd)
 		{
 			ft_putchar_fd(' ', 2);
 			ft_putstr_fd(strerror(errno), 2);
+			ft_putchar_fd('\n', 2);
 			return (0);
 		}
 	}
@@ -73,6 +74,7 @@ int	open_files(t_put *cmd)
 		{
 			ft_putchar_fd(' ', 2);
 			ft_putstr_fd(strerror(errno), 2);
+			ft_putchar_fd('\n', 2);
 			return (0);
 		}
 	}
@@ -108,6 +110,62 @@ int	here(t_tokens *token)
 	return (1);
 }
 
+void	check_here(t_ast *s)
+{
+	t_ast	*ast;
+	t_ast	*temp;
+
+	ast = s;
+	while (ast)
+	{
+		if (ast->type == AST_COMMAND)
+		{
+			//check if redirect
+			temp = ast->redir_target;
+			while (temp)
+			{
+				if (temp->type == AST_HEREDOC)
+					here(temp->token);
+				temp = temp->redir_target; 
+			}
+		}
+		else if (ast->type == AST_AND || ast->type == AST_OR)
+		{
+			//check first the left side and then the right side and then move to the right of the right
+			temp = ast->left->redir_target;
+			while (temp)
+			{
+				if (temp->type == AST_HEREDOC)
+					here(temp->token);
+				temp = temp->redir_target;
+			}
+			if (ast->right->type == AST_COMMAND)
+				temp = ast->right->redir_target;
+			else
+				temp = ast->right->left->redir_target;
+			while (temp)
+			{
+				if (temp->type == AST_HEREDOC)
+					here(temp->token);
+				temp = temp->redir_target;
+			}
+			ast = ast->right;
+		}
+		else if (ast->type == AST_PIPE)
+		{
+			//check the left side
+			temp = ast->left->redir_target;
+			while (temp)
+			{
+				if (temp->type == AST_HEREDOC)
+					here(temp->token);
+				temp = temp->redir_target;
+			}
+		}
+		ast = ast->right;
+	}
+}
+
 void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell)
 {
 	t_ast	*temp;
@@ -129,7 +187,9 @@ void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell)
 		}
 		else if (temp->type == AST_HEREDOC)
 		{
-			here(temp->token);
+			//if (access(".heredoc", F_OK) == 0)
+				//unlink(".heredoc");
+			//here(temp->token);
 			cmd->infile = ".heredoc";
 		}
 		if (!open_files(cmd))
@@ -230,6 +290,22 @@ int	count_pipes(t_ast *s)
 	return (count);
 }
 
+int	count_operators(t_ast *s)
+{
+	t_ast	*i;
+	int	count;
+
+	i = s;
+	count = 0;
+	while (i)
+	{
+		if (i->type == AST_AND || i->type == AST_OR)
+			count++;
+		i = i->right;
+	}
+	return (count);
+}
+
 int	pipeing(t_pipes *p)
 {
 	int	i;
@@ -279,7 +355,7 @@ int	mallocing(t_pipes *p)
 	}
 	else
 	{
-		p->pids = malloc(sizeof(int) * 1);
+		p->pids = malloc(sizeof(int) * (p->o_count + 1));
 		if (!p->pids)
 			return (0);
 	}
@@ -344,6 +420,7 @@ int	execution(t_ast *s, char ***envp)
 	t_minishell	minishell;
 	int	n;
 	int	j;
+	int status;
 	t_put	cmd;
 
 	cmd.infile = NULL;
@@ -355,6 +432,7 @@ int	execution(t_ast *s, char ***envp)
 	minishell.ast = s;
 	getcwd(minishell.pwd, sizeof(minishell.pwd));
 	minishell.p.count = count_pipes(minishell.ast);
+	minishell.p.o_count = count_operators(minishell.ast);
 	if (!mallocing(&minishell.p) || !pipeing(&minishell.p))
 	{
 		error2(&minishell, "malloc failed\n", &cmd);
@@ -389,12 +467,57 @@ int	execution(t_ast *s, char ***envp)
 	}
 	else
 	{
+		//go throug the whole tree and check the heredocs
+		check_here(minishell.ast);
 		while (minishell.ast)
 		{
 			if (minishell.ast->type == AST_PIPE)
 				execute(minishell.ast->left, envp, &minishell, n, &cmd);
 			else if (minishell.ast->type == AST_COMMAND)
 				execute(minishell.ast, envp, &minishell, n, &cmd);
+			else if (minishell.ast->type == AST_AND)
+			{	
+				execute(minishell.ast->left, envp, &minishell, n, &cmd);
+				while (minishell.ast->type == AST_AND)
+				{
+					status = 0;
+					waitpid(minishell.p.pids[n], &status, 0);
+					if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+					{
+						if (minishell.ast->right->type == AST_COMMAND)
+							execute(minishell.ast->right, envp, &minishell, ++n, &cmd);
+						else
+							execute(minishell.ast->right->left, envp, &minishell, ++n, &cmd);
+					}
+					else
+					{
+						while (minishell.ast->type == AST_AND)
+							minishell.ast = minishell.ast->right;
+						break ;
+					}
+					minishell.ast = minishell.ast->right;
+				}
+				//minishell.ast = minishell.ast->right;
+				//run left side, if it succeeds run right side
+			}
+			else if (minishell.ast->type == AST_OR)
+			{
+				//if left side fails run right side, if left succeeds don't run right
+				execute(minishell.ast->left, envp, &minishell, n, &cmd);
+				while (minishell.ast->type == AST_OR)
+				{
+					status = 0;
+					waitpid(minishell.p.pids[n], &status, 0);
+					if (!WIFEXITED(status))
+					{
+						if (minishell.ast->right->type == AST_COMMAND)
+							execute(minishell.ast->right, envp, &minishell, ++n, &cmd);
+						else
+							execute(minishell.ast->right->left, envp, &minishell, ++n, &cmd);
+					}
+					minishell.ast = minishell.ast->right;
+				}
+			}
 			if (n > 0)
 				minishell.p.i++;
 			minishell.p.o++;
@@ -404,7 +527,7 @@ int	execution(t_ast *s, char ***envp)
 	}
 	close_and_free(&minishell.p, &cmd);
 	j = 0;
-	while (j <= minishell.p.count)
+	while (j <= (minishell.p.count + minishell.p.o_count))
 		s->code = waiting(minishell.p.pids[j++]);
 	//i = -1;
 	//free(minishell.pwd);
