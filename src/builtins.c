@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/25 19:14:07 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/28 11:47:32 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -258,7 +258,7 @@ int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, 
 
 int	is_builtin(char **cmd)
 {
-	if (!cmd[0])
+	if (!cmd || !cmd[0])
 		return (0);
 	if (!ft_strncmp(cmd[0], "echo", 5))
 		return (1);

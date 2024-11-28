@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2024/11/25 18:27:37 by hpirkola         ###   ########.fr        #
+#    Updated: 2024/11/28 11:44:49 by hpirkola         ###   ########.fr        #
 #    Updated: 2024/11/11 16:52:17 by hpirkola         ###   ########.fr        #
 #    Updated: 2024/11/07 10:34:01 by upolat           ###   ########.fr        #
 #                                                                              #
@@ -43,7 +43,7 @@ SOURCES = 	$(SRC_DIR)/main.c \
 
 OBJECTS = $(SOURCES:.c=.o)
 
-CFLAGS = -Wall -Wextra -Werror #-g
+CFLAGS = -Wall -Wextra -Werror -g
 
 libft_dir := library/libft
 libft := $(libft_dir)/libft.a
