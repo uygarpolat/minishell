@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/20 14:57:03 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/11/27 14:13:49 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,10 @@ void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 		close(cmd->in);
 	if (cmd->outfile)
 		close(cmd->out);
-	close(in);
-	close(out);
+	if (in >= 0)
+		close(in);
+	if (out >= 0)
+		close(out);
 }
 
 int	open_files(t_put *cmd)
@@ -77,6 +79,35 @@ int	open_files(t_put *cmd)
 	return (1);
 }
 
+int	here(t_tokens *token)
+{
+	int	fd;
+	int	len;
+	char	*buf;
+
+	len = ft_strlen(token->value);
+	fd = open(".heredoc", O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	if (fd < 0)
+		return (0);
+	while (1)
+	{
+		write(1, "heredoc> ", 9);
+		buf = get_next_line(0);
+		if (!buf)
+			break ;
+		if (buf < 0)
+			return (0);
+		if (!ft_strncmp(token->value, buf, len) && buf[len] == '\n')
+			break ;
+		write(fd, buf, ft_strlen(buf));
+		free(buf);
+	}
+	if (buf)
+		free(buf);
+	close(fd);
+	return (1);
+}
+
 void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell)
 {
 	t_ast	*temp;
@@ -95,6 +126,11 @@ void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell)
 		{
 			cmd->o_type = 'a';
 			cmd->outfile = temp->token->value;
+		}
+		else if (temp->type == AST_HEREDOC)
+		{
+			here(temp->token);
+			cmd->infile = ".heredoc";
 		}
 		if (!open_files(cmd))
 		{
@@ -173,7 +209,6 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 		}
 		execve(path, s->words, *envp);
 		ft_putstr_fd(strerror(errno), 2);
-		//ft_putchar_fd('\n', 2);
 		error(minishell, cmd);
 		exit(errno);
 	}
@@ -233,7 +268,11 @@ int	mallocing(t_pipes *p)
 			return (0);
 		i = -1;
 		while (++i < p->count)
+		{
 			p->pipes[i] = malloc(sizeof(int) * 2);
+			if (!p->pipes[i])
+				return (0);
+		}
 		p->pids = malloc(sizeof(int) * (p->count + 1));
 		if (!p->pids)
 			return (0);
@@ -263,9 +302,9 @@ void	close_and_free(t_pipes *p, t_put *cmd)
 		}
 		free(p->pipes);
 	}
-	if (cmd->infile)
+	if (cmd->infile && cmd->in >= 0)
 		close(cmd->in);
-	if (cmd->outfile)
+	if (cmd->outfile && cmd->out >= 0)
 		close(cmd->out);
 }
 
@@ -309,6 +348,8 @@ int	execution(t_ast *s, char ***envp)
 
 	cmd.infile = NULL;
 	cmd.outfile = NULL;
+	cmd.in = -1;
+	cmd.out = -1;
 	cmd.stdin2 = -1;
 	cmd.stdout2 = -1;
 	minishell.ast = s;
@@ -339,6 +380,8 @@ int	execution(t_ast *s, char ***envp)
 				dup2(cmd.stdout2, STDOUT_FILENO);
 				close(cmd.stdout2);
 			}
+			if (access(".heredoc", F_OK) == 0)
+				unlink(".heredoc");
 			close_and_free(&minishell.p, &cmd);
 			return (0);
 	}
@@ -365,5 +408,7 @@ int	execution(t_ast *s, char ***envp)
 	//free(minishell.pwd);
 	if (minishell.p.pids)
 		free(minishell.p.pids);
+	if (access(".heredoc", F_OK) == 0)
+		unlink(".heredoc");
 	return (s->code);
 }
