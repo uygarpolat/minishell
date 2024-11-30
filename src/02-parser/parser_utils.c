@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 11:49:03 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/30 21:23:04 by upolat           ###   ########.fr       */
+/*   Updated: 2024/11/30 21:48:22 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,8 @@ int	establish_lowest_precedence(t_tokens *tokens, t_precedence *p)
 		if (p->i < 0)
 			return (-1);
 		p->prec = get_precedence(tokens[p->i].type);
-		if (p->prec != -1 && ((p->prec < p->lowest_prec) || (p->prec == 1 && p->prec <= p->lowest_prec)))
+		if (p->prec != -1 && ((p->prec < p->lowest_prec)
+				|| (p->prec == 1 && p->prec <= p->lowest_prec)))
 		{
 			p->lowest_prec = p->prec;
 			p->lowest_prec_pos = p->i;
