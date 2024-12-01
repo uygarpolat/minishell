@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/30 21:46:42 by upolat           ###   ########.fr       */
+/*   Updated: 2024/12/01 18:47:21 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ int	main(int argc, char **argv, char **envp)
 	new_envp = ft_strdup2(envp);
 	if (!new_envp)
 		return (error_handler(NULL, NULL, &code, 1), code);
-	if (init_term_and_signal(argc, argv))
+	if (init_term_and_signal(argc, argv, &code))
 		return (free_2d_array((void ***)&new_envp), EXIT_FAILURE);
 	display_welcome_message(&code, new_envp, 0);
 	while (1)
