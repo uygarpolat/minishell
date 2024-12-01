@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/12/01 18:47:21 by upolat           ###   ########.fr       */
+/*   Updated: 2024/12/02 00:44:45 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,6 @@
 #include "../includes/tokenizer.h"
 #include "../includes/ast.h"
 #include "../includes/signals.h"
-
-int	g_signal = 0;
 
 void	display_welcome_message(int *code, char **new_envp, int flag);
 
