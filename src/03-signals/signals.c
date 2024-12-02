@@ -6,30 +6,18 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:35:18 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/28 12:47:38 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/02 00:44:06 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/signals.h"
 
-void	handle_sigint(int signum)
+int	event(void)
 {
-	(void)signum;
-	g_signal = 1;
-	ft_putstr_fd("\n", STDOUT_FILENO);
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
+	return (0);
 }
 
-void	handle_sigquit(int signum)
-{
-	rl_on_new_line();
-	rl_redisplay();
-	(void)signum;
-}
-
-int	init_term_and_signal(int argc, char **argv)
+int	init_term_and_signal(int argc, char **argv, int *exit_code)
 {
 	struct termios	term;
 
@@ -43,9 +31,6 @@ int	init_term_and_signal(int argc, char **argv)
 		if (tcsetattr(STDIN_FILENO, TCSANOW, &term) == -1)
 			return (perror("tcsetattr"), 1);
 	}
-	if (signal(SIGINT, handle_sigint) == SIG_ERR)
-		return (perror("signal SIGINT"), 1);
-	if (signal(SIGQUIT, handle_sigquit) == SIG_ERR)
-		return (perror("signal SIGQUIT"), 1);
+	set_signals(exit_code, SIGNAL_PARENT);
 	return (0);
 }

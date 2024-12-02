@@ -6,10 +6,10 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2024/11/28 11:44:49 by hpirkola         ###   ########.fr        #
-#    Updated: 2024/11/11 16:52:17 by hpirkola         ###   ########.fr        #
-#    Updated: 2024/11/07 10:34:01 by upolat           ###   ########.fr        #
+#    Updated: 2024/12/02 00:46:12 by upolat           ###   ########.fr        #
 #                                                                              #
+# **************************************************************************** #
+
 # **************************************************************************** #
 
 NAME = minishell
@@ -31,7 +31,7 @@ SOURCES = 	$(SRC_DIR)/main.c \
 			$(PARSER_DIR)/parser.c $(PARSER_DIR)/parser_utils.c \
 			$(PARSER_DIR)/populate_command_node.c $(PARSER_DIR)/memory_and_error.c \
 			\
-			$(SIGNALS_DIR)/signals.c \
+			$(SIGNALS_DIR)/signals.c $(SIGNALS_DIR)/signals_utils.c \
 			\
 			$(VISUALIZATION_DIR)/print_ast.c $(VISUALIZATION_DIR)/print_tokens.c \
 			$(VISUALIZATION_DIR)/print_welcome.c \

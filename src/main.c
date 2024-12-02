@@ -6,18 +6,16 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/28 16:53:51 by upolat           ###   ########.fr       */
-/*   Updated: 2024/11/11 15:15:17 by hpirkola         ###   ########.fr       */
-/*   Updated: 2024/11/07 10:35:14 by upolat           ###   ########.fr       */
+/*   Updated: 2024/12/02 00:44:45 by upolat           ###   ########.fr       */
 /*                                                                            */
+/* ************************************************************************** */
+
 /* ************************************************************************** */
 
 #include "../library/libft/libft.h"
 #include "../includes/tokenizer.h"
 #include "../includes/ast.h"
 #include "../includes/signals.h"
-
-int	g_signal = 0;
 
 void	display_welcome_message(int *code, char **new_envp, int flag);
 
@@ -94,7 +92,7 @@ int	main(int argc, char **argv, char **envp)
 	new_envp = ft_strdup2(envp);
 	if (!new_envp)
 		return (error_handler(NULL, NULL, &code, 1), code);
-	if (init_term_and_signal(argc, argv))
+	if (init_term_and_signal(argc, argv, &code))
 		return (free_2d_array((void ***)&new_envp), EXIT_FAILURE);
 	display_welcome_message(&code, new_envp, 0);
 	while (1)

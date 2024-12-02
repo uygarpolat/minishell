@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/28 14:54:11 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/02 01:51:02 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
+#include "../includes/signals.h"
 
 void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 {
@@ -81,8 +82,9 @@ int	open_files(t_put *cmd)
 	return (1);
 }
 
-int	here(t_tokens *token)
+int	here(t_tokens *token, t_ast *ast, char **envp)
 {
+	(void)envp; // Note from Uygar: I will use this envp later for dollar expansion inside of heredoc.
 	int	fd;
 	int	len;
 	char	*buf;
@@ -91,26 +93,34 @@ int	here(t_tokens *token)
 	fd = open(".heredoc", O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (fd < 0)
 		return (0);
+	set_signals(ast->code_parser, SIGNAL_HEREDOC); // Note from Uygar: Signals entering heredoc mode
 	while (1)
 	{
-		write(1, "heredoc> ", 9);
-		buf = get_next_line(0);
+		//write(1, "heredoc> ", 9);
+		//buf = get_next_line(0);
+		buf = readline("> ");
+		if (*ast->code_parser == 130) // Note from Uygar: This is checking for ctrl+C
+			break ;
 		if (!buf)
 			break ;
 		if (buf < 0)
 			return (0);
-		if (!ft_strncmp(token->value, buf, len) && buf[len] == '\n')
+		if (!ft_strncmp(token->value, buf, len + 1))
 			break ;
+		//if (!ft_strncmp(token->value, buf, len) && buf[len] == '\n')
+		//	break ;
 		write(fd, buf, ft_strlen(buf));
+		write(fd, "\n", 1);
 		free(buf);
 	}
+	set_signals(ast->code_parser, SIGNAL_PARENT); // Note from Uygar: Signals entering parent process mode
 	if (buf)
 		free(buf);
 	close(fd);
 	return (1);
 }
 
-void	check_here(t_ast *s)
+void	check_here(t_ast *s, char ***envp)
 {
 	t_ast	*ast;
 	t_ast	*temp;
@@ -125,7 +135,7 @@ void	check_here(t_ast *s)
 			while (temp)
 			{
 				if (temp->type == AST_HEREDOC)
-					here(temp->token);
+					here(temp->token, s, *envp);
 				temp = temp->redir_target; 
 			}
 		}
@@ -136,7 +146,7 @@ void	check_here(t_ast *s)
 			while (temp)
 			{
 				if (temp->type == AST_HEREDOC)
-					here(temp->token);
+					here(temp->token, s, *envp);
 				temp = temp->redir_target;
 			}
 			if (ast->right->type == AST_COMMAND)
@@ -146,7 +156,7 @@ void	check_here(t_ast *s)
 			while (temp)
 			{
 				if (temp->type == AST_HEREDOC)
-					here(temp->token);
+					here(temp->token, s, *envp);
 				temp = temp->redir_target;
 			}
 			ast = ast->right;
@@ -158,7 +168,7 @@ void	check_here(t_ast *s)
 			while (temp)
 			{
 				if (temp->type == AST_HEREDOC)
-					here(temp->token);
+					here(temp->token, s, *envp);
 				temp = temp->redir_target;
 			}
 		}
@@ -210,6 +220,7 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 	minishell->p.pids[n] = fork();
 	if (minishell->p.pids[n] == 0)
 	{
+		set_signals(s->code_parser, SIGNAL_CHILD); // Added by Uygar. Signals entering child process mode.
 		get_in_out(s, cmd, minishell);
 		if (minishell->p.pipes || cmd->infile || cmd->outfile)
 		{
@@ -267,6 +278,30 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 				exit(127);
 			}
 		}
+		
+		/*
+		Note from Uygar regarding heredoc:
+		The following 2 lines are added by Uygar.
+		*s->code_parser=130 happens if ctrl+C comes during heredoc.
+		If there is a better place for these 2 lines, they can be moved.
+		I chose before execve because I didn't know where else they could be.
+		My understanding is nothing should go into execve if ctrl+C happens during heredoc.
+		You can check against *s->code_parser to implement this elsewhere.
+		Currently there are some problems:
+		1) If heredoc input is "cat << END" and ctrl+C happens, echo $? returns 1,
+		which mimicks Bash. But if heredoc input is "<< END", echo $? returns 0, which is wrong.
+		Why does this happen?
+		2) One more new line than bash is displayed when ctrl+C happens in heredoc mode.
+		3) When ctrl+C comes, .heredoc file is not displayed on the screen, but what
+		happens to .heredoc? We should make sure we are deleting and unlinking .heredoc
+		after ctrl+C (I didn't do it).
+		
+		IMPORTANT: One very important assumption in my heredoc signal implementation is
+		that heredoc happens in the parent process. If it is happening in a child process,
+		we should talk. My understanding is that it must happen in parent process.
+		*/
+		if (*s->code_parser == 130) // Added by Uygar
+			exit(1); // Added by Uygar
 		execve(path, s->words, *envp);
 		ft_putstr_fd(strerror(errno), 2);
 		error(minishell, cmd);
@@ -468,7 +503,7 @@ int	execution(t_ast *s, char ***envp)
 	else
 	{
 		//go throug the whole tree and check the heredocs
-		check_here(minishell.ast);
+		check_here(minishell.ast, envp);
 		while (minishell.ast)
 		{
 			if (minishell.ast->type == AST_PIPE)
