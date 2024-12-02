@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/02 00:36:44 by upolat           ###   ########.fr       */
+/*   Updated: 2024/12/02 01:51:02 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,8 +82,9 @@ int	open_files(t_put *cmd)
 	return (1);
 }
 
-int	here(t_tokens *token, t_ast *ast)
+int	here(t_tokens *token, t_ast *ast, char **envp)
 {
+	(void)envp; // Note from Uygar: I will use this envp later for dollar expansion inside of heredoc.
 	int	fd;
 	int	len;
 	char	*buf;
@@ -119,7 +120,7 @@ int	here(t_tokens *token, t_ast *ast)
 	return (1);
 }
 
-void	check_here(t_ast *s)
+void	check_here(t_ast *s, char ***envp)
 {
 	t_ast	*ast;
 	t_ast	*temp;
@@ -134,7 +135,7 @@ void	check_here(t_ast *s)
 			while (temp)
 			{
 				if (temp->type == AST_HEREDOC)
-					here(temp->token, s);
+					here(temp->token, s, *envp);
 				temp = temp->redir_target; 
 			}
 		}
@@ -145,7 +146,7 @@ void	check_here(t_ast *s)
 			while (temp)
 			{
 				if (temp->type == AST_HEREDOC)
-					here(temp->token, s);
+					here(temp->token, s, *envp);
 				temp = temp->redir_target;
 			}
 			if (ast->right->type == AST_COMMAND)
@@ -155,7 +156,7 @@ void	check_here(t_ast *s)
 			while (temp)
 			{
 				if (temp->type == AST_HEREDOC)
-					here(temp->token, s);
+					here(temp->token, s, *envp);
 				temp = temp->redir_target;
 			}
 			ast = ast->right;
@@ -167,7 +168,7 @@ void	check_here(t_ast *s)
 			while (temp)
 			{
 				if (temp->type == AST_HEREDOC)
-					here(temp->token, s);
+					here(temp->token, s, *envp);
 				temp = temp->redir_target;
 			}
 		}
@@ -502,7 +503,7 @@ int	execution(t_ast *s, char ***envp)
 	else
 	{
 		//go throug the whole tree and check the heredocs
-		check_here(minishell.ast);
+		check_here(minishell.ast, envp);
 		while (minishell.ast)
 		{
 			if (minishell.ast->type == AST_PIPE)
