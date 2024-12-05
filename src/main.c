@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/12/02 00:44:45 by upolat           ###   ########.fr       */
+/*   Updated: 2024/12/04 23:23:06 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,8 +102,6 @@ int	main(int argc, char **argv, char **envp)
 			continue ;
 		else if (input_res == -1)
 			break ;
-		if (*input)
-			add_history(input);
 		code = execute_shell(input, &code, &new_envp);
 	}
 	free_2d_array((void ***)&new_envp);
