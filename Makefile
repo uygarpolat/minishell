@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2024/12/02 00:46:12 by upolat           ###   ########.fr        #
+#    Updated: 2024/12/04 14:53:31 by hpirkola         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,7 +39,8 @@ SOURCES = 	$(SRC_DIR)/main.c \
 			$(SRC_DIR)/execution.c $(SRC_DIR)/path.c \
 			$(SRC_DIR)/builtins.c \
 		 	$(SRC_DIR)/ft_strdup2.c $(SRC_DIR)/errors.c \
-			$(SRC_DIR)/ft_atol.c \
+			$(SRC_DIR)/ft_atol.c  $(SRC_DIR)/files.c $(SRC_DIR)/functions.c \
+			$(SRC_DIR)/heredoc.c $(SRC_DIR)/exec_builtin.c $(SRC_DIR)/pipes.c \
 
 OBJECTS = $(SOURCES:.c=.o)
 

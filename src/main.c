@@ -6,10 +6,8 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/12/04 23:23:06 by upolat           ###   ########.fr       */
+/*   Updated: 2024/12/11 12:07:55 by upolat           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
-
 /* ************************************************************************** */
 
 #include "../library/libft/libft.h"
@@ -31,7 +29,8 @@ int	execute_shell(char *input, int *code, char ***new_envp)
 		ast = build_ast(tokens, 0, capacity.current_size - 1, 0);
 		if (ast)
 		{
-			print_ast(ast, 0, 0);
+			//printf("s->words: %p\n", ast->words);
+			//print_ast(ast, 0, 1);
 			*code = execution(ast, new_envp);
 			free_ast(&ast);
 		}
