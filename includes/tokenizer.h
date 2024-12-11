@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 23:39:43 by upolat           ###   ########.fr       */
+/*   Updated: 2024/12/11 15:41:04 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,8 +121,9 @@ int			handle_expansion_and_wildcard(t_tokens *tokens,
 
 // handle_word_and_separator.c
 int			handle_seperator(char **input,
-				t_tokens *tokens, t_capacity *capacity);
-int			handle_word(char **input, t_tokens *tokens, t_capacity *capacity);
+				t_tokens *tokens, t_capacity *capacit, int *code);
+int			handle_word(char **input, t_tokens *tokens, t_capacity *capacity,
+				int *code);
 
 // populate_tokens.c
 int			populate_tokens(char *str, int *code, int *int_array, int m);
