@@ -6,8 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 14:32:27 by upolat           ###   ########.fr       */
-/*   Updated: 2024/11/07 12:36:19 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/11 15:41:20 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +42,9 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity,
 		if (tokens == NULL)
 			return (NULL);
 		if (*input && is_seperator(*input, *(input + 1)))
-			error_code = handle_seperator(&input, tokens, capacity);
+			error_code = handle_seperator(&input, tokens, capacity, code);
 		else if (*input)
-			error_code = handle_word(&input, tokens, capacity);
+			error_code = handle_word(&input, tokens, capacity, code);
 		if (error_code == -1)
 			return (NULL);
 	}

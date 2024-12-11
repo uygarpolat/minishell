@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:23:17 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 14:09:42 by upolat           ###   ########.fr       */
+/*   Updated: 2024/12/11 15:44:54 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,8 @@ static int	malloc_individual_tokens(t_tokens *tokens, char **input,
 	return (0);
 }
 
-int	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
+int	handle_seperator(char **input, t_tokens *tokens,
+		t_capacity *capacity, int *code)
 {
 	char			*temp;
 	t_token_type	type;
@@ -53,6 +54,7 @@ int	handle_seperator(char **input, t_tokens *tokens, t_capacity *capacity)
 	tokens[capacity->current_size].type = type;
 	if (malloc_individual_tokens(tokens, input, temp, capacity))
 		return (-1);
+	tokens[capacity->current_size - 1].code = code;
 	return (0);
 }
 
@@ -94,7 +96,7 @@ static int	skip_quotes(char **temp)
 	return (1);
 }
 
-int	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
+int	handle_word(char **input, t_tokens *tokens, t_capacity *capacity, int *code)
 {
 	char	*temp;
 
@@ -104,10 +106,8 @@ int	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 	while (*temp)
 	{
 		while (*temp && skip_quotes(&temp))
-		{
 			if (*temp)
 				temp++;
-		}
 		if (*temp == '&')
 		{
 			if (*(temp + 1) == '&')
@@ -120,5 +120,6 @@ int	handle_word(char **input, t_tokens *tokens, t_capacity *capacity)
 	tokens[capacity->current_size].type = TOKEN_WORD;
 	if (malloc_individual_tokens(tokens, input, temp, capacity))
 		return (-1);
+	tokens[capacity->current_size - 1].code = code;
 	return (0);
 }
