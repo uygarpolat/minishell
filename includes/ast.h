@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/28 12:03:07 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/04 14:54:06 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,9 +102,29 @@ void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
 char	*get_path(char **cmd, char **envp);
 char	**paths(char **envp);
 
+//exec_builtin.c
+int	only_builtin(char ***envp, t_minishell *minishell, t_put *cmd);
+void	run_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd);
+
 //builtins.c
 int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n, t_put *file);
 int	is_builtin(char **cmd);
+
+//files.c
+void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
+int	open_files(t_put *cmd);
+void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell);
+
+//pipes.c
+void	close_pipes(t_minishell *minishell);
+int	count_pipes(t_ast *s);
+int	count_operators(t_ast *s);
+int	pipeing(t_pipes *p);
+int	mallocing(t_pipes *p);
+
+//functions.c
+int	waiting(int pid);
+void	close_and_free(t_pipes *p, t_put *cmd);
 
 // ft_strdup2.c
 char		**ft_strdup2(char **str);
@@ -113,6 +133,9 @@ char		**ft_strdup3(char **str, char *dir);
 //errors.c
 void	error(t_minishell *minishell, t_put *cmd);
 void	error2(t_minishell *minishell, char *str, t_put *cmd);
+void	print_and_exit(char *str, int code);
+int	print_error(void);
+void	error_check(char *path, t_ast *s);
 
 // parser.c
 t_ast		*build_ast(t_tokens *tokens, int start, int end, int code);
@@ -139,4 +162,9 @@ void		print_ast(t_ast *node, int level, int flag);
 
 //ft_atol.c
 int	ft_atol(const char *str);
+
+//heredoc.c
+void	check_here(t_ast *s, char ***envp);
+void	here_loop(t_ast *s, t_ast *ast, char ***envp);
+int	here(t_tokens *token, t_ast *ast, char **envp);
 #endif
