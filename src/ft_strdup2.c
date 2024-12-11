@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:43:21 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/10/28 17:12:43 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/04 14:58:06 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ char	**ft_strdup3(char **str, char *dir)
 		if (!ft_strncmp(str[i], "PWD=", 4))
 		{
 			new_dir = ft_strjoin("PWD=", dir);
-			word[i] = new_dir;	
+			word[i] = new_dir;
 		}
 		else
 			word[i] = ft_strdup(str[i]);
@@ -68,4 +68,3 @@ char	**ft_strdup2(char **str)
 	word[i] = NULL;
 	return (word);
 }
-

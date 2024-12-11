@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 17:31:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/25 18:04:24 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/04 15:02:45 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static unsigned long long	to_int(const char *str, int neg)
 {
-	int		i;
+	int					i;
 	unsigned long long	result;
 
 	i = 0;
@@ -23,7 +23,7 @@ static unsigned long long	to_int(const char *str, int neg)
 	{
 		if ((result > 9223372036854775807 / 10 && neg == 1) \
 			|| (result == 9223372036854775807 / 10 && str[i] - '0' > 7))
-				return (0);
+			return (0);
 		result = result * 10 + (str[i] - '0');
 		i++;
 	}
