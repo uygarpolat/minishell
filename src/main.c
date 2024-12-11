@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2024/12/11 12:07:55 by upolat           ###   ########.fr       */
+/*   Updated: 2024/12/11 15:22:22 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ int	execute_shell(char *input, int *code, char ***new_envp)
 		if (ast)
 		{
 			//printf("s->words: %p\n", ast->words);
-			//print_ast(ast, 0, 1);
+			print_ast(ast, 0, 0);
 			*code = execution(ast, new_envp);
 			free_ast(&ast);
 		}

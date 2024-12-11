@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:28:07 by upolat            #+#    #+#             */
-/*   Updated: 2024/12/02 00:45:22 by upolat           ###   ########.fr       */
+/*   Updated: 2024/12/11 15:44:07 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ enum
 {
 	SIGNAL_PARENT,
 	SIGNAL_CHILD,
-    SIGNAL_HEREDOC
+	SIGNAL_HEREDOC
 };
 
 void	handle_sigint(int signum);

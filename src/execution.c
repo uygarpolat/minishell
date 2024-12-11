@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/04 15:03:20 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/11 15:25:42 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,6 @@ void	initialize(t_put *cmd, t_minishell *minishell, t_ast *s)
 	minishell->p.i = 0;
 	minishell->p.o = 0;
 	s->code = 0;
-
 }
 
 int	execution(t_ast *s, char ***envp)
