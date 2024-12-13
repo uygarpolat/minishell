@@ -23,8 +23,6 @@ cat | cat | cat | ls
 notexist_cmd
 unset PATH
 notexist_cmd
-.
-..
 env | grep PWD
 cd ..
 env | grep PWD

@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/11 15:25:42 by upolat           ###   ########.fr       */
+/*   Updated: 2024/12/13 13:15:51 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,12 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 	close_pipes(minishell);
 	if (is_builtin(s->words))
 		run_builtin(s, envp, minishell, n, cmd);
-	if (!*s->words)
-		exit(0);
+	//if (!*s->words)
+		//exit(0);
 	path = get_path(s->words, *envp);
 	error_check(path, s);
-	if (*s->code_parser == 130) // Added by Uygar
-		exit(1); // Added by Uygar, comment from helmi: we need to clean everything since execve is not doing it for us
+	if (*(s->code_parser) == 130) // Added by Uygar
+		exit(1); // comment from helmi: we need to clean everything since execve is not doing it for us
 	execve(path, s->words, *envp);
 	error(minishell, cmd);
 	print_and_exit(strerror(errno), errno);

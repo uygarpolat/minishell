@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/04 14:54:06 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/13 11:50:04 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,7 +161,7 @@ int			populate_command_node(t_tokens *tokens,
 void		print_ast(t_ast *node, int level, int flag);
 
 //ft_atol.c
-int	ft_atol(const char *str);
+long long	ft_atol(const char *str);
 
 //heredoc.c
 void	check_here(t_ast *s, char ***envp);
