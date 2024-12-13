@@ -6,34 +6,36 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 17:31:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/04 15:02:45 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/13 12:13:18 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
 
-static unsigned long long	to_int(const char *str, int neg)
+static long long	to_int(const char *str, int neg)
 {
 	int					i;
-	unsigned long long	result;
+	long long	result;
 
 	i = 0;
 	result = 0;
 	while (str[i] >= '0' && str[i] <= '9')
 	{
 		if ((result > 9223372036854775807 / 10 && neg == 1) \
-			|| (result == 9223372036854775807 / 10 && str[i] - '0' > 7))
+			|| (result == 9223372036854775807 / 10 && str[i] - '0' > 7 && neg == 1))
 			return (0);
+		else if (result == 9223372036854775807 / 10 && str[i] - '0' > 8 && neg == -1)
+            return (0);
 		result = result * 10 + (str[i] - '0');
 		i++;
 	}
-	return (result * neg);
+	return (result * (long long) neg);
 }
 
-int	ft_atol(const char *str)
+long long	ft_atol(const char *str)
 {
 	int	neg;
-	int	result;
+	long long	result;
 
 	neg = 1;
 	result = 0;
@@ -46,6 +48,6 @@ int	ft_atol(const char *str)
 			neg *= -1;
 		str++;
 	}
-	result = (int) to_int(str, neg);
+	result = to_int(str, neg);
 	return (result);
 }

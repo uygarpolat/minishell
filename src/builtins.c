@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/02 15:41:17 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/13 12:19:51 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -45,7 +45,7 @@ char	**ch_envp(char **envp, char *new_dir)
 char	**rm_envp(char **envp, char *str)
 {
 	char	**new_envp;
-	int		i;
+	int	i;
 	int		j;
 	int		flag;
 
@@ -122,7 +122,7 @@ void	print_env(char **envp)
 
 int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n, t_put *file)
 {
-	int	i;
+	long long	i;
 	char	**str;
 
 	if (minishell->p.count == 0)
