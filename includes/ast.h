@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/13 11:50:04 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/16 15:01:56 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,10 +110,18 @@ void	run_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *c
 int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n, t_put *file);
 int	is_builtin(char **cmd);
 
+//env_export.c
+int	run_export(char **cmd, char ***envp);
+char	**ch_envp(char **envp, char *cmd);
+char	**add_env(char **envp, char *cmd);
+char	**rm_envp(char **envp, char *cmd);
+void	print_env(char **envp);
+
 //files.c
 void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
 int	open_files(t_put *cmd);
 void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell);
+void	check_in_out(t_ast *s, t_minishell *minishell, t_put *file, int n);
 
 //pipes.c
 void	close_pipes(t_minishell *minishell);

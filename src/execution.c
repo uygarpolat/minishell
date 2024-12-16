@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/13 13:15:51 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/16 13:06:11 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 	close_pipes(minishell);
 	if (is_builtin(s->words))
 		run_builtin(s, envp, minishell, n, cmd);
-	//if (!*s->words)
-		//exit(0);
+	if (!*s->words)
+		exit(0);
 	path = get_path(s->words, *envp);
 	error_check(path, s);
 	if (*(s->code_parser) == 130) // Added by Uygar
