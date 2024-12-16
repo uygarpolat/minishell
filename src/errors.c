@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 11:05:16 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/13 13:09:36 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/16 13:09:36 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,8 @@ void	error_check(char *path, t_ast *s)
 	}
 	if (stat(path, &buf) == 0)
 	{
-		if (!ft_strncmp(s->words[0], "..", 3))
-			print_and_exit(" command not found", 127);
+		if (!ft_strncmp(s->words[0], "..", 3) || !ft_strncmp(s->words[0], "\0", 2))
+			print_and_exit(" command not found\n", 127);
 		if (S_ISDIR(buf.st_mode))
 			print_and_exit(" Is a directory\n", 126);
 		if (access(path, X_OK) != 0)

@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:39:14 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/04 14:40:53 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/16 14:52:28 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,4 +89,21 @@ void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell)
 		}
 		temp = temp->redir_target;
 	}
+}
+
+void	check_in_out(t_ast *s, t_minishell *minishell, t_put *file, int n)
+{
+	get_in_out(s, file, minishell);
+	if (file->infile || file->outfile)
+	{
+		if (file->infile)
+			file->stdin2 = dup(STDIN_FILENO);
+		if (file->outfile)
+			file->stdout2 = dup(STDOUT_FILENO);
+		dupping(minishell, &minishell->p, file, n);
+	}
+	if (file->infile && file->in >= 0)
+		close(file->in);
+	if (file->outfile && file->out >= 0)
+		close(file->out);
 }
