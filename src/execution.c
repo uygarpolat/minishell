@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/16 13:06:11 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/17 12:37:35 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,36 @@ int	and_or(t_minishell *minishell, char ***envp, int n, t_put *cmd)
 {
 	int	status;
 
-	if (minishell->ast->type == AST_AND)
+	//move to the very first and/or
+	while (minishell->ast->left->type == AST_AND || minishell->ast->left->type == AST_OR)
+		minishell->ast = minishell->ast->left;
+	execute(minishell->ast->left, envp, minishell, n, cmd);
+	while (minishell->ast->type == AST_AND || minishell->ast->type == AST_OR)
+	{
+		status = 0;
+		waitpid(minishell->p.pids[n], &status, 0);
+		if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+		{
+			if (minishell->ast->type == AST_AND)
+			{
+				if (minishell->ast->right->type == AST_COMMAND)
+					execute(minishell->ast->right, envp, minishell, ++n, cmd);
+				else
+					execute(minishell->ast->left->right, envp, minishell, ++n, cmd);
+			}
+		}
+		else if (minishell->ast->type == AST_OR)
+		{
+			if (minishell->ast->right->type == AST_COMMAND)
+				execute(minishell->ast->right, envp, minishell, ++n, cmd);
+			else
+				execute(minishell->ast->left->right, envp, minishell, ++n, cmd);
+		}
+		minishell->ast = minishell->ast->right;
+	}
+	return (n);
+	
+	/*if (minishell->ast->type == AST_AND)
 	{	
 		execute(minishell->ast->left, envp, minishell, n, cmd);
 		while (minishell->ast->type == AST_AND)
@@ -114,7 +143,7 @@ int	and_or(t_minishell *minishell, char ***envp, int n, t_put *cmd)
 			minishell->ast = minishell->ast->right;
 		}
 	}
-	return (n);
+	return (n);*/
 }
 
 void	execute_tree(t_minishell *minishell, char ***envp, t_put *cmd)
