@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/16 13:06:11 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/18 18:38:54 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,58 +64,150 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 		we should talk. My understanding is that it must happen in parent process.
 		*/
 
+void	execute_no_pipes(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
+{
+	char	*path;
+
+	minishell->p.pids[n] = fork();
+	if (minishell->p.pids[n] != 0)
+		return ;
+	set_signals(s->code_parser, SIGNAL_CHILD); // Added by Uygar. Signals entering child process mode.
+	get_in_out(s, cmd, minishell);
+	if (minishell->p.pipes || cmd->infile || cmd->outfile)
+	{
+		//if (n == minishell->p.count)
+			//minishell->p.o = minishell->p.count - 1;
+		if (minishell->p.pipes)
+			close(minishell->p.pipes[minishell->p.o][1]);
+		if (cmd->infile)
+		{
+			//dup2 input from infile
+			if (dup2(cmd->in, 0) == -1)
+				error2(minishell, "dup2 error\n", cmd);
+			close(cmd->in);
+		}
+		else if (s->left && s->left->type == AST_PIPE)
+		{
+			if (dup2(minishell->p.pipes[minishell->p.i][0], 1))
+				error2(minishell, "dup2 error\n", cmd);
+		}
+		if (cmd->outfile)
+		{
+			if (dup2(cmd->out, 1) == -1)
+				error2(minishell, "dup2, error\n", cmd);
+			close(cmd->in);
+		}
+	}
+	close_pipes(minishell);
+	if (is_builtin(s->words))
+		run_builtin(s, envp, minishell, n, cmd);
+	if (!*s->words)
+		exit(0);
+	path = get_path(s->words, *envp);
+	error_check(path, s);
+	if (*(s->code_parser) == 130) // Added by Uygar
+		exit(1); // comment from helmi: we need to clean everything since execve is not doing it for us
+	execve(path, s->words, *envp);
+	error(minishell, cmd);
+	print_and_exit(strerror(errno), errno);
+}
+
 int	and_or(t_minishell *minishell, char ***envp, int n, t_put *cmd)
 {
-	int	status;
+	int		status;
+	t_ast	*temp;
+	int		i;
+	int		j;
 
-	if (minishell->ast->type == AST_AND)
-	{	
-		execute(minishell->ast->left, envp, minishell, n, cmd);
-		while (minishell->ast->type == AST_AND)
-		{
-			status = 0;
-			waitpid(minishell->p.pids[n], &status, 0);
-			if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
-			{
-				if (minishell->ast->right->type == AST_COMMAND)
-					execute(minishell->ast->right, envp, minishell, ++n, cmd);
-				else
-					execute(minishell->ast->right->left, envp, minishell, ++n, cmd);
-			}
-			else
-			{
-				while (minishell->ast->right->type == AST_AND)
-					minishell->ast = minishell->ast->right;
-				break ;
-			}
-			minishell->ast = minishell->ast->right;
-		}
-	}
-	else if (minishell->ast->type == AST_OR)
+	temp = minishell->ast;
+	i = minishell->p.o_count - 1;
+	while (temp->left->type != AST_COMMAND)
+		temp = temp->left;
+	if (temp->type == AST_AND || temp->type == AST_OR)
+		execute_no_pipes(temp->left, envp, minishell, n, cmd);
+	else if (temp->type == AST_PIPE)
 	{
-		execute(minishell->ast->left, envp, minishell, n, cmd);
-		while (minishell->ast->type == AST_OR)
+		execute(temp->left->left, envp, minishell, n, cmd);
+		if (n > 0)
+			minishell->p.i++;
+		minishell->p.o++;	
+	}
+	while (i >= 0)
+	{
+		status = 0;
+		waitpid(minishell->p.pids[n], &status, 0);
+		if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
 		{
-			status = 0;
-			waitpid(minishell->p.pids[n], &status, 0);
-			if (!WIFEXITED(status) || WEXITSTATUS(status) != 0)
+			if (temp->type == AST_AND)
 			{
-				if (minishell->ast->right->type == AST_COMMAND)
-					execute(minishell->ast->right, envp, minishell, ++n, cmd);
-				else
-					execute(minishell->ast->right->left, envp, minishell, ++n, cmd);
+				if (temp->right->type == AST_COMMAND)
+					execute_no_pipes(temp->right, envp, minishell, ++n, cmd);
+				else if (temp->right->type == AST_PIPE)
+				{
+					execute(temp->right->left, envp, minishell, ++n, cmd);
+					if (n > 1)
+						minishell->p.i++;
+					minishell->p.o++;
+					//execute right side of pipe
+					execute(temp->right->right, envp, minishell, ++n, cmd);
+					minishell->p.i++;
+					minishell->p.o++;
+				}
 			}
-			else
+			if (temp->type == AST_OR && temp->right->type != AST_PIPE)
 			{
-				while (minishell->ast->right->type == AST_OR)
-					minishell->ast = minishell->ast->right;
+				minishell->ast = temp->right;
 				break ;
 			}
-			minishell->ast = minishell->ast->right;
 		}
+		else if (temp->type == AST_OR)
+		{
+			if (temp->right->type == AST_COMMAND)
+				execute_no_pipes(temp->right, envp, minishell, ++n, cmd);
+			else if (temp->right->type == AST_PIPE)
+			{
+				execute(temp->right->left, envp, minishell, ++n, cmd);
+				if (n > 1)
+					minishell->p.i++;
+				minishell->p.o++;
+				//execute right side of pipe
+				execute(temp->right->right, envp, minishell, ++n, cmd);
+				minishell->p.i++;
+				minishell->p.o++;
+			}
+		
+		}
+		else if (temp->type == AST_PIPE)
+		{
+			//need a while loop for pipes here??
+			if (temp->right->type == AST_COMMAND)
+				execute(temp->right, envp, minishell, ++n, cmd);
+			else
+				execute(temp->right->left, envp, minishell, ++n, cmd);
+			if (n > 1)
+				minishell->p.i++;
+			minishell->p.o++;
+			//execute right side of pipe
+			if (temp->right->type == AST_PIPE)
+			{
+				execute(temp->right->right, envp, minishell, ++n, cmd);
+				minishell->p.i++;
+				minishell->p.o++;
+			}
+		}
+		temp = minishell->ast;
+		j = 0;
+		while (j < i - 1)
+		{
+			temp = temp->left;
+			j++;
+		}
+		i--;
 	}
+	if (minishell->ast)
+		minishell->ast = minishell->ast->right;
 	return (n);
-}
+}	
 
 void	execute_tree(t_minishell *minishell, char ***envp, t_put *cmd)
 {
@@ -134,7 +226,8 @@ void	execute_tree(t_minishell *minishell, char ***envp, t_put *cmd)
 			minishell->p.i++;
 		minishell->p.o++;
 		n++;
-		minishell->ast = minishell->ast->right;
+		if (minishell->ast)
+			minishell->ast = minishell->ast->right;
 	}
 }
 

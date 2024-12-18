@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/16 15:14:20 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/18 17:20:27 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -19,7 +19,10 @@ int	run_echo(char **cmd)
 	int	n;
 
 	if (!cmd[1])
+	{
 		printf("\n");
+		return (1);
+	}
 	n = 0;
 	if (!ft_strncmp(cmd[1], "-n", 3))
 		n = 1;
@@ -49,6 +52,8 @@ int	run_cd(char ***envp, char **cmd, t_minishell *minishell)
 	}
 	if (chdir(cmd[1]) != 0)
 	{
+		if (!ft_strncmp(cmd[1], "", 2))
+			return (1);
 		ft_putstr_fd(" No such file or directory\n", 2);
 		return (0);
 	}
