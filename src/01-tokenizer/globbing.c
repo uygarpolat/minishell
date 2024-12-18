@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/26 00:45:16 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/16 14:18:12 by upolat           ###   ########.fr       */
+/*   Updated: 2024/12/18 19:00:41 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ static int	populate_res(t_tokens **tokens, t_globber *g,
 		exit_message = back_to_char(*tokens, int_array);
 		if (exit_message == NULL)
 			return (-1);
-		error_handler(exit_message, "ambiguous redirect", (*tokens)->code, 2);
+		error_handler(exit_message, "ambiguous redirect", (*tokens)->code, 1);
 		free_void((void **)&exit_message, NULL);
 		return (-1);
 	}
