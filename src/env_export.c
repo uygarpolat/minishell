@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_export.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/16 14:56:23 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/29 19:36:55 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,6 +123,15 @@ int	run_export(char **cmd, char ***envp)
 	int		i;
 	char	**str;
 
+	// Note from Uygar: I added this check for when the only input is "export",
+	// otherwise it was seg faulting.
+	// Currently envp and export both print the same list, that should be fixed.
+	int j = 0;
+	while(cmd[j])
+		j++;
+	if (j == 1)
+		return (print_env(*envp), 1);
+	
 	if (cmd[1][0] != '_' && !ft_isalpha(cmd[1][0]))
 	{
 		ft_putstr_fd(" not a valid identifier\n", 2);
