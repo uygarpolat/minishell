@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/20 13:03:24 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/03 09:56:20 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,6 @@ void	execute_no_pipes(t_ast *s, char ***envp, t_minishell *minishell, int n, t_p
 {
 	char	*path;
 
-	ft_putstr_fd("hello!\n", 2);
 	minishell->p.pids[n] = fork();
 	if (minishell->p.pids[n] != 0)
 		return ;
@@ -87,11 +86,9 @@ void	execute_no_pipes(t_ast *s, char ***envp, t_minishell *minishell, int n, t_p
 				error2(minishell, "dup2 error\n", cmd);
 			close(cmd->in);
 		}
-		ft_putstr_fd("ksdjfkjdsfh\n", 2);
 		if (n == 1)
 		{
 			//else if (s->left && s->left->type == AST_PIPE)
-			ft_putstr_fd("hey\n", 2);
 			if (dup2(minishell->p.pipes[minishell->p.i][0], 1))
 				error2(minishell, "dup2 error\n", cmd);
 		}
@@ -184,7 +181,6 @@ int	and_or(t_minishell *minishell, char ***envp, int n, t_put *cmd)
 		}
 		else if (temp->type == AST_OR)
 		{
-			ft_putstr_fd("b\n", 2);
 			if (temp->right->type == AST_COMMAND)
 				execute_no_pipes(temp->right, envp, minishell, ++n, cmd);
 			else if (temp->right->type == AST_PIPE)
@@ -203,7 +199,6 @@ int	and_or(t_minishell *minishell, char ***envp, int n, t_put *cmd)
 		else if (temp->type == AST_PIPE)
 		{
 			//need a while loop for pipes here??
-			ft_putstr_fd("c\n", 2);
 			if (temp->right->type == AST_COMMAND)
 				execute_no_pipes(temp->right, envp, minishell, ++n, cmd);
 			else
