@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 11:05:16 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/16 13:09:36 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/03 14:25:31 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,16 +30,19 @@ void	error2(t_minishell *minishell, char *str, t_put *cmd)
 		free(minishell->p.pids);
 }
 
-int	print_error(void)
+int	print_error(char *str)
 {
-	ft_putchar_fd(' ', 2);
+	ft_putstr_fd(str, 2);
+	ft_putstr_fd(": ", 2);
 	ft_putstr_fd(strerror(errno), 2);
 	ft_putchar_fd('\n', 2);
 	return (0);
 }
 
-void	print_and_exit(char *str, int code)
+void	print_and_exit(char *cmd, char *str, int code)
 {
+	ft_putstr_fd(cmd, 2);
+	ft_putstr_fd(": ", 2);
 	ft_putstr_fd(str, 2);
 	exit(code);
 }
@@ -51,19 +54,19 @@ void	error_check(char *path, t_ast *s)
 	if (!path)
 	{
 		if (!ft_strchr(s->words[0], '/'))
-			print_and_exit(" command not found\n", 127);
+			print_and_exit(s->words[0], "command not found\n", 127);
 		else if (stat(s->words[0], &buf) == 0 && access(s->words[0], X_OK) != 0)
-			print_and_exit(" Permission denied\n", 126);
+			print_and_exit(s->words[0], "Permission denied\n", 126);
 		else if (ft_strchr(s->words[0], '/'))
-			print_and_exit(" No such file or directory\n", 127);
+			print_and_exit(s->words[0], "No such file or directory\n", 127);
 	}
 	if (stat(path, &buf) == 0)
 	{
 		if (!ft_strncmp(s->words[0], "..", 3) || !ft_strncmp(s->words[0], "\0", 2))
-			print_and_exit(" command not found\n", 127);
+			print_and_exit(s->words[0], "command not found\n", 127);
 		if (S_ISDIR(buf.st_mode))
-			print_and_exit(" Is a directory\n", 126);
+			print_and_exit(s->words[0], "Is a directory\n", 126);
 		if (access(path, X_OK) != 0)
-			print_and_exit(" Permission denied\n", 127);
+			print_and_exit(s->words[0], "Permission denied\n", 127);
 	}
 }

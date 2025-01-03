@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:39:14 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/20 12:23:13 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/03 14:21:07 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ int	open_files(t_put *cmd)
 			close(cmd->in);
 		cmd->in = open(cmd->infile, O_RDONLY);
 		if (cmd->in < 0)
-			return (print_error());
+			return (print_error(cmd->infile));
 	}
 	if (cmd->outfile)
 	{
@@ -60,7 +60,7 @@ int	open_files(t_put *cmd)
 		else
 			cmd->out = open(cmd->outfile, O_APPEND | O_CREAT | O_WRONLY, 0644);
 		if (cmd->out < 0)
-			return (print_error());
+			return (print_error(cmd->outfile));
 	}
 	return (1);
 }

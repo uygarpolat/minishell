@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/29 19:36:55 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/03 14:44:12 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,31 +82,94 @@ char	**rm_envp(char **envp, char *str)
 	return (envp);
 }
 
+int	var_exists(char **envp, char *str)
+{
+	int		i;
+	int		j;
+	char	*temp;
+	
+	i = -1;
+	while (str[++i])
+	{
+		if (str[i] == '=')
+		{
+			i++;
+			break;
+		}
+	}
+	temp = malloc(sizeof(char) * (i + 1));
+	j = -1;
+	while (++j < i)
+		temp[j] = str[j];
+	temp[j] = '\0';
+	if (get_var(envp, temp) == NULL)
+		return (0);
+	return (1);
+}
+
+char	**ch_var(char **envp, char *str)
+{
+	int	i;
+	int	len;
+
+	len = -1;
+	while (str[++len])
+	{
+		if (str[len] == '=')
+		{
+			len++;
+			break ;
+		}
+	}
+	i = -1;
+	while (envp[++i])
+	{
+		if (!ft_strncmp(envp[i], str, len))
+		{
+			free(envp[i]);
+			envp[i] = ft_strdup(str);
+			break ;
+		}
+	}
+	return (envp);
+}
+
 char	**add_env(char **envp, char *str)
 {
 	char	**new_envp;
 	int		i;
+	int		flag;
 
 	i = 0;
+	flag = 0;
 	while (envp[i])
 		i++;
-	new_envp = malloc(sizeof(char *) * (i + 2));
-	if (new_envp == NULL)
-		return (NULL);
-	i = -1;
-	while (envp[++i])
+	//check with get_var if the variable already exists
+	//str: var=abc, we need to separate the var= from str
+	if (var_exists(envp, str))
+		flag = 1;
+	if (!flag)
 	{
-		new_envp[i] = ft_strdup(envp[i]);
-		if (!new_envp[i])
-		{
-			free_2d_array((void ***)&new_envp);
+		new_envp = malloc(sizeof(char *) * (i + 2));
+		if (new_envp == NULL)
 			return (NULL);
+		i = -1;
+		while (envp[++i])
+		{
+			new_envp[i] = ft_strdup(envp[i]);
+			if (!new_envp[i])
+			{
+				free_2d_array((void ***)&new_envp);
+				return (NULL);
+			}
 		}
+		new_envp[i] = ft_strdup(str);
+		new_envp[++i] = NULL;
+		free_2d_array((void ***)&envp);
+		return (new_envp);
 	}
-	new_envp[i] = ft_strdup(str);
-	new_envp[++i] = NULL;
-	free_2d_array((void ***)&envp);
-	return (new_envp);
+	else
+		return (ch_var(envp, str));
 }
 
 void	print_env(char **envp)
@@ -118,29 +181,41 @@ void	print_env(char **envp)
 		printf("%s\n", envp[i]);
 }
 
+int	print_export(char **envp)
+{
+	int	i;
+	
+	i = -1;
+	while (envp && envp[++i])
+	{
+		printf("declare -x ");
+		printf("%s\n", envp[i]);
+	}
+	return (1);
+}
+
 int	run_export(char **cmd, char ***envp)
 {
 	int		i;
 	char	**str;
 
-	// Note from Uygar: I added this check for when the only input is "export",
-	// otherwise it was seg faulting.
-	// Currently envp and export both print the same list, that should be fixed.
-	int j = 0;
-	while(cmd[j])
-		j++;
-	if (j == 1)
-		return (print_env(*envp), 1);
-	
+	if (!cmd[1])
+		return (print_export(*envp));
 	if (cmd[1][0] != '_' && !ft_isalpha(cmd[1][0]))
 	{
-		ft_putstr_fd(" not a valid identifier\n", 2);
+		ft_putstr_fd("minishell: export: ", 2);
+		ft_putstr_fd(cmd[1], 2);
+		ft_putstr_fd(": ", 2);
+		ft_putstr_fd("not a valid identifier\n", 2);
 		return (0);
 	}
 	str = ft_split(cmd[1], '=');
 	if (!str)
 	{
-		ft_putstr_fd(" not a valid identifier\n", 2);
+		ft_putstr_fd("minishell: export: ", 2);
+		ft_putstr_fd(cmd[1], 2);
+		ft_putstr_fd(": ", 2);
+		ft_putstr_fd("not a valid identifier\n", 2);
 		return (0);
 	}
 	i = -1;
@@ -149,7 +224,10 @@ int	run_export(char **cmd, char ***envp)
 		if (str[0][i] != '_' && !ft_isalpha(str[0][i]) && \
 				!ft_isdigit(str[0][i]))
 		{
-			ft_putstr_fd(" not a valid identifier\n", 2);
+			ft_putstr_fd("minishell: export: ", 2);
+			ft_putstr_fd(str[0], 2);
+			ft_putstr_fd(": ", 2);
+			ft_putstr_fd("not a valid identifier\n", 2);
 			return (0);
 		}
 	}
