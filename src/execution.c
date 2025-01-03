@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/18 18:38:54 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/03 09:56:20 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,8 +86,9 @@ void	execute_no_pipes(t_ast *s, char ***envp, t_minishell *minishell, int n, t_p
 				error2(minishell, "dup2 error\n", cmd);
 			close(cmd->in);
 		}
-		else if (s->left && s->left->type == AST_PIPE)
+		if (n == 1)
 		{
+			//else if (s->left && s->left->type == AST_PIPE)
 			if (dup2(minishell->p.pipes[minishell->p.i][0], 1))
 				error2(minishell, "dup2 error\n", cmd);
 		}
@@ -127,7 +128,7 @@ int	and_or(t_minishell *minishell, char ***envp, int n, t_put *cmd)
 		execute_no_pipes(temp->left, envp, minishell, n, cmd);
 	else if (temp->type == AST_PIPE)
 	{
-		execute(temp->left->left, envp, minishell, n, cmd);
+		execute(temp->left, envp, minishell, n, cmd);
 		if (n > 0)
 			minishell->p.i++;
 		minishell->p.o++;	
@@ -159,6 +160,24 @@ int	and_or(t_minishell *minishell, char ***envp, int n, t_put *cmd)
 				minishell->ast = temp->right;
 				break ;
 			}
+			else if (temp->type == AST_PIPE)
+			{
+				//need a while loop for pipes here??
+				if (temp->right->type == AST_COMMAND)
+					execute_no_pipes(temp->right, envp, minishell, ++n, cmd);
+				else
+					execute(temp->right->left, envp, minishell, ++n, cmd);
+				if (n > 1)
+					minishell->p.i++;
+				minishell->p.o++;
+				//execute right side of pipe
+				if (temp->right->type == AST_PIPE)
+				{
+					execute(temp->right->right, envp, minishell, ++n, cmd);
+					minishell->p.i++;
+					minishell->p.o++;
+				}
+			}
 		}
 		else if (temp->type == AST_OR)
 		{
@@ -181,7 +200,7 @@ int	and_or(t_minishell *minishell, char ***envp, int n, t_put *cmd)
 		{
 			//need a while loop for pipes here??
 			if (temp->right->type == AST_COMMAND)
-				execute(temp->right, envp, minishell, ++n, cmd);
+				execute_no_pipes(temp->right, envp, minishell, ++n, cmd);
 			else
 				execute(temp->right->left, envp, minishell, ++n, cmd);
 			if (n > 1)

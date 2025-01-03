@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:43:30 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/18 16:13:28 by hpirkola         ###   ########.fr       */
+/*   Updated: 2024/12/20 12:21:34 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ int	count_pipes(t_ast *s)
 
 	i = s;
 	count = 0;
-	while (i->left && (i->left->type == AST_AND || i->left->type == AST_OR))
+	while (i->left && (i->type == AST_AND || i->type == AST_OR))
 			i = i->left;
 	while (i->type != AST_COMMAND)
 	{
