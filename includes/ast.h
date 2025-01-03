@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/16 15:01:56 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/03 14:26:45 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,7 @@ void	run_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *c
 //builtins.c
 int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n, t_put *file);
 int	is_builtin(char **cmd);
+char	*get_var(char **envp, char *key);
 
 //env_export.c
 int	run_export(char **cmd, char ***envp);
@@ -141,8 +142,8 @@ char		**ft_strdup3(char **str, char *dir);
 //errors.c
 void	error(t_minishell *minishell, t_put *cmd);
 void	error2(t_minishell *minishell, char *str, t_put *cmd);
-void	print_and_exit(char *str, int code);
-int	print_error(void);
+void	print_and_exit(char *cmd, char *str, int code);
+int	print_error(char *str);
 void	error_check(char *path, t_ast *s);
 
 // parser.c

@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/18 17:20:27 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/03 14:32:36 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -38,23 +38,38 @@ int	run_echo(char **cmd)
 	return (1);
 }
 
+char	*get_var(char **envp, char *key)
+{
+	while (*envp)
+	{
+		if (!ft_strncmp(*envp, key, ft_strlen(key)))
+			return (*envp + ft_strlen(key));
+		envp++;
+	}
+	return (NULL);
+}
+
 int	run_cd(char ***envp, char **cmd, t_minishell *minishell)
 {
 	if (!cmd[1])
 	{
-		//change to home directory?
+		if (chdir(get_var(*envp,"HOME=")) != 0)
+		{
+			ft_putstr_fd("minishell: cd: HOME not set\n", 2);
+			return (0);
+		}
 		return (1);
 	}
 	if (cmd[2])
 	{
-		ft_putstr_fd(" too many arguments\n", 2);
+		ft_putstr_fd("minishell: cd: too many arguments\n", 2);
 		return (0);
 	}
 	if (chdir(cmd[1]) != 0)
 	{
 		if (!ft_strncmp(cmd[1], "", 2))
 			return (1);
-		ft_putstr_fd(" No such file or directory\n", 2);
+		ft_putstr_fd("minishell: cd: No such file or directory\n", 2);
 		return (0);
 	}
 	*envp = ch_envp(*envp, cmd[1]);
@@ -77,8 +92,7 @@ int	run_exit(char **cmd, t_minishell *minishell, t_put *file)
 		exit(0);
 	if (cmd[2])
 	{
-		ft_putstr_fd(" too many arguments\n", 2);
-		//can we get the exit code to 1 without exiting the program?
+		ft_putstr_fd("minishell: exit: too many arguments\n", 2);
 		if (!ft_isdigit(*cmd[1]) && ft_isdigit(*cmd[2]))
 			exit(2);
 		return (0);
@@ -87,7 +101,7 @@ int	run_exit(char **cmd, t_minishell *minishell, t_put *file)
 	if (i == 0 && ft_strncmp(cmd[1], "0", 2) && ft_strncmp(cmd[1], "+0", 3) \
 		&& ft_strncmp(cmd[1], "-0", 3))
 	{
-		ft_putstr_fd(" numeric argument required\n", 2);
+		ft_putstr_fd("minishell: exit: numeric argument required\n", 2);
 		error(minishell, file);
 		exit(2);
 	}
@@ -119,7 +133,8 @@ int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, 
 	else if (!ft_strncmp(cmd[0], "env", 4))
 		print_env(*envp);
 	else if (!ft_strncmp(cmd[0], "exit", 5))
-		run_exit(cmd, minishell, file);
+		if (!run_exit(cmd, minishell, file))
+			return (0);
 	return (1);
 }
 
