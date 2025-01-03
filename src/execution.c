@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/03 09:56:20 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/03 15:33:10 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 		exit(1); // comment from helmi: we need to clean everything since execve is not doing it for us
 	execve(path, s->words, *envp);
 	error(minishell, cmd);
-	print_and_exit(strerror(errno), errno);
+	print_and_exit(s->words[0], strerror(errno), errno);
 }
 
 		/*
@@ -110,7 +110,7 @@ void	execute_no_pipes(t_ast *s, char ***envp, t_minishell *minishell, int n, t_p
 		exit(1); // comment from helmi: we need to clean everything since execve is not doing it for us
 	execve(path, s->words, *envp);
 	error(minishell, cmd);
-	print_and_exit(strerror(errno), errno);
+	print_and_exit(s->words[0], strerror(errno), errno);
 }
 
 int	and_or(t_minishell *minishell, char ***envp, int n, t_put *cmd)
