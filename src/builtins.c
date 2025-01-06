@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/03 14:32:36 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/06 13:02:39 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -51,6 +51,8 @@ char	*get_var(char **envp, char *key)
 
 int	run_cd(char ***envp, char **cmd, t_minishell *minishell)
 {
+	char	*pwd;
+
 	if (!cmd[1])
 	{
 		if (chdir(get_var(*envp,"HOME=")) != 0)
@@ -72,14 +74,24 @@ int	run_cd(char ***envp, char **cmd, t_minishell *minishell)
 		ft_putstr_fd("minishell: cd: No such file or directory\n", 2);
 		return (0);
 	}
-	*envp = ch_envp(*envp, cmd[1]);
-	if (!envp)
-		return (0);
-	if (getcwd(minishell->pwd, sizeof(minishell->pwd) != 0))
+	//*envp = ch_envp(*envp, cmd[1]);
+	//if (!envp)
+		//return (0);
+	if (getcwd(minishell->pwd, sizeof(minishell->pwd)) == NULL)
 	{
 		ft_putstr_fd("getcwd error\n", 2);
 		return (0);
 	}
+	pwd = malloc(sizeof(char) * 5);
+	if (!pwd)
+	{
+		ft_putstr_fd("malloc fail\n", 2);
+		return (0);
+	}
+	pwd = ft_strjoin("PWD=", minishell->pwd);
+	*envp = ch_var(*envp, pwd);
+	if (!envp)
+		return (0);
 	return (1);
 }
 
@@ -120,7 +132,11 @@ int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, 
 	else if (!ft_strncmp(cmd[0], "cd", 3))
 		return (run_cd(envp, cmd, minishell));
 	else if (!ft_strncmp(cmd[0], "pwd", 4))
-		printf("%s\n", minishell->pwd);
+	{
+		//printf("%s\n", minishell->pwd);
+		//what if you have unsetted pwd?? check if get_var returns null first?
+		printf("%s\n", get_var(*envp, "PWD="));
+	}
 	else if (!ft_strncmp(cmd[0], "export", 7))
 		return (run_export(cmd, envp));
 	else if (!ft_strncmp(cmd[0], "unset", 6))

@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/03 15:33:10 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/06 10:25:15 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -273,7 +273,7 @@ int	execution(t_ast *s, char ***envp)
 	t_put		cmd;
 
 	initialize(&cmd, &minishell, s);
-	getcwd(minishell.pwd, sizeof(minishell.pwd)); //this needs to be done in the main
+	//getcwd(minishell.pwd, sizeof(minishell.pwd)); //this needs to be done in the main
 	if (!mallocing(&minishell.p) || !pipeing(&minishell.p))
 	{
 		error2(&minishell, "malloc failed\n", &cmd);

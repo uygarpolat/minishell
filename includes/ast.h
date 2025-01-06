@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/03 14:26:45 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/06 11:52:30 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,7 @@ char	**ch_envp(char **envp, char *cmd);
 char	**add_env(char **envp, char *cmd);
 char	**rm_envp(char **envp, char *cmd);
 void	print_env(char **envp);
+char	**ch_var(char **envp, char *str);
 
 //files.c
 void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
