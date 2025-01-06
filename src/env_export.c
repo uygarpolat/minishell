@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/03 14:44:12 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/06 09:50:43 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,31 +46,32 @@ char	**rm_envp(char **envp, char *str)
 	char	**new_envp;
 	int		i;
 	int		j;
+	int		len;
 	int		flag;
 
-	i = 0;
+	len = 0;
 	flag = 0;
-	while (envp[i])
-		i++;
-	new_envp = ft_calloc((size_t) i, sizeof(char *));
+	while (envp[len])
+		len++;
+	new_envp = ft_calloc((size_t) len, sizeof(char *));
 	if (new_envp == NULL)
 		return (NULL);
 	i = -1;
 	j = 0;
-	while (envp[++i])
+	while (envp[++i] && j < len)
 	{
 		if (!ft_strncmp(str, envp[i], ft_strlen(str)))
 		{
 			flag = 1;
 			continue ;
 		}
-		if (new_envp[j])
-			new_envp[j] = ft_strdup(envp[i]);
+		new_envp[j] = ft_strdup(envp[i]);
 		if (!new_envp[j])
 		{
 			free_2d_array((void ***)&new_envp);
 			return (NULL);
 		}
+		j++;
 	}
 	if (flag)
 	{
@@ -78,6 +79,7 @@ char	**rm_envp(char **envp, char *str)
 		free_2d_array((void ***)&envp);
 		return (new_envp);
 	}
+	new_envp[j - 1] = NULL;
 	free_2d_array((void ***)&new_envp);
 	return (envp);
 }
