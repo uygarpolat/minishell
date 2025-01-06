@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/06 10:26:04 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/07 00:35:28 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,14 @@ int	execute_shell(char *input, int *code, char ***new_envp)
 	t_ast		*ast;
 
 	tokens = ft_tokenizer(input, &capacity, *new_envp, code);
-	if (tokens)
+	if (capacity.current_size == 1 && tokens[0].value[0] == '\0'
+		&& ft_strchr(input, '$'))
+		free_tokens(tokens, &capacity);
+	else if (tokens)
 	{
 		ast = build_ast(tokens, 0, capacity.current_size - 1, 0);
 		if (ast)
 		{
-			//printf("s->words: %p\n", ast->words);
 			print_ast(ast, 0, 0);
 			*code = execution(ast, new_envp);
 			free_ast(&ast);
