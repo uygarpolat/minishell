@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:48:00 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/04 14:57:28 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/07 14:03:01 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,21 @@ void	close_and_free(t_pipes *p, t_put *cmd)
 	i = 0;
 	if (p->pipes)
 	{
-		while (i < p->count)
+		if (p->count == 1)
 		{
-			close(p->pipes[i][0]);
-			close(p->pipes[i][1]);
-			free(p->pipes[i]);
-			i++;
+			close(p->pipes[0][0]);
+			close(p->pipes[0][1]);
+			free(p->pipes[0]);
+		}
+		else
+		{
+			while (i < 2)
+			{
+				close(p->pipes[i][0]);
+				close(p->pipes[i][1]);
+				free(p->pipes[i]);
+				i++;
+			}
 		}
 		free(p->pipes);
 	}
