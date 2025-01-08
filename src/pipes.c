@@ -6,22 +6,30 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:43:30 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/20 12:21:34 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/08 10:21:00 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
 
-void	close_pipes(t_minishell *minishell)
+void	close_pipes(t_minishell *minishell, int n)
 {
 	int	i;
 
 	i = 0;
-	while (i < minishell->p.count)
+	if (minishell->p.count == 1 || n == 0)
 	{
-		close(minishell->p.pipes[i][0]);
-		close(minishell->p.pipes[i][1]);
-		i++;
+		close(minishell->p.pipes[0][0]);
+		close(minishell->p.pipes[0][1]);
+	}
+	else
+	{
+		while (i < 2)
+		{
+			close(minishell->p.pipes[i][0]);
+			close(minishell->p.pipes[i][1]);
+			i++;
+		}
 	}
 }
 
@@ -70,20 +78,20 @@ int	count_operators(t_ast *s)
 	return (count);
 }
 
-int	pipeing(t_pipes *p)
+/*int	pipeing(t_pipes *p)
 {
 	int	i;
 
 	p->i = 0;
 	p->o = 0;
 	i = -1;
-	while (++i < p->count)
+	while (++i < 2)
 	{
 		if (pipe(p->pipes[i]) < 0)
 			return (0);
 	}
 	return (1);
-}
+}*/
 
 int	mallocing(t_pipes *p)
 {
@@ -93,15 +101,20 @@ int	mallocing(t_pipes *p)
 	p->pids = NULL;
 	if (p->count > 0)
 	{
-		p->pipes = malloc(sizeof(int *) * p->count);
+		if (p->count == 1)
+			p->pipes = malloc(sizeof(int *) * 1);
+		else
+			p->pipes = malloc(sizeof(int *) * 2);
 		if (!p->pipes)
 			return (0);
 		i = -1;
-		while (++i < p->count)
+		while (++i < 2)
 		{
 			p->pipes[i] = malloc(sizeof(int) * 2);
 			if (!p->pipes[i])
 				return (0);
+			if (p->count == 1)
+				break ;
 		}
 	}
 	p->pids = malloc(sizeof(int) * (p->count + p->o_count + 1));

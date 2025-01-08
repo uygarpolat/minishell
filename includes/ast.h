@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/06 11:52:30 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/08 10:21:16 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@
 # include <fcntl.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include <readline/history.h> // Remove this?
 # include <string.h>
 # include <sys/wait.h>
 # include <sys/stat.h>
@@ -126,10 +125,10 @@ void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell);
 void	check_in_out(t_ast *s, t_minishell *minishell, t_put *file, int n);
 
 //pipes.c
-void	close_pipes(t_minishell *minishell);
+void	close_pipes(t_minishell *minishell, int n);
 int	count_pipes(t_ast *s);
 int	count_operators(t_ast *s);
-int	pipeing(t_pipes *p);
+//int	pipeing(t_pipes *p);
 int	mallocing(t_pipes *p);
 
 //functions.c

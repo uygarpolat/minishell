@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/06 13:02:39 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/06 14:59:32 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -95,13 +95,18 @@ int	run_cd(char ***envp, char **cmd, t_minishell *minishell)
 	return (1);
 }
 
-int	run_exit(char **cmd, t_minishell *minishell, t_put *file)
+int	run_exit(char **cmd, t_minishell *minishell, t_put *file, char ***envp)
 {
 	long long	i;
 
-	printf("exit\n");
+	//if we are in a child process, we should free everything before exiting???
 	if (!cmd[1])
+	{
+		if (minishell->p.count > 0)
+			free_2d_array((void ***)envp);
 		exit(0);
+	}
+	printf("exit\n");
 	if (cmd[2])
 	{
 		ft_putstr_fd("minishell: exit: too many arguments\n", 2);
@@ -118,7 +123,11 @@ int	run_exit(char **cmd, t_minishell *minishell, t_put *file)
 		exit(2);
 	}
 	else
+	{
+		if (minishell->p.pipes > 0)
+			free_2d_array((void ***)envp);
 		exit(i);
+	}
 	return (1);
 }
 
@@ -149,8 +158,10 @@ int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, 
 	else if (!ft_strncmp(cmd[0], "env", 4))
 		print_env(*envp);
 	else if (!ft_strncmp(cmd[0], "exit", 5))
-		if (!run_exit(cmd, minishell, file))
+	{
+		if (!run_exit(cmd, minishell, file, envp))
 			return (0);
+	}
 	return (1);
 }
 
