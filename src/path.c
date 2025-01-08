@@ -6,61 +6,12 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:52:03 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/11/14 14:58:32 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/08 12:13:31 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
 
-/*
-static int	path_error(char **cmd, char **all_paths, t_minishell *minishell)
-{
-	if (all_paths && cmd[0][0] != '/')
-		error2(minishell, "command not found\n");
-	else
-		error2(minishell, "No such file or directory\n");
-	free_2d_array((void ***)&all_paths);
-	return (127);
-}*/
-/*
-static void	check_cmd(char **cmd, t_minishell *minishell, char **envp)
-{
-	if (!cmd)
-	{
-		free_2d_array((void ***)&envp);
-		error2(minishell, "command not found\n");
-		exit (127);
-	}
-	if (cmd[0])
-	{
-		if (cmd[0][0] == '.' || cmd[0][0] == '/')
-		{
-			if (access(cmd[0], X_OK) != 0)
-			{
-				perror(strerror(errno));
-				exit(127);
-			}
-		}
-	}
-	{
-		if (cmd[0][0] == '.')
-		{
-			if (cmd[0][ft_strlen(cmd[0]) - 1] == '/')
-			{
-				free_2d_array((void ***)&envp);
-				error2(minishell, "Is a directory\n");
-				exit (126);
-			}
-			else if (access(cmd[0], X_OK) == -1)
-			{
-				free_2d_array((void ***)&envp);
-				error2(minishell, "Permission denied\n");
-				exit (126);
-			}
-		}
-	}
-}
-*/
 char	**paths(char **envp)
 {
 	char	*paths;
@@ -80,15 +31,6 @@ char	**paths(char **envp)
 	all_paths = ft_split(paths, ':');
 	return (all_paths);
 }
-/*
-int	is_dir(char *cmd)
-{
-	struct stat	buf;
-
-	if (stat(cmd, &buf) == 0 && S_ISDIR(buf.st_mode))
-		return (1);
-	return (0);
-}*/
 
 char	*get_path(char **cmd, char **envp)
 {
@@ -109,9 +51,13 @@ char	*get_path(char **cmd, char **envp)
 		result = ft_strjoin(full_path, cmd[0]);
 		free(full_path);
 		if (access(result, X_OK) == 0)
+		{
+			free_2d_array((void ***)&all_paths);
 			return (result);
+		}
 		free(result);
 	}
+	free_2d_array((void ***)&all_paths);
 	if ((access(cmd[0], X_OK) == 0 && ft_strchr(cmd[0], '/')))
 		return (cmd[0]);
 	return (NULL);

@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/06 14:59:32 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/08 11:55:04 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -104,6 +104,9 @@ int	run_exit(char **cmd, t_minishell *minishell, t_put *file, char ***envp)
 	{
 		if (minishell->p.count > 0)
 			free_2d_array((void ***)envp);
+		close_and_free(&minishell->p, file);
+		free(minishell->p.pids);
+		free_ast(&minishell->ast);
 		exit(0);
 	}
 	printf("exit\n");
