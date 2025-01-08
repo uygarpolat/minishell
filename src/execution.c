@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/07 13:41:15 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/08 10:22:10 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,11 @@ int	ft_pipe(t_pipes *p, int n)
 {
 	if (n % 2 == 0 && n < p->count && p->count > 0)
 	{
-		//use p->pipes[2] (read) and p->pipes[1] (write)
+		//pipe the one we are writing into
 		if (pipe(p->pipes[0]) < 0)
 		{
 			//close possible open reading pipes
+			ft_putstr_fd("Pipe failed\n", 2);
 			if (p->count > 1)
 			{
 				close(p->pipes[1][0]);
@@ -35,6 +36,7 @@ int	ft_pipe(t_pipes *p, int n)
 	{
 		if (pipe(p->pipes[1]) < 0)
 		{
+			ft_putstr_fd("Pipe failed\n", 2);
 			//close possible open reading pipes
 			close(p->pipes[0][0]);
 			close(p->pipes[0][1]);
@@ -59,7 +61,7 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 	if (minishell->p.pipes || cmd->infile || cmd->outfile)
 		dupping(minishell, &minishell->p, cmd, n);
 	if (minishell->p.count)
-		close_pipes(minishell);
+		close_pipes(minishell, n);
 	if (is_builtin(s->words))
 		run_builtin(s, envp, minishell, n, cmd);
 	if (!*s->words)
@@ -131,7 +133,7 @@ void	execute_no_pipes(t_ast *s, char ***envp, t_minishell *minishell, int n, t_p
 			close(cmd->in);
 		}
 	}
-	close_pipes(minishell);
+	close_pipes(minishell, n);
 	if (is_builtin(s->words))
 		run_builtin(s, envp, minishell, n, cmd);
 	if (!*s->words)

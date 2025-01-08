@@ -6,18 +6,18 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:43:30 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/07 13:42:06 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/08 10:21:00 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
 
-void	close_pipes(t_minishell *minishell)
+void	close_pipes(t_minishell *minishell, int n)
 {
 	int	i;
 
 	i = 0;
-	if (minishell->p.count == 1)
+	if (minishell->p.count == 1 || n == 0)
 	{
 		close(minishell->p.pipes[0][0]);
 		close(minishell->p.pipes[0][1]);
