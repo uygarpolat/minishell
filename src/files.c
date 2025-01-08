@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:39:14 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/03 14:21:07 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/07 11:28:42 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,17 +19,27 @@ void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 
 	in = -1;
 	out = -1;
-	if (!cmd->infile && p->count > 0)
-		in = p->pipes[p->i][0];
+	if (!cmd->infile && p->count > 0 && n > 0)
+	{
+		if (n % 2 == 0)
+			in = p->pipes[1][0];
+		else
+			in = p->pipes[0][0];
+	}
 	else if (cmd->infile)
 		in = cmd->in;
-	if (!cmd->outfile && p->count > 0)
-		out = p->pipes[p->o][1];
+	if (!cmd->outfile && p->count > 0 && n < p->count)
+	{
+		if (n % 2 == 0)
+			out = p->pipes[0][1];
+		else
+			out = p->pipes[1][1];
+	}
 	else if (cmd->outfile)
 		out = cmd->out;
-	if ((n < minishell->p.count || cmd->outfile) && dup2(out, 1) == -1)
+	if (/*(n < minishell->p.count || cmd->outfile)*/ out >= 0 && dup2(out, 1) == -1)
 		error2(minishell, "dup2 error\n", cmd);
-	if ((n > 0 || cmd->infile) && dup2(in, 0) == -1)
+	if (/*(n > 0 || cmd->infile)*/ in >= 0 && dup2(in, 0) == -1)
 		error2(minishell, "dup2 error\n", cmd);
 	if (cmd->infile)
 		close(cmd->in);
