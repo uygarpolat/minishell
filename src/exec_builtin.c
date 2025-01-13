@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/13 14:32:29 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/13 14:49:37 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ int	only_builtin(char ***envp, t_minishell *minishell, t_put *cmd)
 {
 	if (!execute_builtin(minishell->ast, envp, minishell, 0, cmd))
 	{	
-		error(minishell, cmd);
+		error(minishell, cmd, envp);
 		return (1);
 	}
 	if (cmd->infile)
@@ -43,7 +43,7 @@ void	run_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *c
 {
 	if (!execute_builtin(s, envp, minishell, n, cmd))
 	{
-		error(minishell, cmd);
+		error(minishell, cmd, envp);
 		//can i exit or should i just return???
 		exit(1);
 	}
