@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/13 14:29:42 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/13 15:18:51 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,11 +144,11 @@ char		**ft_strdup2(char **str);
 char		**ft_strdup3(char **str, char *dir);
 
 //errors.c
-void	error(t_minishell *minishell, t_put *cmd);
+void	error(t_minishell *minishell, t_put *cmd, char ***envp);
 void	error2(t_minishell *minishell, char *str, t_put *cmd);
-void	print_and_exit(char *cmd, char *str, int code, t_ast *s);
+void	print_and_exit(char *cmd, char *str, int code, t_minishell *minishell);
 int	print_error(char *str);
-void	error_check(char *path, t_ast *s, t_pipes *p, char **envp);
+void	error_check(char *path, t_ast *s, t_minishell *minishell, char **envp, t_put *cmd);
 
 
 // parser.c

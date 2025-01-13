@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/13 14:28:26 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/13 14:49:57 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -121,7 +121,7 @@ int	run_exit(t_ast *s, t_minishell *minishell, t_put *file, char ***envp)
 		&& ft_strncmp(s->words[1], "-0", 3))
 	{
 		ft_putstr_fd("minishell: exit: numeric argument required\n", 2);
-		error(minishell, file);
+		error(minishell, file, envp);
 		free_ast(&minishell->ast);
 		free_2d_array((void ***)envp);
 		exit(2);
