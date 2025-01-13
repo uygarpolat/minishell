@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/08 15:28:08 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/13 14:32:29 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,13 +44,16 @@ void	run_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *c
 	if (!execute_builtin(s, envp, minishell, n, cmd))
 	{
 		error(minishell, cmd);
+		//can i exit or should i just return???
 		exit(1);
 	}
 	//clean everything
-	if (minishell->p.count > 0)
-		free_2d_array((void ***)envp);
+	//if (minishell->p.count > 0) //do we need this???
+	free_2d_array((void ***)envp);
 	free_ast(&minishell->ast);
 	free(minishell->p.pids);
 	close_and_free(&minishell->p, cmd);
+	free_tokens(minishell->tokens, &minishell->capacity);
+	//can i exit or should i just return???
 	exit(0);
 }

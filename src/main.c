@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/12 00:34:51 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/13 14:27:32 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	execute_shell(char *input, int *code, char ***new_envp)
 		if (ast)
 		{
 			print_ast(ast, 0, 0);
-			*code = execution(ast, new_envp);
+			*code = execution(ast, new_envp, tokens, capacity);
 			free_ast(&ast);
 		}
 		free_tokens(tokens, &capacity);

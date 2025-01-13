@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/13 10:22:48 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/13 14:29:42 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,11 +87,13 @@ typedef struct s_minishell
 {
 	t_ast	*ast;
 	t_pipes	p;
+	t_tokens	*tokens;
+	t_capacity	capacity;
 	char	pwd[PATH_MAX];
 }			t_minishell;
 
 //execution.c
-int			execution(t_ast *s, char ***envp);
+int			execution(t_ast *s, char ***envp, t_tokens *tokens, t_capacity capacity);
 void		close_and_free(t_pipes *p, t_put *cmd);
 void		get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell);
 int			open_files(t_put *cmd);

@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/08 15:09:34 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/13 14:29:25 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -265,23 +265,25 @@ int	and_or(t_minishell *minishell, char ***envp, int n, t_put *cmd)
 void	execute_tree(t_minishell *minishell, char ***envp, t_put *cmd)
 {
 	int	n;
+	t_ast	*ast;
 
+	ast = minishell->ast;
 	n = 0;
-	while (minishell->ast)
+	while (ast)
 	{
-		if (minishell->ast->type == AST_PIPE)
-			execute(minishell->ast->left, envp, minishell, n, cmd);
-		else if (minishell->ast->type == AST_COMMAND)
-			execute(minishell->ast, envp, minishell, n, cmd);
-		else if (minishell->ast->type == AST_AND || minishell->ast->type == AST_OR)
+		if (ast->type == AST_PIPE)
+			execute(ast->left, envp, minishell, n, cmd);
+		else if (ast->type == AST_COMMAND)
+			execute(ast, envp, minishell, n, cmd);
+		else if (ast->type == AST_AND || ast->type == AST_OR)
 			n = and_or(minishell, envp, n, cmd);
 		n++;
-		if (minishell->ast)
-			minishell->ast = minishell->ast->right;
+		if (ast)
+			ast = ast->right;
 	}
 }
 
-void	initialize(t_put *cmd, t_minishell *minishell, t_ast *s)
+void	initialize(t_put *cmd, t_minishell *minishell, t_ast *s, t_tokens *tokens, t_capacity capacity)
 {
 	cmd->infile = NULL;
 	cmd->outfile = NULL;
@@ -294,16 +296,18 @@ void	initialize(t_put *cmd, t_minishell *minishell, t_ast *s)
 	minishell->p.o_count = count_operators(minishell->ast);
 	minishell->p.i = 0;
 	minishell->p.o = 0;
+	minishell->tokens = tokens;
+	minishell->capacity = capacity;
 	s->code = 0;
 }
 
-int	execution(t_ast *s, char ***envp)
+int	execution(t_ast *s, char ***envp, t_tokens *tokens, t_capacity capacity)
 {
 	t_minishell	minishell;
 	int			i;
 	t_put		cmd;
 
-	initialize(&cmd, &minishell, s);
+	initialize(&cmd, &minishell, s, tokens, capacity);
 	if (!mallocing(&minishell.p))
 	{
 		error2(&minishell, "malloc failed\n", &cmd);
