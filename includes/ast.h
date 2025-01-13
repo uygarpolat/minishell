@@ -107,10 +107,10 @@ void		run_builtin(t_ast *s, char ***envp,
 				t_minishell *minishell, int n, t_put *cmd);
 
 //builtins.c
-int			execute_builtin(t_ast *s, char **cmd, char ***envp,
-				t_minishell *minishell, int n, t_put *file);
-int			is_builtin(char **cmd);
-char		*get_var(char **envp, char *key);
+int	execute_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *file);
+int	is_builtin(char **cmd);
+char	*get_var(char **envp, char *key);
+
 
 //env_export.c
 int			run_export(char **cmd, char ***envp);
@@ -142,11 +142,12 @@ char		**ft_strdup2(char **str);
 char		**ft_strdup3(char **str, char *dir);
 
 //errors.c
-void		error(t_minishell *minishell, t_put *cmd);
-void		error2(t_minishell *minishell, char *str, t_put *cmd);
-void		print_and_exit(char *cmd, char *str, int code);
-int			print_error(char *str);
-void		error_check(char *path, t_ast *s);
+void	error(t_minishell *minishell, t_put *cmd);
+void	error2(t_minishell *minishell, char *str, t_put *cmd);
+void	print_and_exit(char *cmd, char *str, int code, t_ast *s);
+int	print_error(char *str);
+void	error_check(char *path, t_ast *s, t_pipes *p, char **envp);
+
 
 // parser.c
 t_ast		*build_ast(t_tokens *tokens, int start, int end, int code);

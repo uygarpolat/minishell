@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/06 14:59:32 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/08 14:47:51 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -95,28 +95,24 @@ int	run_cd(char ***envp, char **cmd, t_minishell *minishell)
 	return (1);
 }
 
-int	run_exit(char **cmd, t_minishell *minishell, t_put *file, char ***envp)
+int	run_exit(t_ast *s, t_minishell *minishell, t_put *file, char ***envp)
 {
 	long long	i;
 
 	//if we are in a child process, we should free everything before exiting???
-	if (!cmd[1])
-	{
-		if (minishell->p.count > 0)
-			free_2d_array((void ***)envp);
-		exit(0);
-	}
+	if (!s->words[1])
+		return (1);
 	printf("exit\n");
-	if (cmd[2])
+	if (s->words[2])
 	{
 		ft_putstr_fd("minishell: exit: too many arguments\n", 2);
-		if (!ft_isdigit(*cmd[1]) && ft_isdigit(*cmd[2]))
+		if (!ft_isdigit(*s->words[1]) && ft_isdigit(*s->words[2]))
 			exit(2);
 		return (0);
 	}
-	i = ft_atol(cmd[1]);
-	if (i == 0 && ft_strncmp(cmd[1], "0", 2) && ft_strncmp(cmd[1], "+0", 3) \
-		&& ft_strncmp(cmd[1], "-0", 3))
+	i = ft_atol(s->words[1]);
+	if (i == 0 && ft_strncmp(s->words[1], "0", 2) && ft_strncmp(s->words[1], "+0", 3) \
+		&& ft_strncmp(s->words[1], "-0", 3))
 	{
 		ft_putstr_fd("minishell: exit: numeric argument required\n", 2);
 		error(minishell, file);
@@ -131,37 +127,34 @@ int	run_exit(char **cmd, t_minishell *minishell, t_put *file, char ***envp)
 	return (1);
 }
 
-int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n, t_put *file)
+int	execute_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *file)
 {
 	//remove variables by accesing cmd from s and something else too
 	if (minishell->p.count == 0)
 		check_in_out(s, minishell, file, n);
-	if (!ft_strncmp(cmd[0], "echo", 5))
-		return (run_echo(cmd));
-	else if (!ft_strncmp(cmd[0], "cd", 3))
-		return (run_cd(envp, cmd, minishell));
-	else if (!ft_strncmp(cmd[0], "pwd", 4))
+	if (!ft_strncmp(s->words[0], "echo", 5))
+		return (run_echo(s->words));
+	else if (!ft_strncmp(s->words[0], "cd", 3))
+		return (run_cd(envp, s->words, minishell));
+	else if (!ft_strncmp(s->words[0], "pwd", 4))
 	{
 		//printf("%s\n", minishell->pwd);
 		//what if you have unsetted pwd?? check if get_var returns null first?
 		printf("%s\n", get_var(*envp, "PWD="));
 	}
-	else if (!ft_strncmp(cmd[0], "export", 7))
-		return (run_export(cmd, envp));
-	else if (!ft_strncmp(cmd[0], "unset", 6))
+	else if (!ft_strncmp(s->words[0], "export", 7))
+		return (run_export(s->words, envp));
+	else if (!ft_strncmp(s->words[0], "unset", 6))
 	{
-		if (cmd[1])
-			*envp = rm_envp(*envp, cmd[1]);
+		if (s->words[1])
+			*envp = rm_envp(*envp, s->words[1]);
 		if (!envp)
 			return (0);
 	}
-	else if (!ft_strncmp(cmd[0], "env", 4))
+	else if (!ft_strncmp(s->words[0], "env", 4))
 		print_env(*envp);
-	else if (!ft_strncmp(cmd[0], "exit", 5))
-	{
-		if (!run_exit(cmd, minishell, file, envp))
-			return (0);
-	}
+	else if (!ft_strncmp(s->words[0], "exit", 5))
+		return (run_exit(s, minishell, file, envp));
 	return (1);
 }
 

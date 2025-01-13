@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/04 14:58:44 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/08 15:28:08 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	only_builtin(char ***envp, t_minishell *minishell, t_put *cmd)
 {
-	if (!execute_builtin(minishell->ast, minishell->ast->words, envp, minishell, 0, cmd))
+	if (!execute_builtin(minishell->ast, envp, minishell, 0, cmd))
 	{	
 		error(minishell, cmd);
 		return (1);
@@ -41,11 +41,16 @@ int	only_builtin(char ***envp, t_minishell *minishell, t_put *cmd)
 
 void	run_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 {
-	if (!execute_builtin(s, s->words, envp, minishell, n, cmd))
+	if (!execute_builtin(s, envp, minishell, n, cmd))
 	{
 		error(minishell, cmd);
 		exit(1);
 	}
 	//clean everything
+	if (minishell->p.count > 0)
+		free_2d_array((void ***)envp);
+	free_ast(&minishell->ast);
+	free(minishell->p.pids);
+	close_and_free(&minishell->p, cmd);
 	exit(0);
 }
