@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/08 14:47:51 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/13 14:28:26 by hpirkola         ###   ########.fr       */
 /*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -107,7 +107,13 @@ int	run_exit(t_ast *s, t_minishell *minishell, t_put *file, char ***envp)
 	{
 		ft_putstr_fd("minishell: exit: too many arguments\n", 2);
 		if (!ft_isdigit(*s->words[1]) && ft_isdigit(*s->words[2]))
+		{
+			free_2d_array((void ***)envp);
+			free_ast(&minishell->ast);
+			free(minishell->p.pids);
+			close_and_free(&minishell->p, file);
 			exit(2);
+		}
 		return (0);
 	}
 	i = ft_atol(s->words[1]);
@@ -116,12 +122,20 @@ int	run_exit(t_ast *s, t_minishell *minishell, t_put *file, char ***envp)
 	{
 		ft_putstr_fd("minishell: exit: numeric argument required\n", 2);
 		error(minishell, file);
+		free_ast(&minishell->ast);
+		free_2d_array((void ***)envp);
 		exit(2);
 	}
 	else
 	{
-		if (minishell->p.pipes > 0)
-			free_2d_array((void ***)envp);
+		//if (minishell->p.count > 0) //do we need this???
+		free_2d_array((void ***)envp);
+		free_ast(&minishell->ast);
+		free(minishell->p.pids);
+		free_tokens(minishell->tokens, &minishell->capacity);
+		close_and_free(&minishell->p, file);
+		//if (s)
+			//free(s);
 		exit(i);
 	}
 	return (1);
