@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/12/11 15:41:04 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/13 10:16:34 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,8 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity,
 // error_and_grammar.c
 int			tokens_error_checker(t_tokens *tokens,
 				t_capacity *capacity, int i, int k);
+char		*check_match_count(t_tokens *tokens,
+				int *int_array, int match_count);
 
 // expand_dollar.c
 int			*ultimate_dollar_expansion(t_arrays *a, t_token_type type,

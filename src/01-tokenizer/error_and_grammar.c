@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:07:15 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/18 11:45:39 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/13 10:15:55 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,4 +69,11 @@ int	tokens_error_checker(t_tokens *tokens, t_capacity *capacity, int i, int k)
 		i++;
 	}
 	return (0);
+}
+
+char	*check_match_count(t_tokens *tokens, int *int_array, int match_count)
+{
+	if (!match_count)
+		return (back_to_char(tokens, int_array));
+	return (NULL);
 }
