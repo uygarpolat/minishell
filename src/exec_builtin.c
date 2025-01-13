@@ -6,11 +6,40 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/13 14:49:37 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/13 16:46:21 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
+
+int	execute_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *file)
+{
+	if (minishell->p.count == 0)
+		check_in_out(s, minishell, file, n);
+	if (!ft_strncmp(s->words[0], "echo", 5))
+		return (run_echo(s->words));
+	else if (!ft_strncmp(s->words[0], "cd", 3))
+		return (run_cd(envp, s->words, minishell));
+	else if (!ft_strncmp(s->words[0], "pwd", 4))
+	{
+		//printf("%s\n", get_var(*envp, "PWD="));
+		printf("%s\n", minishell->pwd);
+	}
+	else if (!ft_strncmp(s->words[0], "export", 7))
+		return (run_export(s->words, envp));
+	else if (!ft_strncmp(s->words[0], "unset", 6))
+	{
+		if (s->words[1])
+			*envp = rm_envp(*envp, s->words[1]);
+		if (!envp)
+			return (0);
+	}
+	else if (!ft_strncmp(s->words[0], "env", 4))
+		print_env(*envp);
+	else if (!ft_strncmp(s->words[0], "exit", 5))
+		return (run_exit(s, minishell, file, envp));
+	return (1);
+}
 
 int	only_builtin(char ***envp, t_minishell *minishell, t_put *cmd)
 {
@@ -44,16 +73,12 @@ void	run_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *c
 	if (!execute_builtin(s, envp, minishell, n, cmd))
 	{
 		error(minishell, cmd, envp);
-		//can i exit or should i just return???
 		exit(1);
 	}
-	//clean everything
-	//if (minishell->p.count > 0) //do we need this???
 	free_2d_array((void ***)envp);
 	free_ast(&minishell->ast);
 	free(minishell->p.pids);
 	close_and_free(&minishell->p, cmd);
 	free_tokens(minishell->tokens, &minishell->capacity);
-	//can i exit or should i just return???
 	exit(0);
 }

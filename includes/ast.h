@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/13 15:18:51 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/13 16:44:48 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,9 @@ void		run_builtin(t_ast *s, char ***envp,
 int	execute_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *file);
 int	is_builtin(char **cmd);
 char	*get_var(char **envp, char *key);
-
+int	run_exit(t_ast *s, t_minishell *minishell, t_put *file, char ***envp);
+int	run_cd(char ***envp, char **cmd, t_minishell *minishell);
+int	run_echo(char **cmd);
 
 //env_export.c
 int			run_export(char **cmd, char ***envp);
@@ -138,6 +140,7 @@ int			mallocing(t_pipes *p);
 //functions.c
 int			waiting(int pid);
 void		close_and_free(t_pipes *p, t_put *cmd);
+int	print_and_return(char *str);
 
 // ft_strdup2.c
 char		**ft_strdup2(char **str);
