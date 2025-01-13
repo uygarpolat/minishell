@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:48:00 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/07 14:03:01 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/13 16:42:55 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,4 +55,10 @@ int	waiting(int pid)
 	else
 		code = EXIT_FAILURE;
 	return (code);
+}
+
+int	print_and_return(char *str)
+{
+	ft_putstr_fd(str, 2);
+	return (0);
 }
