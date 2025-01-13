@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/13 15:18:14 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/13 16:37:38 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -298,6 +298,8 @@ void	initialize(t_put *cmd, t_minishell *minishell, t_ast *s, t_tokens *tokens, 
 	minishell->p.o = 0;
 	minishell->tokens = tokens;
 	minishell->capacity = capacity;
+	if (getcwd(minishell->pwd, sizeof(minishell->pwd)) == NULL)
+		return ; //FIX THIS
 	s->code = 0;
 }
 
