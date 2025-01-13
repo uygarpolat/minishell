@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/08 10:21:16 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/08 13:38:34 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ int	only_builtin(char ***envp, t_minishell *minishell, t_put *cmd);
 void	run_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd);
 
 //builtins.c
-int	execute_builtin(t_ast *s, char **cmd, char ***envp, t_minishell *minishell, int n, t_put *file);
+int	execute_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *file);
 int	is_builtin(char **cmd);
 char	*get_var(char **envp, char *key);
 
@@ -142,9 +142,9 @@ char		**ft_strdup3(char **str, char *dir);
 //errors.c
 void	error(t_minishell *minishell, t_put *cmd);
 void	error2(t_minishell *minishell, char *str, t_put *cmd);
-void	print_and_exit(char *cmd, char *str, int code);
+void	print_and_exit(char *cmd, char *str, int code, t_ast *s);
 int	print_error(char *str);
-void	error_check(char *path, t_ast *s);
+void	error_check(char *path, t_ast *s, t_pipes *p, char **envp);
 
 // parser.c
 t_ast		*build_ast(t_tokens *tokens, int start, int end, int code);
