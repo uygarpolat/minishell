@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 01:28:07 by upolat            #+#    #+#             */
-/*   Updated: 2024/12/11 15:44:07 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/14 12:31:45 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 # include <signal.h>
 # include <errno.h>
 # include "../library/libft/libft.h"
+
+extern int	g_signal;
 
 enum
 {

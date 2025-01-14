@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:29:27 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/04 14:54:53 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/14 14:58:18 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ int	here(t_tokens *token, t_ast *ast, char **envp)
 	const int	len = ft_strlen(token->value);
 	char		*buf;
 
-	(void)envp; //I will use this envp later for dollar expansion inside of heredoc.
+	(void)envp; //I will use this envp later for dollar expansion inside of heredoc. Note from Uygar: Decided that this envp is not needed, so it can be removed from here and also from the function parameter.
 	fd = open(".heredoc", O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (fd < 0)
 		return (0);
@@ -73,8 +73,11 @@ int	here(t_tokens *token, t_ast *ast, char **envp)
 	while (1)
 	{
 		buf = readline("> ");
-		if (*ast->code_parser == 130 || !buf) //This is checking for ctrl+C
+		if (g_signal == 130 || !buf) //This is checking for ctrl+C
+		{
+			*ast->code_parser = 130;
 			break ;
+		}
 		if (!ft_strncmp(token->value, buf, len + 1))
 			break ;
 		write(fd, buf, ft_strlen(buf));

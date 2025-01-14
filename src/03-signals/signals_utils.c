@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/02 00:39:48 by upolat            #+#    #+#             */
-/*   Updated: 2024/12/02 00:47:21 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/14 15:42:45 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,14 @@ static void	set_signal_exit(int *exit_code)
 	static int	*exit_code_ptr;
 
 	if (exit_code != NULL)
+	{
 		exit_code_ptr = exit_code;
+	}
 	else
+	{
 		*exit_code_ptr = 130;
+		g_signal = 130;
+	}
 }
 
 static void	sig_handler_heredoc(int signo)

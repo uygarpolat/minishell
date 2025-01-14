@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   functions.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:48:00 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/13 16:42:55 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/14 19:14:17 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
+#include "../../includes/signals.h"
 
 void	close_and_free(t_pipes *p, t_put *cmd)
 {
@@ -43,15 +44,31 @@ void	close_and_free(t_pipes *p, t_put *cmd)
 		close(cmd->out);
 }
 
+// int	waiting(int pid)
+// {
+// 	int	status;
+// 	int	code;
+
+// 	status = 0;
+// 	waitpid(pid, &status, 0);
+// 	if (WIFEXITED(status))
+// 		code = WEXITSTATUS(status);
+// 	else
+// 		code = EXIT_FAILURE + g_signal;
+// 	return (code);
+// }
+
 int	waiting(int pid)
 {
 	int	status;
 	int	code;
 
-	status = 0;
+	code = 0;
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status))
 		code = WEXITSTATUS(status);
+	else if (WIFSIGNALED(status))
+		code = 128 + WTERMSIG(status);
 	else
 		code = EXIT_FAILURE;
 	return (code);
