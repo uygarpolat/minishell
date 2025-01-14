@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:29:27 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/14 14:58:18 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/14 22:25:04 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ int	here(t_tokens *token, t_ast *ast, char **envp)
 	const int	len = ft_strlen(token->value);
 	char		*buf;
 
-	(void)envp; //I will use this envp later for dollar expansion inside of heredoc. Note from Uygar: Decided that this envp is not needed, so it can be removed from here and also from the function parameter.
+	(void)envp; //Note from Uygar: Decided that this envp is not needed, so it can be removed from here and also from the function parameter.
 	fd = open(".heredoc", O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (fd < 0)
 		return (0);

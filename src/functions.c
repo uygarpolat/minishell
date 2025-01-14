@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:48:00 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/14 19:14:17 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/14 22:26:00 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,20 +43,6 @@ void	close_and_free(t_pipes *p, t_put *cmd)
 	if (cmd->outfile && cmd->out >= 0)
 		close(cmd->out);
 }
-
-// int	waiting(int pid)
-// {
-// 	int	status;
-// 	int	code;
-
-// 	status = 0;
-// 	waitpid(pid, &status, 0);
-// 	if (WIFEXITED(status))
-// 		code = WEXITSTATUS(status);
-// 	else
-// 		code = EXIT_FAILURE + g_signal;
-// 	return (code);
-// }
 
 int	waiting(int pid)
 {
