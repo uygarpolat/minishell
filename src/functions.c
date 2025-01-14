@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:48:00 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/14 17:30:14 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/14 19:14:17 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,20 +66,11 @@ int	waiting(int pid)
 	code = 0;
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status))
-	{
 		code = WEXITSTATUS(status);
-		printf("Incoming code: %d (g_signal: %d)\n", code, g_signal);
-	}
 	else if (WIFSIGNALED(status))
-	{
-		int sig = WTERMSIG(status);
-		// Typical Bash-like practice: 128 + signal_number
-		code = 128 + sig;
-		printf("Child was terminated by signal %d -> code=%d\n", sig, code);
-	}
+		code = 128 + WTERMSIG(status);
 	else
 		code = EXIT_FAILURE;
-
 	return (code);
 }
 
