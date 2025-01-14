@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:29:27 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/14 11:46:46 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/14 14:58:18 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,8 +73,11 @@ int	here(t_tokens *token, t_ast *ast, char **envp)
 	while (1)
 	{
 		buf = readline("> ");
-		if (*ast->code_parser == 130 || !buf) //This is checking for ctrl+C
+		if (g_signal == 130 || !buf) //This is checking for ctrl+C
+		{
+			*ast->code_parser = 130;
 			break ;
+		}
 		if (!ft_strncmp(token->value, buf, len + 1))
 			break ;
 		write(fd, buf, ft_strlen(buf));

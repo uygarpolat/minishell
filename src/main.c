@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/13 14:27:32 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/14 14:14:59 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include "../includes/signals.h"
 
 void	display_welcome_message(int *code, char **new_envp, int flag);
+
+int	g_signal = 0;
 
 int	execute_shell(char *input, int *code, char ***new_envp)
 {
@@ -33,6 +35,7 @@ int	execute_shell(char *input, int *code, char ***new_envp)
 		if (ast)
 		{
 			print_ast(ast, 0, 0);
+			g_signal = 0;
 			*code = execution(ast, new_envp, tokens, capacity);
 			free_ast(&ast);
 		}
