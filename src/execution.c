@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/14 15:48:49 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/14 17:32:15 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,9 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 	path = get_path(s->words, *envp);
 	error_check(path, s, minishell, *envp, cmd);
 	if (g_signal == 130) // Added by Uygar
-		exit(1); // comment from helmi: we need to clean everything since execve is not doing it for us
+	{
+		exit(130); // comment from helmi: we need to clean everything since execve is not doing it for us
+	}
 	execve(path, s->words, *envp);
 	error(minishell, cmd, envp);
 	print_and_exit(s->words[0], strerror(errno), errno, minishell);
@@ -141,7 +143,9 @@ void	execute_no_pipes(t_ast *s, char ***envp, t_minishell *minishell, int n, t_p
 	path = get_path(s->words, *envp);
 	error_check(path, s, minishell, *envp, cmd);
 	if (g_signal == 130) // Added by Uygar
-		exit(1); // comment from helmi: we need to clean everything since execve is not doing it for us
+	{
+		exit(130); // comment from helmi: we need to clean everything since execve is not doing it for us
+	}
 	execve(path, s->words, *envp);
 	error(minishell, cmd, envp);
 	print_and_exit(s->words[0], strerror(errno), errno, minishell);

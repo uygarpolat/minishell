@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   functions.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:48:00 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/14 15:52:09 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/14 17:30:14 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,23 +44,42 @@ void	close_and_free(t_pipes *p, t_put *cmd)
 		close(cmd->out);
 }
 
+// int	waiting(int pid)
+// {
+// 	int	status;
+// 	int	code;
+
+// 	status = 0;
+// 	waitpid(pid, &status, 0);
+// 	if (WIFEXITED(status))
+// 		code = WEXITSTATUS(status);
+// 	else
+// 		code = EXIT_FAILURE + g_signal;
+// 	return (code);
+// }
+
 int	waiting(int pid)
 {
 	int	status;
 	int	code;
 
-	status = 0;
+	code = 0;
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status))
 	{
 		code = WEXITSTATUS(status);
-		printf("Incoming code: %d\n", code);
+		printf("Incoming code: %d (g_signal: %d)\n", code, g_signal);
+	}
+	else if (WIFSIGNALED(status))
+	{
+		int sig = WTERMSIG(status);
+		// Typical Bash-like practice: 128 + signal_number
+		code = 128 + sig;
+		printf("Child was terminated by signal %d -> code=%d\n", sig, code);
 	}
 	else
-	{
-		code = EXIT_FAILURE + g_signal;
-		printf("Incoming cooode: %d (g_signal: %d)\n", code, g_signal);
-	}
+		code = EXIT_FAILURE;
+
 	return (code);
 }
 
