@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:23:17 by upolat            #+#    #+#             */
-/*   Updated: 2024/12/11 15:44:54 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/15 17:11:38 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ static int	malloc_individual_tokens(t_tokens *tokens, char **input,
 	if (tokens[capacity->current_size].value == NULL)
 	{
 		error_handler(NULL, NULL, tokens->code, 1);
-		free_tokens(tokens, capacity);
+		free_tokens(&tokens, capacity);
 		return (-1);
 	}
 	ft_strlcpy(tokens[capacity->current_size].value, *input, temp - *input + 1);

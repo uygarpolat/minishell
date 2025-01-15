@@ -3,13 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/13 16:43:53 by hpirkola         ###   ########.fr       */
-/*   Updated: 2024/10/29 10:29:40 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/15 17:12:16 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "../includes/ast.h"
 
@@ -112,7 +112,7 @@ int	run_exit(t_ast *s, t_minishell *minishell, t_put *file, char ***envp)
 		free_2d_array((void ***)envp);
 		free_ast(&minishell->ast);
 		free(minishell->p.pids);
-		free_tokens(minishell->tokens, &minishell->capacity);
+		free_tokens(&minishell->tokens, &minishell->capacity);
 		close_and_free(&minishell->p, file);
 		exit(i);
 	}

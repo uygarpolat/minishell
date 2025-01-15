@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtin.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/13 16:46:21 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/15 17:13:15 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,6 @@ void	run_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *c
 	free_ast(&minishell->ast);
 	free(minishell->p.pids);
 	close_and_free(&minishell->p, cmd);
-	free_tokens(minishell->tokens, &minishell->capacity);
+	free_tokens(&minishell->tokens, &minishell->capacity);
 	exit(0);
 }
