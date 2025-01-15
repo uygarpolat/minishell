@@ -6,40 +6,39 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:25:49 by upolat            #+#    #+#             */
-/*   Updated: 2024/12/11 12:53:33 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/15 17:17:37 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/tokenizer.h"
 
-void	*free_tokens(t_tokens *tokens, t_capacity *capacity)
+void	free_tokens(t_tokens **tokens, t_capacity *capacity)
 {
 	int	i;
 
+	if (tokens == NULL || *tokens == NULL)
+		return ;
 	i = 0;
-	if (!tokens)
-		return (tokens);
 	while (i < capacity->max_size)
 	{
-		free_void((void **)&tokens[i].value, NULL);
-		free_2d_array((void ***)&tokens[i].globbed);
+		free_void((void **)&(*tokens)[i].value, NULL);
+		free_2d_array((void ***)&(*tokens)[i].globbed);
 		i++;
 	}
-	free_void((void **)&tokens, NULL);
-	return ((void *)tokens);
+	free_void((void **)tokens, NULL);
 }
 
 static void	realloc_error(t_tokens *tokens, t_tokens *new_tokens,
 			t_capacity *capacity, int i)
 {
 	error_handler(NULL, NULL, tokens->code, 1);
-	free_tokens(tokens, capacity);
+	free_tokens(&tokens, capacity);
 	if (new_tokens != NULL)
 	{
 		capacity->max_size *= 2;
 		while (++i < capacity->max_size)
 			new_tokens[i].value = NULL;
-		free_tokens(new_tokens, capacity);
+		free_tokens(&new_tokens, capacity);
 	}
 }
 
@@ -68,7 +67,7 @@ t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
 			new_tokens[i].globbed = NULL;
 		}
 	}
-	free_tokens(tokens, capacity);
+	free_tokens(&tokens, capacity);
 	capacity->max_size *= 2;
 	return (new_tokens);
 }

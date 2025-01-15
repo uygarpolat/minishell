@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2024/12/11 15:41:20 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/15 17:10:03 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,6 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity,
 	}
 	if (tokens_error_checker(tokens, capacity, 0, 0) == -1
 		|| handle_expansion_and_wildcard(tokens, capacity, envp) == -1)
-		return ((t_tokens *)free_tokens(tokens, capacity));
+		return (free_tokens(&tokens, capacity), tokens);
 	return (tokens);
 }

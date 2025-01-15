@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/13 10:16:34 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/15 17:08:49 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ char		*expand_wildcard(int *int_array, t_tokens *tokens,
 				int loc, int flag);
 
 // malloc_and_free.c
-void		*free_tokens(t_tokens *tokens, t_capacity *capacity);
+void		free_tokens(t_tokens **tokens, t_capacity *capacity);
 t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
 				t_capacity *capacity, int i);
 

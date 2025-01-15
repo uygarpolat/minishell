@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion_and_wildcard.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:10:10 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/15 15:48:14 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/15 20:41:55 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,13 +71,11 @@ int	handle_expansion_and_wildcard(t_tokens *tokens,
 		if ((char)a.int_array_new[0] == '\0' && ft_strchr(&tokens[i].value[0], '$'))
 		{
 			free_void((void **)&tokens[i].value, NULL);
+			free_int_arrays(&a);
 			continue ;
-			// printf("%s\n", tokens[i].value);
 		}
 		free_void((void **)&tokens[i].value, NULL);
-		
 		tokens[i].value = expand_wildcard(a.int_array_new, tokens, i, 0);
-		
 		free_int_arrays(&a);
 		if (tokens[i].value == NULL)
 			return (-1);
