@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 11:46:21 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/07 00:30:03 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/15 22:44:11 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ int	populate_command_node(t_tokens *tokens, t_ast *root, int start, int *end)
 			error_code = redirection_node_creator(tokens, root, &i);
 		else if (tokens[i].globbed)
 			error_code = populate_command_node_globbing(tokens, root, i);
-		else // if (ft_strlen(tokens[i].value) > 0)
+		else
 			error_code = populate_command_node_empty_check(tokens, root, i);
 	}
 	root->words = temp;
