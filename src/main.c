@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/14 14:14:59 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/15 14:24:56 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,28 @@ void	display_welcome_message(int *code, char **new_envp, int flag);
 
 int	g_signal = 0;
 
+int	check_before_execute(t_tokens *tokens, t_capacity capacity, char *input, int *code)
+{
+	// char	**split;
+	
+	// (void)capacity;
+	// split = ft_split(input, ' ');
+	
+	// if (tokens && tokens[0].value[0] == '\0' && !ft_strchr(split[0], '$'))
+	// {
+	// 	error_handler(&tokens[0].value[0], "command not found", code, 127);
+	// 	free_2d_array((void ***)&split);
+	// 	return (1);
+	// }
+	// free_2d_array((void ***)&split);
+	// return (0);
+
+	(void)code;
+	if (tokens && capacity.current_size == 1 && tokens[0].value[0] == '\0' && ft_strchr(input, '$'))
+		return (1);
+	return(0);
+}
+
 int	execute_shell(char *input, int *code, char ***new_envp)
 {
 	t_tokens	*tokens;
@@ -26,8 +48,7 @@ int	execute_shell(char *input, int *code, char ***new_envp)
 	t_ast		*ast;
 
 	tokens = ft_tokenizer(input, &capacity, *new_envp, code);
-	if (tokens && capacity.current_size == 1
-		&& tokens[0].value[0] == '\0' && ft_strchr(input, '$'))
+	if (check_before_execute(tokens, capacity, input, code))
 		free_tokens(tokens, &capacity);
 	else if (tokens)
 	{
