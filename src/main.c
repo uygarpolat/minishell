@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/16 15:23:17 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/16 16:35:53 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,19 +48,12 @@ void	format_tokens(t_tokens **tokens, t_capacity *capacity)
 		free_void((void **)tokens, NULL);
 }
 
-void	duplicate_tokens(t_token_info *token_info, t_tokens *tokens, t_capacity capacity, char ***envp)
-{	
-	token_info->tokens = tokens;
-	token_info->capacity = capacity;
-	token_info->envp = envp;
-}
-
 int	execute_shell(char *input, int *code, char ***new_envp)
 {
 	t_tokens		*tokens;
 	t_capacity		capacity;
 	t_ast			*ast;
-	// t_token_info	token_info;
+	t_token_info	token_info;
 
 	tokens = ft_tokenizer(input, &capacity, *new_envp, code);
 	if (tokens)
@@ -72,7 +65,9 @@ int	execute_shell(char *input, int *code, char ***new_envp)
 		{
 			print_ast(ast, 0, 0);
 			g_signal = 0;
-			// duplicate_tokens(&token_info, tokens, capacity, new_envp);
+			token_info.tokens = tokens;
+			token_info.capacity = capacity;
+			token_info.envp = new_envp;
 			// *code = execution(ast, &token_info);
 			*code = execution(ast, new_envp, tokens, capacity);
 			free_ast(&ast);
