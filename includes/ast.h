@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/16 14:44:56 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/16 15:00:54 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,7 @@ typedef struct	s_token_info
 {
 	t_tokens	*tokens;
 	t_capacity	capacity;
+	char		***envp;
 }				t_token_info;
 
 //execution.c
