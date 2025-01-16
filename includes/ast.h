@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ast.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/13 16:44:48 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/16 14:44:56 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,12 @@ typedef struct s_minishell
 	t_capacity	capacity;
 	char	pwd[PATH_MAX];
 }			t_minishell;
+
+typedef struct	s_token_info
+{
+	t_tokens	*tokens;
+	t_capacity	capacity;
+}				t_token_info;
 
 //execution.c
 int			execution(t_ast *s, char ***envp, t_tokens *tokens, t_capacity capacity);
