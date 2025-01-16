@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:52:03 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/08 12:13:31 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/16 10:53:17 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@ char	**paths(char **envp)
 		}
 		envp++;
 	}
-	all_paths = ft_split(paths, ':');
+	if (paths)
+		all_paths = ft_split(paths, ':');
 	return (all_paths);
 }
 
