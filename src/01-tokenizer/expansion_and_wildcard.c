@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansion_and_wildcard.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:10:10 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/16 10:05:29 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/16 13:10:52 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,20 @@ static int	calloc_and_populate(t_tokens *tokens,
 	return (0);
 }
 
+int	handle_expansion_and_wildcard_utils(t_tokens *tokens, t_arrays *a, int i)
+{
+	a->int_array_new = a->int_array_new_start;
+	if ((char)a->int_array_new[0] == '\0'
+		&& ft_strchr(tokens[i].value, '$') && tokens[i].value[0] != '"')
+	{
+		free_void((void **)&tokens[i].value, NULL);
+		free_int_arrays(a);
+		return (1);
+	}
+	free_void((void **)&tokens[i].value, NULL);
+	return (0);
+}
+
 int	handle_expansion_and_wildcard(t_tokens *tokens,
 		t_capacity *capacity, char **envp)
 {
@@ -67,14 +81,8 @@ int	handle_expansion_and_wildcard(t_tokens *tokens,
 		a.int_array_old = a.int_array_old_start;
 		if (ultimate_dollar_expansion(&a, type, 1, 0) == NULL)
 			return (free_int_arrays(&a), -1);
-		a.int_array_new = a.int_array_new_start;
-		if ((char)a.int_array_new[0] == '\0' && ft_strchr(tokens[i].value, '$') && tokens[i].value[0] != '"')
-		{
-			free_void((void **)&tokens[i].value, NULL);
-			free_int_arrays(&a);
+		if (handle_expansion_and_wildcard_utils(tokens, &a, i))
 			continue ;
-		}
-		free_void((void **)&tokens[i].value, NULL);
 		tokens[i].value = expand_wildcard(a.int_array_new, tokens, i, 0);
 		free_int_arrays(&a);
 		if (tokens[i].value == NULL)
