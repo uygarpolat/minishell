@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/15 17:13:15 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/16 11:37:54 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,8 @@ int	only_builtin(char ***envp, t_minishell *minishell, t_put *cmd)
 {
 	if (!execute_builtin(minishell->ast, envp, minishell, 0, cmd))
 	{	
-		error(minishell, cmd, envp);
+		//error(minishell, cmd, envp);
+		free(minishell->p.pids);
 		return (1);
 	}
 	if (cmd->infile)
@@ -80,5 +81,6 @@ void	run_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *c
 	free(minishell->p.pids);
 	close_and_free(&minishell->p, cmd);
 	free_tokens(&minishell->tokens, &minishell->capacity);
+	minishell->tokens = NULL;
 	exit(0);
 }

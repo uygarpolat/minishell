@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 11:05:16 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/15 17:12:48 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/16 11:45:26 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,10 @@ void	error(t_minishell *minishell, t_put *cmd, char ***envp)
 	//if (minishell->ast)
 		//free_ast(&minishell->ast);
 	if (minishell->tokens)
+	{
 		free_tokens(&minishell->tokens, &minishell->capacity);
+		minishell->tokens = NULL;
+	}
 }
 
 void	error2(t_minishell *minishell, char *str, t_put *cmd)
@@ -36,7 +39,10 @@ void	error2(t_minishell *minishell, char *str, t_put *cmd)
 	if (minishell->ast)
 		free_ast(&minishell->ast);
 	if (minishell->tokens)
+	{
 		free_tokens(&minishell->tokens, &minishell->capacity);
+		minishell->tokens = NULL;
+	}
 }
 
 int	print_error(char *str)
@@ -57,6 +63,7 @@ void	print_and_exit(char *cmd, char *str, int code, t_minishell *minishell)
 	ft_putstr_fd(": ", 2);
 	ft_putstr_fd(str, 2);
 	free_ast(&minishell->ast);
+	free_tokens(&minishell->tokens, &minishell->capacity);
 	exit(code);
 }
 
