@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/14 19:25:11 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/16 14:06:58 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,8 @@ int	ft_pipe(t_pipes *p, int n)
 {
 	if (n % 2 == 0 && n < p->count && p->count > 0)
 	{
-		//pipe the one we are writing into
 		if (pipe(p->pipes[0]) < 0)
 		{
-			//close possible open reading pipes
 			ft_putstr_fd("Pipe failed\n", 2);
 			if (p->count > 1)
 			{
@@ -37,7 +35,6 @@ int	ft_pipe(t_pipes *p, int n)
 		if (pipe(p->pipes[1]) < 0)
 		{
 			ft_putstr_fd("Pipe failed\n", 2);
-			//close possible open reading pipes
 			close(p->pipes[0][0]);
 			close(p->pipes[0][1]);
 			return (0);
@@ -56,7 +53,7 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 	minishell->p.pids[n] = fork();
 	if (minishell->p.pids[n] != 0)
 		return ;
-	set_signals(s->code_parser, SIGNAL_CHILD); // Added by Uygar. Signals entering child process mode.
+	set_signals(s->code_parser, SIGNAL_CHILD);
 	get_in_out(s, cmd, minishell);
 	if (minishell->p.pipes || cmd->infile || cmd->outfile)
 		dupping(minishell, &minishell->p, cmd, n);
@@ -68,35 +65,13 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 		exit(0);
 	path = get_path(s->words, *envp);
 	error_check(path, s, minishell, *envp, cmd);
-	if (g_signal == 130) // Added by Uygar
-		exit(130); // comment from helmi: we need to clean everything since execve is not doing it for us
+	if (g_signal == 130)
+		exit(130);
 	execve(path, s->words, *envp);
 	error(minishell, cmd, envp);
 	print_and_exit(s->words[0], strerror(errno), errno, minishell);
 }
-
-		/*
-		Note from Uygar regarding heredoc:
-		The following 2 lines are added by Uygar.
-		*s->code_parser=130 happens if ctrl+C comes during heredoc.
-		If there is a better place for these 2 lines, they can be moved.
-		I chose before execve because I didn't know where else they could be.
-		My understanding is nothing should go into execve if ctrl+C happens during heredoc.
-		You can check against *s->code_parser to implement this elsewhere.
-		Currently there are some problems:
-		1) If heredoc input is "cat << END" and ctrl+C happens, echo $? returns 1,
-		which mimicks Bash. But if heredoc input is "<< END", echo $? returns 0, which is wrong.
-		Why does this happen?
-		2) One more new line than bash is displayed when ctrl+C happens in heredoc mode.
-		3) When ctrl+C comes, .heredoc file is not displayed on the screen, but what
-		happens to .heredoc? We should make sure we are deleting and unlinking .heredoc
-		after ctrl+C (I didn't do it).
-		
-		IMPORTANT: One very important assumption in my heredoc signal implementation is
-		that heredoc happens in the parent process. If it is happening in a child process,
-		we should talk. My understanding is that it must happen in parent process.
-		*/
-
+/*
 void	execute_no_pipes(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 {
 	char	*path;
@@ -141,12 +116,15 @@ void	execute_no_pipes(t_ast *s, char ***envp, t_minishell *minishell, int n, t_p
 	path = get_path(s->words, *envp);
 	error_check(path, s, minishell, *envp, cmd);
 	if (g_signal == 130) // Added by Uygar
+	{
+		error(minishell, cmd, envp);
 		exit(130); // comment from helmi: we need to clean everything since execve is not doing it for us
+	}
 	execve(path, s->words, *envp);
 	error(minishell, cmd, envp);
 	print_and_exit(s->words[0], strerror(errno), errno, minishell);
-}
-
+}*/
+/*
 int	and_or(t_minishell *minishell, char ***envp, int n, t_put *cmd)
 {
 	int		status;
@@ -260,11 +238,11 @@ int	and_or(t_minishell *minishell, char ***envp, int n, t_put *cmd)
 	if (minishell->ast)
 		minishell->ast = minishell->ast->right;
 	return (n);
-}	
+}*/	
 
 void	execute_tree(t_minishell *minishell, char ***envp, t_put *cmd)
 {
-	int	n;
+	int		n;
 	t_ast	*ast;
 
 	ast = minishell->ast;
@@ -275,15 +253,15 @@ void	execute_tree(t_minishell *minishell, char ***envp, t_put *cmd)
 			execute(ast->left, envp, minishell, n, cmd);
 		else if (ast->type == AST_COMMAND)
 			execute(ast, envp, minishell, n, cmd);
-		else if (ast->type == AST_AND || ast->type == AST_OR)
-			n = and_or(minishell, envp, n, cmd);
+		//else if (ast->type == AST_AND || ast->type == AST_OR)
+			//n = and_or(minishell, envp, n, cmd);
 		n++;
 		if (ast)
 			ast = ast->right;
 	}
 }
 
-void	initialize(t_put *cmd, t_minishell *minishell, t_ast *s, t_tokens *tokens, t_capacity capacity)
+int	initialize(t_put *cmd, t_minishell *minishell, t_ast *s, t_tokens *tokens, t_capacity capacity)
 {
 	cmd->infile = NULL;
 	cmd->outfile = NULL;
@@ -299,8 +277,9 @@ void	initialize(t_put *cmd, t_minishell *minishell, t_ast *s, t_tokens *tokens, 
 	minishell->tokens = tokens;
 	minishell->capacity = capacity;
 	if (getcwd(minishell->pwd, sizeof(minishell->pwd)) == NULL)
-		return ; //FIX THIS
+		return (0);
 	s->code = 0;
+	return (1);
 }
 
 int	execution(t_ast *s, char ***envp, t_tokens *tokens, t_capacity capacity)
@@ -309,13 +288,22 @@ int	execution(t_ast *s, char ***envp, t_tokens *tokens, t_capacity capacity)
 	int			i;
 	t_put		cmd;
 
-	initialize(&cmd, &minishell, s, tokens, capacity);
+	if (!initialize(&cmd, &minishell, s, tokens, capacity))
+	{
+		ft_putstr_fd("getcwd failed\n", 2);
+		return (1);
+	}
 	if (!mallocing(&minishell.p))
 	{
 		error2(&minishell, "malloc failed\n", &cmd);
 		return (1);
 	}
 	check_here(minishell.ast, envp);
+	if (g_signal == 130)
+	{
+		free(minishell.p.pids);
+		return (130);
+	}
 	if (minishell.p.count == 0 && is_builtin(s->words))
 		return (only_builtin(envp, &minishell, &cmd));
 	else

@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:29:27 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/14 22:25:04 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/16 13:35:15 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	check_here(t_ast *s, char ***envp)
 			ast = ast->right;
 		}
 		else if (ast->type == AST_PIPE)
-			here_loop(s, ast, envp);
+			here_loop(s, ast->left, envp);
 		ast = ast->right;
 	}
 }
