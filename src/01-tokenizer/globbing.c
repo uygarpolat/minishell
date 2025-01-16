@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/26 00:45:16 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/13 10:14:43 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/16 10:28:30 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,8 +110,6 @@ char	*expand_wildcard(int *int_array, t_tokens *tokens, int loc, int flag)
 	match_count = 0;
 	if (loc != 0 && identify_token(tokens[loc - 1].type))
 		g.flag = 1;
-	if (!ft_strchr((char *)int_array, '*'))
-		return (back_to_char(tokens, int_array));
 	if (init_expand_wildcard(tokens, &g, loc) == -1)
 		return (NULL);
 	match_count = count_matching_entries(&tokens, int_array, &g, 0);
