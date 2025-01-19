@@ -64,6 +64,3 @@ echo 'single"$USER"'double"
 cat < $varia
 cat > $varia
 cat >> $varia
-cat < "$varia"
-cat > "$varia"
-cat >> "$varia"
