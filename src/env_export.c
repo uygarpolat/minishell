@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/20 13:09:03 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/20 14:57:27 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,10 +75,11 @@ char	**rm_envp(char **envp, char *str)
 	}
 	if (flag)
 	{
-		new_envp[i - 1] = NULL;
+		new_envp[i] = NULL;
 		free_2d_array((void ***)&envp);
 		return (new_envp);
 	}
+	free(new_envp[j - 1]);
 	new_envp[j - 1] = NULL;
 	free_2d_array((void ***)&new_envp);
 	return (envp);
