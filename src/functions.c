@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:48:00 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/14 22:26:00 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/20 14:00:41 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,13 +30,16 @@ void	close_and_free(t_pipes *p, t_put *cmd)
 		{
 			while (i < 2)
 			{
-				close(p->pipes[i][0]);
-				close(p->pipes[i][1]);
+				if (p->pipes[i][0] >= 0)
+					close(p->pipes[i][0]);
+				if (p->pipes[i][1] >= 0)
+					close(p->pipes[i][1]);
 				free(p->pipes[i]);
 				i++;
 			}
 		}
 		free(p->pipes);
+		p->pipes = NULL;
 	}
 	if (cmd->infile && cmd->in >= 0)
 		close(cmd->in);
@@ -60,8 +63,10 @@ int	waiting(int pid)
 	return (code);
 }
 
-int	print_and_return(char *str)
+int	print_and_return(char *str, char *cmd, char *str2)
 {
 	ft_putstr_fd(str, 2);
+	ft_putstr_fd(cmd, 2);
+	ft_putstr_fd(str2, 2);
 	return (0);
 }

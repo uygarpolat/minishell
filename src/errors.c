@@ -6,21 +6,34 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 11:05:16 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/16 17:07:03 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/20 13:02:55 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
 
-void	error(t_minishell *minishell, t_put *cmd, char ***envp)
+void	error(t_minishell *minishell, t_put *cmd)
 {
-	free_2d_array((void ***)envp);
+	free_2d_array((void ***)minishell->envp);
 	if (minishell->p.pipes)
 		close_and_free(&minishell->p, cmd);
 	if (minishell->p.pids)
 		free(minishell->p.pids);
-	// if (minishell->ast)
-	// 	free_ast(&minishell->ast);
+	//if (minishell->ast)
+	 	//free_ast(&minishell->ast);
+	if (minishell->tokens)
+		free_tokens(&minishell->tokens, &minishell->capacity);
+}
+
+void	file_error(t_minishell *minishell, t_put *cmd)
+{
+	free_2d_array((void ***)minishell->envp);
+	if (minishell->p.pipes)
+		close_and_free(&minishell->p, cmd);
+	if (minishell->p.pids)
+		free(minishell->p.pids);
+	if (minishell->ast)
+	 	free_ast(&minishell->ast);
 	if (minishell->tokens)
 		free_tokens(&minishell->tokens, &minishell->capacity);
 }
@@ -53,7 +66,7 @@ int	print_error(char *str)
 
 void	print_and_exit(char *cmd, char *str, int code, t_minishell *minishell)
 {
-	if (!cmd[0])
+	if (!cmd || !cmd[0])
 		ft_putstr_fd("''", 2);
 	else
 		ft_putstr_fd(cmd, 2);
@@ -66,7 +79,7 @@ void	print_and_exit(char *cmd, char *str, int code, t_minishell *minishell)
 	exit(code);
 }
 
-void	error_check(char *path, t_ast *s, t_minishell *minishell, char	**envp, t_put *cmd)
+void	error_check(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 {
 	struct stat	buf;
 
@@ -74,17 +87,17 @@ void	error_check(char *path, t_ast *s, t_minishell *minishell, char	**envp, t_pu
 	{
 		if (!ft_strchr(s->words[0], '/'))
 		{
-			error(minishell, cmd, &envp);
+			error(minishell, cmd);
 			print_and_exit(s->words[0], "command not found\n", 127, minishell);
 		}
 		else if (stat(s->words[0], &buf) == 0 && access(s->words[0], X_OK) != 0)
 		{
-			error(minishell, cmd, &envp);
+			error(minishell, cmd);
 			print_and_exit(s->words[0], "Permission denied\n", 126, minishell);
 		}
 		else if (ft_strchr(s->words[0], '/'))
 		{
-			error(minishell, cmd, &envp);
+			error(minishell, cmd);
 			print_and_exit(s->words[0], "No such file or directory\n", 127, minishell);
 		}
 	}
@@ -92,16 +105,20 @@ void	error_check(char *path, t_ast *s, t_minishell *minishell, char	**envp, t_pu
 	{
 		if (!ft_strncmp(s->words[0], "..", 3) || !ft_strncmp(s->words[0], "\0", 2))
 		{
-			free_2d_array((void ***)&envp);
+			free_2d_array((void ***)minishell->envp);
 			free(minishell->p.pids);
+			if (minishell->p.pipes)
+				close_and_free(&minishell->p, cmd);
 			if (path)
 				free(path);
 			print_and_exit(s->words[0], "command not found\n", 127, minishell);
 		}
 		if (!ft_strncmp(s->words[0], ".", 2))
 		{
-			free_2d_array((void ***)&envp);
+			free_2d_array((void ***)minishell->envp);
 			free(minishell->p.pids);
+			if (minishell->p.pipes)
+				close_and_free(&minishell->p, cmd);
 			if (path)
 				free(path);
 			ft_putstr_fd("minishell: ", 2);
@@ -109,14 +126,18 @@ void	error_check(char *path, t_ast *s, t_minishell *minishell, char	**envp, t_pu
 		}
 		if (S_ISDIR(buf.st_mode))
 		{
-			free_2d_array((void ***)&envp);
+			free_2d_array((void ***)minishell->envp);
 			free(minishell->p.pids);
+			if (minishell->p.pipes)
+				close_and_free(&minishell->p, cmd);
 			print_and_exit(s->words[0], "Is a directory\n", 126, minishell);
 		}
 		if (access(path, X_OK) != 0)
 		{
-			free_2d_array((void ***)&envp);
+			free_2d_array((void ***)minishell->envp);
 			free(minishell->p.pids);
+			if (minishell->p.pipes)
+				close_and_free(&minishell->p, cmd);
 			if (path)
 				free(path);
 			print_and_exit(s->words[0], "Permission denied\n", 127, minishell);

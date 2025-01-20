@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:39:14 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/13 14:51:44 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/20 12:45:01 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell)
 			cmd->infile = ".heredoc";
 		if (!open_files(cmd))
 		{
-			error(minishell, cmd, NULL);
+			file_error(minishell, cmd);
 			exit (1);
 		}
 		temp = temp->redir_target;
