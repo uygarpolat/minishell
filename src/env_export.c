@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/06 10:23:58 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/20 13:09:03 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,11 @@ int	var_exists(char **envp, char *str)
 		temp[j] = str[j];
 	temp[j] = '\0';
 	if (get_var(envp, temp) == NULL)
+	{
+		free(temp);
 		return (0);
+	}
+	free(temp);
 	return (1);
 }
 
@@ -230,9 +234,11 @@ int	run_export(char **cmd, char ***envp)
 			ft_putstr_fd(str[0], 2);
 			ft_putstr_fd(": ", 2);
 			ft_putstr_fd("not a valid identifier\n", 2);
+			free_2d_array((void ***)&str);
 			return (0);
 		}
 	}
+	free_2d_array((void ***)&str);
 	*envp = add_env(*envp, cmd[1]);
 	if (!envp)
 		return (0);

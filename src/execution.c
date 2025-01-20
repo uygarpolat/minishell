@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/16 14:06:58 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/20 13:31:51 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int	ft_pipe(t_pipes *p, int n)
 	return (1);
 }
 
-void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
+void	execute(t_ast *s, t_minishell *minishell, int n, t_put *cmd)
 {
 	char	*path;
 
@@ -60,15 +60,19 @@ void	execute(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
 	if (minishell->p.count)
 		close_pipes(minishell, n);
 	if (is_builtin(s->words))
-		run_builtin(s, envp, minishell, n, cmd);
+		run_builtin(s, minishell, n, cmd);
 	if (!*s->words)
+	{
+		error(minishell, cmd);
+		free_ast(&minishell->ast);
 		exit(0);
-	path = get_path(s->words, *envp);
-	error_check(path, s, minishell, *envp, cmd);
+	}
+	path = get_path(s->words, *minishell->envp);
+	error_check(path, s, minishell, cmd);
 	if (g_signal == 130)
 		exit(130);
-	execve(path, s->words, *envp);
-	error(minishell, cmd, envp);
+	execve(path, s->words, *minishell->envp);
+	error(minishell, cmd);
 	print_and_exit(s->words[0], strerror(errno), errno, minishell);
 }
 /*
@@ -240,7 +244,7 @@ int	and_or(t_minishell *minishell, char ***envp, int n, t_put *cmd)
 	return (n);
 }*/	
 
-void	execute_tree(t_minishell *minishell, char ***envp, t_put *cmd)
+void	execute_tree(t_minishell *minishell, t_put *cmd)
 {
 	int		n;
 	t_ast	*ast;
@@ -250,9 +254,9 @@ void	execute_tree(t_minishell *minishell, char ***envp, t_put *cmd)
 	while (ast)
 	{
 		if (ast->type == AST_PIPE)
-			execute(ast->left, envp, minishell, n, cmd);
+			execute(ast->left, minishell, n, cmd);
 		else if (ast->type == AST_COMMAND)
-			execute(ast, envp, minishell, n, cmd);
+			execute(ast, minishell, n, cmd);
 		//else if (ast->type == AST_AND || ast->type == AST_OR)
 			//n = and_or(minishell, envp, n, cmd);
 		n++;
@@ -261,7 +265,7 @@ void	execute_tree(t_minishell *minishell, char ***envp, t_put *cmd)
 	}
 }
 
-int	initialize(t_put *cmd, t_minishell *minishell, t_ast *s, t_tokens *tokens, t_capacity capacity)
+int	initialize(t_put *cmd, t_minishell *minishell, t_ast *s, t_token_info *token_info)
 {
 	cmd->infile = NULL;
 	cmd->outfile = NULL;
@@ -272,23 +276,22 @@ int	initialize(t_put *cmd, t_minishell *minishell, t_ast *s, t_tokens *tokens, t
 	minishell->ast = s;
 	minishell->p.count = count_pipes(minishell->ast);
 	minishell->p.o_count = count_operators(minishell->ast);
-	minishell->p.i = 0;
-	minishell->p.o = 0;
-	minishell->tokens = tokens;
-	minishell->capacity = capacity;
+	minishell->tokens = token_info->tokens;
+	minishell->capacity = token_info->capacity;
+	minishell->envp = token_info->envp;
 	if (getcwd(minishell->pwd, sizeof(minishell->pwd)) == NULL)
 		return (0);
 	s->code = 0;
 	return (1);
 }
 
-int	execution(t_ast *s, char ***envp, t_tokens *tokens, t_capacity capacity)
+int	execution(t_ast *s, t_token_info *token_info)
 {
 	t_minishell	minishell;
 	int			i;
 	t_put		cmd;
 
-	if (!initialize(&cmd, &minishell, s, tokens, capacity))
+	if (!initialize(&cmd, &minishell, s, token_info))
 	{
 		ft_putstr_fd("getcwd failed\n", 2);
 		return (1);
@@ -298,16 +301,16 @@ int	execution(t_ast *s, char ***envp, t_tokens *tokens, t_capacity capacity)
 		error2(&minishell, "malloc failed\n", &cmd);
 		return (1);
 	}
-	check_here(minishell.ast, envp);
+	check_here(minishell.ast, minishell.envp);
 	if (g_signal == 130)
 	{
 		free(minishell.p.pids);
 		return (130);
 	}
 	if (minishell.p.count == 0 && is_builtin(s->words))
-		return (only_builtin(envp, &minishell, &cmd));
+		return (only_builtin(&minishell, &cmd));
 	else
-		execute_tree(&minishell, envp, &cmd);
+		execute_tree(&minishell, &cmd);
 	close_and_free(&minishell.p, &cmd);
 	i = 0;
 	while (i <= (minishell.p.count + minishell.p.o_count))

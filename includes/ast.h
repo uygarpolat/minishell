@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/19 19:14:21 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/20 14:01:21 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,7 @@ typedef struct s_minishell
 	t_pipes		p;
 	t_tokens	*tokens;
 	t_capacity	capacity;
+	char		***envp;
 	char		pwd[PATH_MAX];
 }				t_minishell;
 
@@ -100,8 +101,7 @@ typedef struct s_token_info
 }				t_token_info;
 
 //execution.c
-int			execution(t_ast *s, char ***envp, t_tokens *tokens,
-				t_capacity capacity);
+int			execution(t_ast *s, t_token_info *token_info);
 void		close_and_free(t_pipes *p, t_put *cmd);
 void		get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell);
 int			open_files(t_put *cmd);
@@ -112,18 +112,16 @@ char		*get_path(char **cmd, char **envp);
 char		**paths(char **envp);
 
 //exec_builtin.c
-int			only_builtin(char ***envp, t_minishell *minishell, t_put *cmd);
-void		run_builtin(t_ast *s, char ***envp,
-				t_minishell *minishell, int n, t_put *cmd);
+int			only_builtin(t_minishell *minishell, t_put *cmd);
+void		run_builtin(t_ast *s, t_minishell *minishell, int n, t_put *cmd);
 
 //builtins.c
-int			execute_builtin(t_ast *s, char ***envp,
-				t_minishell *minishell, int n, t_put *file);
+int			execute_builtin(t_ast *s, t_minishell *minishell, int n, t_put *file);
 int			is_builtin(char **cmd);
 char		*get_var(char **envp, char *key);
 int			run_exit(t_ast *s, t_minishell *minishell,
-				t_put *file, char ***envp);
-int			run_cd(char ***envp, char **cmd, t_minishell *minishell);
+				t_put *file);
+int			run_cd(char **cmd, t_minishell *minishell);
 int			run_echo(char **cmd);
 
 //env_export.c
@@ -150,20 +148,20 @@ int			mallocing(t_pipes *p);
 //functions.c
 int			waiting(int pid);
 void		close_and_free(t_pipes *p, t_put *cmd);
-int			print_and_return(char *str);
+int			print_and_return(char *str, char *cmd, char *str2);
 
 // ft_strdup2.c
 char		**ft_strdup2(char **str);
 char		**ft_strdup3(char **str, char *dir);
 
 //errors.c
-void		error(t_minishell *minishell, t_put *cmd, char ***envp);
+void		error(t_minishell *minishell, t_put *cmd);
 void		error2(t_minishell *minishell, char *str, t_put *cmd);
 void		print_and_exit(char *cmd, char *str, int code,
 				t_minishell *minishell);
+void		file_error(t_minishell *minishell, t_put *cmd);
 int			print_error(char *str);
-void		error_check(char *path, t_ast *s, t_minishell *minishell,
-				char **envp, t_put *cmd);
+void		error_check(char *path, t_ast *s, t_minishell *minishell, t_put *cmd);
 
 // parser.c
 t_ast		*build_ast(t_tokens *tokens, int start, int end, int code);

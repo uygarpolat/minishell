@@ -6,46 +6,45 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/16 11:37:54 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/20 12:12:03 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
 
-int	execute_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *file)
+int	execute_builtin(t_ast *s, t_minishell *minishell, int n, t_put *file)
 {
 	if (minishell->p.count == 0)
 		check_in_out(s, minishell, file, n);
 	if (!ft_strncmp(s->words[0], "echo", 5))
 		return (run_echo(s->words));
 	else if (!ft_strncmp(s->words[0], "cd", 3))
-		return (run_cd(envp, s->words, minishell));
+		return (run_cd(s->words, minishell));
 	else if (!ft_strncmp(s->words[0], "pwd", 4))
 	{
 		//printf("%s\n", get_var(*envp, "PWD="));
 		printf("%s\n", minishell->pwd);
 	}
 	else if (!ft_strncmp(s->words[0], "export", 7))
-		return (run_export(s->words, envp));
+		return (run_export(s->words, minishell->envp));
 	else if (!ft_strncmp(s->words[0], "unset", 6))
 	{
 		if (s->words[1])
-			*envp = rm_envp(*envp, s->words[1]);
-		if (!envp)
+			*minishell->envp = rm_envp(*minishell->envp, s->words[1]);
+		if (!minishell->envp)
 			return (0);
 	}
 	else if (!ft_strncmp(s->words[0], "env", 4))
-		print_env(*envp);
+		print_env(*minishell->envp);
 	else if (!ft_strncmp(s->words[0], "exit", 5))
-		return (run_exit(s, minishell, file, envp));
+		return (run_exit(s, minishell, file));
 	return (1);
 }
 
-int	only_builtin(char ***envp, t_minishell *minishell, t_put *cmd)
+int	only_builtin(t_minishell *minishell, t_put *cmd)
 {
-	if (!execute_builtin(minishell->ast, envp, minishell, 0, cmd))
+	if (!execute_builtin(minishell->ast, minishell, 0, cmd))
 	{	
-		//error(minishell, cmd, envp);
 		free(minishell->p.pids);
 		return (1);
 	}
@@ -69,14 +68,14 @@ int	only_builtin(char ***envp, t_minishell *minishell, t_put *cmd)
 	return (0);
 }
 
-void	run_builtin(t_ast *s, char ***envp, t_minishell *minishell, int n, t_put *cmd)
+void	run_builtin(t_ast *s, t_minishell *minishell, int n, t_put *cmd)
 {
-	if (!execute_builtin(s, envp, minishell, n, cmd))
+	if (!execute_builtin(s, minishell, n, cmd))
 	{
-		error(minishell, cmd, envp);
+		error(minishell, cmd);
 		exit(1);
 	}
-	free_2d_array((void ***)envp);
+	free_2d_array((void ***)minishell->envp);
 	free_ast(&minishell->ast);
 	free(minishell->p.pids);
 	close_and_free(&minishell->p, cmd);

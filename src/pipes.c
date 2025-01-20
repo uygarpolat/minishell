@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:43:30 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/08 10:21:00 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/20 13:38:33 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,8 @@ int	mallocing(t_pipes *p)
 			p->pipes[i] = malloc(sizeof(int) * 2);
 			if (!p->pipes[i])
 				return (0);
+			p->pipes[i][0] = -1;
+			p->pipes[i][1] = -1;
 			if (p->count == 1)
 				break ;
 		}
