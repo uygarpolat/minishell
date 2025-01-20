@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/20 14:51:41 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/20 15:41:23 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,9 @@ int	ft_pipe(t_pipes *p, int n)
 			return (0);
 		}
 		if (n > 0)
+		{
 			close(p->pipes[1][1]);
+		}
 	}
 	else if (n < p->count && p->count > 0)
 	{
