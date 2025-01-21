@@ -6,12 +6,19 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/21 08:08:58 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/21 09:16:41 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
 #include "../includes/signals.h"
+
+void	pipe_fail(t_pipes *p)
+{
+	ft_putstr_fd("Pipe failed\n", 2);
+	close(p->pipes[0][0]);
+	close(p->pipes[0][1]);
+}
 
 int	ft_pipe(t_pipes *p, int n)
 {
@@ -35,12 +42,7 @@ int	ft_pipe(t_pipes *p, int n)
 	else if (n < p->count && p->count > 0)
 	{
 		if (pipe(p->pipes[1]) < 0)
-		{
-			ft_putstr_fd("Pipe failed\n", 2);
-			close(p->pipes[0][0]);
-			close(p->pipes[0][1]);
-			return (0);
-		}
+			return (pipe_fail(p), 0);
 		close(p->pipes[0][1]);
 	}
 	return (1);
