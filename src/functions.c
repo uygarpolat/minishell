@@ -6,18 +6,31 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:48:00 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/20 14:00:41 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/21 08:23:32 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
 #include "../../includes/signals.h"
 
-void	close_and_free(t_pipes *p, t_put *cmd)
+void	close_loop(t_pipes *p)
 {
 	int	i;
 
 	i = 0;
+	while (i < 2)
+	{
+		if (p->pipes[i][0] >= 0)
+			close(p->pipes[i][0]);
+		if (p->pipes[i][1] >= 0)
+			close(p->pipes[i][1]);
+		free(p->pipes[i]);
+		i++;
+	}
+}
+
+void	close_and_free(t_pipes *p, t_put *cmd)
+{
 	if (p->pipes)
 	{
 		if (p->count == 1)
@@ -27,17 +40,7 @@ void	close_and_free(t_pipes *p, t_put *cmd)
 			free(p->pipes[0]);
 		}
 		else
-		{
-			while (i < 2)
-			{
-				if (p->pipes[i][0] >= 0)
-					close(p->pipes[i][0]);
-				if (p->pipes[i][1] >= 0)
-					close(p->pipes[i][1]);
-				free(p->pipes[i]);
-				i++;
-			}
-		}
+			close_loop(p);
 		free(p->pipes);
 		p->pipes = NULL;
 	}
