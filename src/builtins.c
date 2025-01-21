@@ -6,10 +6,9 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/20 14:03:19 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/21 20:19:16 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "../includes/ast.h"
 
@@ -49,41 +48,54 @@ char	*get_var(char **envp, char *key)
 	return (NULL);
 }
 
-int	run_cd(char **cmd, t_minishell *minishell)
+int	get_pwd(t_minishell *minishell)
 {
 	char	*pwd;
 
-	if (!cmd[1])
-	{
-		if (!get_var(*minishell->envp, "HOME=") || chdir(get_var(*minishell->envp, "HOME=")) != 0)
-		{
-			ft_putstr_fd("minishell: cd: HOME not set\n", 2);
-			return (0);
-		}
-		return (1);
-	}
-	if (cmd[2])
-	{
-		ft_putstr_fd("minishell: cd: too many arguments\n", 2);
-		return (0);
-	}
-	if (chdir(cmd[1]) != 0)
-	{
-		if (!ft_strncmp(cmd[1], "", 2))
-			return (1);
-		return (print_and_return("minishell: cd: ", cmd[1], ": No such file or directory\n"));
-	}
-	if (getcwd(minishell->pwd, sizeof(minishell->pwd)) == NULL)
-	{
-		ft_putstr_fd("getcwd error\n", 2);
-		return (0);
-	}
 	pwd = ft_strjoin("PWD=", minishell->pwd);
+	// Note from Uygar, needs malloc protection
 	*minishell->envp = ch_var(*minishell->envp, pwd);
 	free(pwd);
 	if (!minishell->envp)
 		return (0);
 	return (1);
+}
+
+int	run_cd(char **cmd, t_minishell *minishell)
+{
+	if (!cmd[1])
+	{
+		if (!get_var(*minishell->envp, "HOME=")
+			|| chdir(get_var(*minishell->envp, "HOME=")) != 0)
+			return (ft_putstr_fd("minishell: cd: HOME not set\n", 2), 0);
+		return (1);
+	}
+	if (cmd[2])
+		return (ft_putstr_fd("minishell: cd: too many arguments\n", 2), 0);
+	if (chdir(cmd[1]) != 0)
+	{
+		if (!ft_strncmp(cmd[1], "", 2))
+			return (1);
+		return (print_and_return("minishell: cd: ", cmd[1],
+				": No such file or directory\n"));
+	}
+	if (getcwd(minishell->pwd, sizeof(minishell->pwd)) == NULL)
+		return (ft_putstr_fd("getcwd error\n", 2), 0);
+	if (!get_pwd(minishell))
+		return (0);
+	return (1);
+}
+
+void	graceful_exit(t_minishell *minishell, t_put *file,
+			long long i, int flag)
+{
+	free_2d_array((void ***)minishell->envp);
+	free_ast(&minishell->ast);
+	free(minishell->p.pids);
+	if (flag)
+		free_tokens(&minishell->tokens, &minishell->capacity);
+	close_and_free(&minishell->p, file);
+	exit(i);
 }
 
 int	run_exit(t_ast *s, t_minishell *minishell, t_put *file)
@@ -97,13 +109,7 @@ int	run_exit(t_ast *s, t_minishell *minishell, t_put *file)
 	{
 		ft_putstr_fd("minishell: exit: too many arguments\n", 2);
 		if (!ft_isdigit(*s->words[1]) && ft_isdigit(*s->words[2]))
-		{
-			free_2d_array((void ***)minishell->envp);
-			free_ast(&minishell->ast);
-			free(minishell->p.pids);
-			close_and_free(&minishell->p, file);
-			exit(2);
-		}
+			graceful_exit(minishell, file, 2, 0);
 		return (0);
 	}
 	i = ft_atol(s->words[1]);
@@ -117,14 +123,7 @@ int	run_exit(t_ast *s, t_minishell *minishell, t_put *file)
 		exit(2);
 	}
 	else
-	{
-		free_2d_array((void ***)minishell->envp);
-		free_ast(&minishell->ast);
-		free(minishell->p.pids);
-		free_tokens(&minishell->tokens, &minishell->capacity);
-		close_and_free(&minishell->p, file);
-		exit(i);
-	}
+		graceful_exit(minishell, file, i, 1);
 	return (1);
 }
 

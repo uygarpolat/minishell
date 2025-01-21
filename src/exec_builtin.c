@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/20 12:12:03 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/21 09:00:47 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int	execute_builtin(t_ast *s, t_minishell *minishell, int n, t_put *file)
 int	only_builtin(t_minishell *minishell, t_put *cmd)
 {
 	if (!execute_builtin(minishell->ast, minishell, 0, cmd))
-	{	
+	{
 		free(minishell->p.pids);
 		return (1);
 	}
