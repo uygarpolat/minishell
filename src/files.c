@@ -3,14 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   files.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:39:14 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/20 14:52:47 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/21 08:36:02 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
+
+void	assign_out_fd(t_pipes *p, int n, int *out)
+{
+	if (n % 2 == 0)
+		*out = p->pipes[0][1];
+	else
+		*out = p->pipes[1][1];
+}
 
 void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 {
@@ -29,12 +37,7 @@ void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 	else if (cmd->infile)
 		in = cmd->in;
 	if (!cmd->outfile && p->count > 0 && n < p->count)
-	{
-		if (n % 2 == 0)
-			out = p->pipes[0][1];
-		else
-			out = p->pipes[1][1];
-	}
+		assign_out_fd(p, n, &out);
 	else if (cmd->outfile)
 		out = cmd->out;
 	if (/*(n < minishell->p.count || cmd->outfile)*/ out >= 0 && dup2(out, 1) == -1)
@@ -52,7 +55,7 @@ void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 }
 
 int	open_files(t_put *cmd)
-{	
+{
 	if (cmd->infile)
 	{
 		if (cmd->in > 0)
