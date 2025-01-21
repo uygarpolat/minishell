@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/21 09:16:41 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/21 20:37:33 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,16 @@ int	ft_pipe(t_pipes *p, int n)
 	return (1);
 }
 
+void	no_words(t_ast *s, t_minishell *minishell, t_put *cmd)
+{
+	if (!*s->words)
+	{
+		error(minishell, cmd);
+		free_ast(&minishell->ast);
+		exit(0);
+	}
+}
+
 void	execute(t_ast *s, t_minishell *minishell, int n, t_put *cmd)
 {
 	char	*path;
@@ -65,12 +75,7 @@ void	execute(t_ast *s, t_minishell *minishell, int n, t_put *cmd)
 		close_pipes(minishell, n);
 	if (is_builtin(s->words))
 		run_builtin(s, minishell, n, cmd);
-	if (!*s->words)
-	{
-		error(minishell, cmd);
-		free_ast(&minishell->ast);
-		exit(0);
-	}
+	no_words(s, minishell, cmd);
 	path = get_path(s->words, *minishell->envp);
 	error_check(path, s, minishell, cmd);
 	if (g_signal == 130)
@@ -269,7 +274,8 @@ void	execute_tree(t_minishell *minishell, t_put *cmd)
 	}
 }
 
-int	initialize(t_put *cmd, t_minishell *minishell, t_ast *s, t_token_info *token_info)
+int	initialize(t_put *cmd, t_minishell *minishell,
+		t_ast *s, t_token_info *token_info)
 {
 	cmd->infile = NULL;
 	cmd->outfile = NULL;
@@ -296,21 +302,12 @@ int	execution(t_ast *s, t_token_info *token_info)
 	t_put		cmd;
 
 	if (!initialize(&cmd, &minishell, s, token_info))
-	{
-		ft_putstr_fd("getcwd failed\n", 2);
-		return (1);
-	}
+		return (ft_putstr_fd("getcwd failed\n", 2), 1);
 	if (!mallocing(&minishell.p))
-	{
-		error2(&minishell, "malloc failed\n", &cmd);
-		return (1);
-	}
+		return (error2(&minishell, "malloc failed\n", &cmd), 1);
 	check_here(minishell.ast);
 	if (g_signal == 130)
-	{
-		free(minishell.p.pids);
-		return (130);
-	}
+		return (free(minishell.p.pids), 130);
 	if (minishell.p.count == 0 && is_builtin(s->words))
 		return (only_builtin(&minishell, &cmd));
 	else
