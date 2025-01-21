@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:43:30 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/20 13:38:33 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/21 08:01:59 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ int	count_pipes(t_ast *s)
 	i = s;
 	count = 0;
 	while (i->left && (i->type == AST_AND || i->type == AST_OR))
-			i = i->left;
+		i = i->left;
 	while (i->type != AST_COMMAND)
 	{
 		if (i->type == AST_PIPE)
@@ -93,6 +93,17 @@ int	count_operators(t_ast *s)
 	return (1);
 }*/
 
+int	malloc_check(t_pipes *p)
+{
+	if (p->count == 1)
+		p->pipes = malloc(sizeof(int *) * 1);
+	else
+		p->pipes = malloc(sizeof(int *) * 2);
+	if (!p->pipes)
+		return (0);
+	return (1);
+}
+
 int	mallocing(t_pipes *p)
 {
 	int	i;
@@ -101,11 +112,7 @@ int	mallocing(t_pipes *p)
 	p->pids = NULL;
 	if (p->count > 0)
 	{
-		if (p->count == 1)
-			p->pipes = malloc(sizeof(int *) * 1);
-		else
-			p->pipes = malloc(sizeof(int *) * 2);
-		if (!p->pipes)
+		if (!malloc_check(p))
 			return (0);
 		i = -1;
 		while (++i < 2)

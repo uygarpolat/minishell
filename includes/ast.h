@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/20 14:01:21 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/21 08:38:57 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,8 @@ int			only_builtin(t_minishell *minishell, t_put *cmd);
 void		run_builtin(t_ast *s, t_minishell *minishell, int n, t_put *cmd);
 
 //builtins.c
-int			execute_builtin(t_ast *s, t_minishell *minishell, int n, t_put *file);
+int			execute_builtin(t_ast *s, t_minishell *minishell,
+				int n, t_put *file);
 int			is_builtin(char **cmd);
 char		*get_var(char **envp, char *key);
 int			run_exit(t_ast *s, t_minishell *minishell,
@@ -161,7 +162,8 @@ void		print_and_exit(char *cmd, char *str, int code,
 				t_minishell *minishell);
 void		file_error(t_minishell *minishell, t_put *cmd);
 int			print_error(char *str);
-void		error_check(char *path, t_ast *s, t_minishell *minishell, t_put *cmd);
+void		error_check(char *path, t_ast *s,
+				t_minishell *minishell, t_put *cmd);
 
 // parser.c
 t_ast		*build_ast(t_tokens *tokens, int start, int end, int code);
@@ -190,8 +192,8 @@ void		print_ast(t_ast *node, int level, int flag);
 long long	ft_atol(const char *str);
 
 //heredoc.c
-void		check_here(t_ast *s, char ***envp);
-void		here_loop(t_ast *s, t_ast *ast, char ***envp);
-int			here(t_tokens *token, t_ast *ast, char **envp);
+void		check_here(t_ast *s);
+void		here_loop(t_ast *s, t_ast *ast);
+int			here(t_tokens *token, t_ast *ast);
 
 #endif

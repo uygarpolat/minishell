@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_atol.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 17:31:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2024/12/13 12:13:18 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/21 08:26:16 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static long long	to_int(const char *str, int neg)
 {
-	int					i;
+	int			i;
 	long long	result;
 
 	i = 0;
@@ -22,10 +22,12 @@ static long long	to_int(const char *str, int neg)
 	while (str[i] >= '0' && str[i] <= '9')
 	{
 		if ((result > 9223372036854775807 / 10 && neg == 1) \
-			|| (result == 9223372036854775807 / 10 && str[i] - '0' > 7 && neg == 1))
+			|| (result == 9223372036854775807
+				/ 10 && str[i] - '0' > 7 && neg == 1))
 			return (0);
-		else if (result == 9223372036854775807 / 10 && str[i] - '0' > 8 && neg == -1)
-            return (0);
+		else if (result == 9223372036854775807
+			/ 10 && str[i] - '0' > 8 && neg == -1)
+			return (0);
 		result = result * 10 + (str[i] - '0');
 		i++;
 	}
@@ -34,7 +36,7 @@ static long long	to_int(const char *str, int neg)
 
 long long	ft_atol(const char *str)
 {
-	int	neg;
+	int			neg;
 	long long	result;
 
 	neg = 1;

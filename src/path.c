@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   path.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:52:03 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/16 10:53:17 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/21 08:02:49 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ char	**paths(char **envp)
 		if (ft_strncmp(*envp, "PATH=", 5) == 0)
 		{
 			paths = *envp + 5;
-			break;
+			break ;
 		}
 		envp++;
 	}
@@ -35,7 +35,7 @@ char	**paths(char **envp)
 
 char	*get_path(char **cmd, char **envp)
 {
-	int	i;
+	int		i;
 	char	**all_paths;
 	char	*full_path;
 	char	*result;

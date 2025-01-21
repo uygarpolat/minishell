@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 11:05:16 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/20 13:02:55 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/21 07:54:27 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	error(t_minishell *minishell, t_put *cmd)
 	if (minishell->p.pids)
 		free(minishell->p.pids);
 	//if (minishell->ast)
-	 	//free_ast(&minishell->ast);
+		//free_ast(&minishell->ast);
 	if (minishell->tokens)
 		free_tokens(&minishell->tokens, &minishell->capacity);
 }
@@ -33,7 +33,7 @@ void	file_error(t_minishell *minishell, t_put *cmd)
 	if (minishell->p.pids)
 		free(minishell->p.pids);
 	if (minishell->ast)
-	 	free_ast(&minishell->ast);
+		free_ast(&minishell->ast);
 	if (minishell->tokens)
 		free_tokens(&minishell->tokens, &minishell->capacity);
 }
@@ -79,7 +79,7 @@ void	print_and_exit(char *cmd, char *str, int code, t_minishell *minishell)
 	exit(code);
 }
 
-void	error_check(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
+void	error_not_path(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 {
 	struct stat	buf;
 
@@ -98,32 +98,46 @@ void	error_check(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 		else if (ft_strchr(s->words[0], '/'))
 		{
 			error(minishell, cmd);
-			print_and_exit(s->words[0], "No such file or directory\n", 127, minishell);
+			print_and_exit(s->words[0],
+				"No such file or directory\n", 127, minishell);
 		}
 	}
+}
+
+void	stat_zero(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
+{
+	if (!ft_strncmp(s->words[0], "..", 3) || !ft_strncmp(s->words[0], "\0", 2))
+	{
+		free_2d_array((void ***)minishell->envp);
+		free(minishell->p.pids);
+		if (minishell->p.pipes)
+			close_and_free(&minishell->p, cmd);
+		if (path)
+			free(path);
+		print_and_exit(s->words[0], "command not found\n", 127, minishell);
+	}
+	if (!ft_strncmp(s->words[0], ".", 2))
+	{
+		free_2d_array((void ***)minishell->envp);
+		free(minishell->p.pids);
+		if (minishell->p.pipes)
+			close_and_free(&minishell->p, cmd);
+		if (path)
+			free(path);
+		ft_putstr_fd("minishell: ", 2);
+		print_and_exit(s->words[0],
+			"filename argument required\n", 2, minishell);
+	}
+}
+
+void	error_check(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
+{
+	struct stat	buf;
+
+	error_not_path(path, s, minishell, cmd);
 	if (stat(path, &buf) == 0)
 	{
-		if (!ft_strncmp(s->words[0], "..", 3) || !ft_strncmp(s->words[0], "\0", 2))
-		{
-			free_2d_array((void ***)minishell->envp);
-			free(minishell->p.pids);
-			if (minishell->p.pipes)
-				close_and_free(&minishell->p, cmd);
-			if (path)
-				free(path);
-			print_and_exit(s->words[0], "command not found\n", 127, minishell);
-		}
-		if (!ft_strncmp(s->words[0], ".", 2))
-		{
-			free_2d_array((void ***)minishell->envp);
-			free(minishell->p.pids);
-			if (minishell->p.pipes)
-				close_and_free(&minishell->p, cmd);
-			if (path)
-				free(path);
-			ft_putstr_fd("minishell: ", 2);
-			print_and_exit(s->words[0], "filename argument required\n", 2, minishell);
-		}
+		stat_zero(path, s, minishell, cmd);
 		if (S_ISDIR(buf.st_mode))
 		{
 			free_2d_array((void ***)minishell->envp);
