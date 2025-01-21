@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/20 12:18:36 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/21 08:04:25 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,6 @@ int	execute_shell(char *input, int *code, char ***new_envp)
 			token_info.capacity = capacity;
 			token_info.envp = new_envp;
 			*code = execution(ast, &token_info);
-			//*code = execution(ast, new_envp, tokens, capacity);
 			free_ast(&ast);
 		}
 		free_tokens(&tokens, &capacity);
