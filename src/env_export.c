@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_export.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/20 14:57:27 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/21 11:23:01 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ char	**rm_envp(char **envp, char *str)
 	}
 	if (flag)
 	{
-		new_envp[i] = NULL;
+		new_envp[j] = NULL; // Note from Uygar: this line was, which was overflowing. Changed it to this after talking with chatgpt
 		free_2d_array((void ***)&envp);
 		return (new_envp);
 	}
