@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_export.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/21 11:37:14 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/21 21:36:03 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,10 +67,7 @@ char	**rm_envp(char **envp, char *str)
 		}
 		new_envp[j] = ft_strdup(envp[i]);
 		if (!new_envp[j])
-		{
-			free_2d_array((void ***)&new_envp);
-			return (NULL);
-		}
+			return (free_2d_array((void ***)&new_envp), NULL);
 		j++;
 	}
 	if (flag)
@@ -90,14 +87,14 @@ int	var_exists(char **envp, char *str)
 	int		i;
 	int		j;
 	char	*temp;
-	
+
 	i = -1;
 	while (str[++i])
 	{
 		if (str[i] == '=')
 		{
 			i++;
-			break;
+			break ;
 		}
 	}
 	temp = malloc(sizeof(char) * (i + 1));
@@ -141,23 +138,26 @@ char	**ch_var(char **envp, char *str)
 	return (envp);
 }
 
+int	get_envp_size(char **envp)
+{
+	int	i;
+
+	i = 0;
+	while (envp[i])
+		i++;
+	return (i);
+}
+
 char	**add_env(char **envp, char *str)
 {
 	char	**new_envp;
 	int		i;
-	int		flag;
 
-	i = 0;
-	flag = 0;
-	while (envp[i])
-		i++;
 	//check with get_var if the variable already exists
 	//str: var=abc, we need to separate the var= from str
-	if (var_exists(envp, str))
-		flag = 1;
-	if (!flag)
+	if (!var_exists(envp, str))
 	{
-		new_envp = malloc(sizeof(char *) * (i + 2));
+		new_envp = malloc(sizeof(char *) * (get_envp_size(envp) + 2));
 		if (new_envp == NULL)
 			return (NULL);
 		i = -1;
@@ -165,12 +165,9 @@ char	**add_env(char **envp, char *str)
 		{
 			new_envp[i] = ft_strdup(envp[i]);
 			if (!new_envp[i])
-			{
-				free_2d_array((void ***)&new_envp);
-				return (NULL);
-			}
+				return (free_2d_array((void ***)&new_envp), NULL);
 		}
-		new_envp[i] = ft_strdup(str);
+		new_envp[i] = ft_strdup(str); // Note from Uygar: needs malloc protection
 		new_envp[++i] = NULL;
 		free_2d_array((void ***)&envp);
 		return (new_envp);
@@ -191,7 +188,7 @@ void	print_env(char **envp)
 int	print_export(char **envp)
 {
 	int	i;
-	
+
 	i = -1;
 	while (envp && envp[++i])
 	{
@@ -199,6 +196,16 @@ int	print_export(char **envp)
 		printf("%s\n", envp[i]);
 	}
 	return (1);
+}
+
+void	env_not_valid_identifier(char *str, char ***str2)
+{
+	ft_putstr_fd("minishell: export: ", 2);
+	ft_putstr_fd(str, 2);
+	ft_putstr_fd(": ", 2);
+	ft_putstr_fd("not a valid identifier\n", 2);
+	if (str2 != NULL)
+		free_2d_array((void ***)str2);
 }
 
 int	run_export(char **cmd, char ***envp)
@@ -209,35 +216,16 @@ int	run_export(char **cmd, char ***envp)
 	if (!cmd[1])
 		return (print_export(*envp));
 	if (cmd[1][0] != '_' && !ft_isalpha(cmd[1][0]))
-	{
-		ft_putstr_fd("minishell: export: ", 2);
-		ft_putstr_fd(cmd[1], 2);
-		ft_putstr_fd(": ", 2);
-		ft_putstr_fd("not a valid identifier\n", 2);
-		return (0);
-	}
+		return (env_not_valid_identifier(cmd[1], NULL), 0);
 	str = ft_split(cmd[1], '=');
 	if (!str)
-	{
-		ft_putstr_fd("minishell: export: ", 2);
-		ft_putstr_fd(cmd[1], 2);
-		ft_putstr_fd(": ", 2);
-		ft_putstr_fd("not a valid identifier\n", 2);
-		return (0);
-	}
+		return (env_not_valid_identifier(cmd[1], NULL), 0);
 	i = -1;
 	while (str[0][++i])
 	{
 		if (str[0][i] != '_' && !ft_isalpha(str[0][i]) && \
 				!ft_isdigit(str[0][i]))
-		{
-			ft_putstr_fd("minishell: export: ", 2);
-			ft_putstr_fd(str[0], 2);
-			ft_putstr_fd(": ", 2);
-			ft_putstr_fd("not a valid identifier\n", 2);
-			free_2d_array((void ***)&str);
-			return (0);
-		}
+			return (env_not_valid_identifier(str[0], &str), 0);
 	}
 	free_2d_array((void ***)&str);
 	*envp = add_env(*envp, cmd[1]);
