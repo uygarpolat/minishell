@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/21 08:08:12 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/21 08:38:57 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,7 +116,8 @@ int			only_builtin(t_minishell *minishell, t_put *cmd);
 void		run_builtin(t_ast *s, t_minishell *minishell, int n, t_put *cmd);
 
 //builtins.c
-int			execute_builtin(t_ast *s, t_minishell *minishell, int n, t_put *file);
+int			execute_builtin(t_ast *s, t_minishell *minishell,
+				int n, t_put *file);
 int			is_builtin(char **cmd);
 char		*get_var(char **envp, char *key);
 int			run_exit(t_ast *s, t_minishell *minishell,
@@ -161,7 +162,8 @@ void		print_and_exit(char *cmd, char *str, int code,
 				t_minishell *minishell);
 void		file_error(t_minishell *minishell, t_put *cmd);
 int			print_error(char *str);
-void		error_check(char *path, t_ast *s, t_minishell *minishell, t_put *cmd);
+void		error_check(char *path, t_ast *s,
+				t_minishell *minishell, t_put *cmd);
 
 // parser.c
 t_ast		*build_ast(t_tokens *tokens, int start, int end, int code);
