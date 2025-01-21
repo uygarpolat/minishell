@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/20 14:01:21 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/21 08:08:12 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,8 +190,8 @@ void		print_ast(t_ast *node, int level, int flag);
 long long	ft_atol(const char *str);
 
 //heredoc.c
-void		check_here(t_ast *s, char ***envp);
-void		here_loop(t_ast *s, t_ast *ast, char ***envp);
-int			here(t_tokens *token, t_ast *ast, char **envp);
+void		check_here(t_ast *s);
+void		here_loop(t_ast *s, t_ast *ast);
+int			here(t_tokens *token, t_ast *ast);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/20 15:41:23 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/21 08:08:58 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -303,7 +303,7 @@ int	execution(t_ast *s, t_token_info *token_info)
 		error2(&minishell, "malloc failed\n", &cmd);
 		return (1);
 	}
-	check_here(minishell.ast, minishell.envp);
+	check_here(minishell.ast);
 	if (g_signal == 130)
 	{
 		free(minishell.p.pids);
