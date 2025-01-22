@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/21 08:38:57 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 11:07:25 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,4 +196,6 @@ void		check_here(t_ast *s);
 void		here_loop(t_ast *s, t_ast *ast);
 int			here(t_tokens *token, t_ast *ast);
 
+//var.c
+int	var_exists(char **envp, char *str);
 #endif
