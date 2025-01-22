@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/21 08:04:25 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 16:35:04 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	format_tokens(t_tokens **tokens, t_capacity *capacity)
 		free_void((void **)tokens, NULL);
 }
 
-int	execute_shell(char *input, int *code, char ***new_envp)
+int	execute_shell(char *input, int *code, char ***new_envp, t_minishell *minishell)
 {
 	t_tokens		*tokens;
 	t_capacity		capacity;
@@ -68,7 +68,7 @@ int	execute_shell(char *input, int *code, char ***new_envp)
 			token_info.tokens = tokens;
 			token_info.capacity = capacity;
 			token_info.envp = new_envp;
-			*code = execution(ast, &token_info);
+			*code = execution(ast, &token_info, minishell);
 			free_ast(&ast);
 		}
 		free_tokens(&tokens, &capacity);
@@ -117,15 +117,28 @@ int	preliminary_input_check(char **input)
 	return (0);
 }
 
+void	set_pwd(t_minishell *minishell, char **envp)
+{
+	if (getcwd(minishell->pwd, PATH_MAX) == NULL)
+	{
+		if (!get_var(envp, "PWD="))
+			ft_strlcpy(minishell->pwd, "null", PATH_MAX);
+		else
+			ft_strlcpy(minishell->pwd, get_var(envp, "PWD="), PATH_MAX);
+	}
+}
+
 int	main(int argc, char **argv, char **envp)
 {
 	char	*input;
 	char	**new_envp;
 	int		code;
 	int		input_res;
+	t_minishell	minishell;
 
 	code = 0;
 	new_envp = ft_strdup2(envp);
+	set_pwd(&minishell, new_envp);
 	if (!new_envp)
 		return (error_handler(NULL, NULL, &code, 1), code);
 	if (init_term_and_signal(argc, argv, &code))
@@ -138,7 +151,7 @@ int	main(int argc, char **argv, char **envp)
 			continue ;
 		else if (input_res == -1)
 			break ;
-		code = execute_shell(input, &code, &new_envp);
+		code = execute_shell(input, &code, &new_envp, &minishell);
 	}
 	free_2d_array((void ***)&new_envp);
 	return (code);

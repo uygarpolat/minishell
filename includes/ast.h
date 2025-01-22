@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 12:03:57 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/22 16:34:16 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ typedef struct s_token_info
 }				t_token_info;
 
 //execution.c
-int			execution(t_ast *s, t_token_info *token_info);
+int			execution(t_ast *s, t_token_info *token_info, t_minishell *minishell);
 void		close_and_free(t_pipes *p, t_put *cmd);
 void		get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell);
 int			open_files(t_put *cmd);

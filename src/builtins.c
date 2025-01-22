@@ -6,11 +6,36 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 11:58:37 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/22 15:11:36 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
+
+int	check_newlines(char **cmd)
+{
+	int	i;
+	int	n;
+	int	flag;
+
+	i = 0;
+	while (cmd[++i][0] == '-')
+	{
+		flag = 1;
+		n = 0;
+		while (cmd[i][++n])
+		{
+			if (cmd[i][n] != 'n')
+			{
+				flag = 0;
+				break ;
+			}
+		}
+		if (!flag)
+			break ;
+	}
+	return (i);
+}
 
 int	run_echo(char **cmd)
 {
@@ -22,17 +47,16 @@ int	run_echo(char **cmd)
 		printf("\n");
 		return (1);
 	}
-	n = 0;
-	if (!ft_strncmp(cmd[1], "-n", 3))
-		n = 1;
-	i = 0 + n;
-	while (cmd[++i])
+	i = check_newlines(cmd);
+	n = i;
+	while (cmd[i])
 	{
-		if (i > 1 + n)
+		if (i > n)
 			printf(" ");
 		printf("%s", cmd[i]);
+		i++;
 	}
-	if (n == 0)
+	if (n == 1)
 		printf("\n");
 	return (1);
 }
