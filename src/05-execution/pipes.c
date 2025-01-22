@@ -78,21 +78,6 @@ int	count_operators(t_ast *s)
 	return (count);
 }
 
-/*int	pipeing(t_pipes *p)
-{
-	int	i;
-
-	p->i = 0;
-	p->o = 0;
-	i = -1;
-	while (++i < 2)
-	{
-		if (pipe(p->pipes[i]) < 0)
-			return (0);
-	}
-	return (1);
-}*/
-
 int	malloc_check(t_pipes *p)
 {
 	if (p->count == 1)
