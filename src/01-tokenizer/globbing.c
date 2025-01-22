@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   globbing.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/26 00:45:16 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/16 10:28:30 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 14:46:25 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,10 +69,7 @@ static int	init_expand_wildcard(t_tokens *tokens, t_globber *g, int loc)
 		return (error_handler(NULL, NULL, tokens->code, 1), -1);
 	g->entry = readdir(g->dir);
 	if (g->entry == NULL)
-	{
-		closedir(g->dir);
-		return (error_handler(NULL, NULL, tokens->code, 1), -1);
-	}
+		return (0);
 	return (0);
 }
 
