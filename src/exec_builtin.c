@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/21 09:00:47 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 11:58:20 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,4 +82,25 @@ void	run_builtin(t_ast *s, t_minishell *minishell, int n, t_put *cmd)
 	free_tokens(&minishell->tokens, &minishell->capacity);
 	minishell->tokens = NULL;
 	exit(0);
+}
+
+int	is_builtin(char **cmd)
+{
+	if (!cmd || !cmd[0])
+		return (0);
+	if (!ft_strncmp(cmd[0], "echo", 5))
+		return (1);
+	else if (!ft_strncmp(cmd[0], "cd", 3))
+		return (1);
+	else if (!ft_strncmp(cmd[0], "pwd", 4))
+		return (1);
+	else if (!ft_strncmp(cmd[0], "export", 7))
+		return (1);
+	else if (!ft_strncmp(cmd[0], "unset", 6))
+		return (1);
+	else if (!ft_strncmp(cmd[0], "env", 4))
+		return (1);
+	else if (!ft_strncmp(cmd[0], "exit", 5))
+		return (1);
+	return (0);
 }

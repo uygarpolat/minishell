@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:39:14 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 11:41:34 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/22 12:17:05 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,18 +40,10 @@ void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 		assign_out_fd(p, n, &out);
 	else if (cmd->outfile)
 		out = cmd->out;
-	if (/*(n < minishell->p.count || cmd->outfile)*/ out >= 0 && dup2(out, 1) == -1)
+	if (out >= 0 && dup2(out, 1) == -1)
 		error2(minishell, "dup2 error\n", cmd);
-	if (/*(n > 0 || cmd->infile)*/ in >= 0 && dup2(in, 0) == -1)
+	if (in >= 0 && dup2(in, 0) == -1)
 		error2(minishell, "dup2 error\n", cmd);
-	/*if (cmd->infile)
-		close(cmd->in);
-	if (cmd->outfile)
-		close(cmd->out);
-	if (in >= 0)
-		close(in);
-	if (out >= 0)
-		close(out);*/
 }
 
 int	open_files(t_put *cmd)
