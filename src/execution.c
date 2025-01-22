@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 12:19:55 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/22 16:40:52 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ void	execute_tree(t_minishell *minishell, t_put *cmd)
 	}
 }
 
-int	initialize(t_put *cmd, t_minishell *minishell,
+void	initialize(t_put *cmd, t_minishell *minishell,
 		t_ast *s, t_token_info *token_info)
 {
 	cmd->infile = NULL;
@@ -127,35 +127,31 @@ int	initialize(t_put *cmd, t_minishell *minishell,
 	minishell->tokens = token_info->tokens;
 	minishell->capacity = token_info->capacity;
 	minishell->envp = token_info->envp;
-	if (getcwd(minishell->pwd, sizeof(minishell->pwd)) == NULL)
-		return (0);
 	s->code = 0;
-	return (1);
 }
 
-int	execution(t_ast *s, t_token_info *token_info)
+int	execution(t_ast *s, t_token_info *token_info, t_minishell *minishell)
 {
-	t_minishell	minishell;
+	//t_minishell	minishell;
 	int			i;
 	t_put		cmd;
 
-	if (!initialize(&cmd, &minishell, s, token_info))
-		return (ft_putstr_fd("getcwd failed\n", 2), 1);
-	if (!mallocing(&minishell.p))
-		return (error2(&minishell, "malloc failed\n", &cmd), 1);
-	check_here(minishell.ast);
+	initialize(&cmd, minishell, s, token_info);
+	if (!mallocing(&minishell->p))
+		return (error2(minishell, "malloc failed\n", &cmd), 1);
+	check_here(minishell->ast);
 	if (g_signal == 130)
-		return (free(minishell.p.pids), 130);
-	if (minishell.p.count == 0 && is_builtin(s->words))
-		return (only_builtin(&minishell, &cmd));
+		return (free(minishell->p.pids), 130);
+	if (minishell->p.count == 0 && is_builtin(s->words))
+		return (only_builtin(minishell, &cmd));
 	else
-		execute_tree(&minishell, &cmd);
-	close_and_free(&minishell.p, &cmd);
+		execute_tree(minishell, &cmd);
+	close_and_free(&minishell->p, &cmd);
 	i = 0;
-	while (i <= (minishell.p.count + minishell.p.o_count))
-		s->code = waiting(minishell.p.pids[i++]);
-	if (minishell.p.pids)
-		free(minishell.p.pids);
+	while (i <= (minishell->p.count + minishell->p.o_count))
+		s->code = waiting(minishell->p.pids[i++]);
+	if (minishell->p.pids)
+		free(minishell->p.pids);
 	if (access(".heredoc", F_OK) == 0)
 		unlink(".heredoc");
 	return (s->code);
