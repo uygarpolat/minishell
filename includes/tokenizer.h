@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/15 17:08:49 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 21:35:24 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,8 @@ char		*expand_wildcard(int *int_array, t_tokens *tokens,
 void		free_tokens(t_tokens **tokens, t_capacity *capacity);
 t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
 				t_capacity *capacity, int i);
+int			check_asterisk(int *int_array);
+
 
 // tokenization_utils.c
 int			is_seperator(char c, char c_plus_one);

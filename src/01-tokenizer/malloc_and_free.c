@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:25:49 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/15 17:17:37 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 21:35:11 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,4 +70,20 @@ t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
 	free_tokens(&tokens, capacity);
 	capacity->max_size *= 2;
 	return (new_tokens);
+}
+
+int	check_asterisk(int *int_array)
+{
+	int		i;
+	char	c;
+
+	i = 0;
+	while (int_array[i])
+	{
+		c = (char)int_array[i];
+		if (c == '*')
+			return (0);
+		i++;
+	}
+	return (1);
 }
