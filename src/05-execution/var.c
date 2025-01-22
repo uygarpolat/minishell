@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   var.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 10:52:48 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 11:39:17 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:42:24 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ast.h"
+#include "../../includes/ast.h"
 
 char	*get_var(char **envp, char *key)
 {

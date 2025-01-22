@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   functions.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:48:00 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/21 08:23:32 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 19:42:00 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ast.h"
-#include "../../includes/signals.h"
+#include "../../includes/ast.h"
 
 void	close_loop(t_pipes *p)
 {

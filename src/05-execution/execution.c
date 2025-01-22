@@ -6,12 +6,12 @@
 /*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 17:16:48 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 19:41:30 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ast.h"
-#include "../includes/signals.h"
+#include "../../includes/ast.h"
+#include "../../includes/signals.h"
 
 int	ft_pipe(t_pipes *p, int n)
 {

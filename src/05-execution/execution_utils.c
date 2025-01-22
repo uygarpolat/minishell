@@ -6,11 +6,11 @@
 /*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 17:16:21 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/22 17:23:32 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 19:41:22 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ast.h"
+#include "../../includes/ast.h"
 
 void	no_words(t_ast *s, t_minishell *minishell, t_put *cmd)
 {

@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   ft_atol.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 17:31:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/21 08:26:16 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 19:41:38 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ast.h"
+#include "../../includes/ast.h"
 
 static long long	to_int(const char *str, int neg)
 {

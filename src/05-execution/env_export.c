@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   env_export.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 12:02:24 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:41:02 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ast.h"
+#include "../../includes/ast.h"
 
 int	get_envp_size(char **envp)
 {

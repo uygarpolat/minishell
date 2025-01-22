@@ -6,11 +6,11 @@
 /*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 12:00:43 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 19:22:29 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 19:41:06 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ast.h"
+#include "../../includes/ast.h"
 
 char	**ch_envp(char **envp, char *new_dir)
 {

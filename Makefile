@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2025/01/22 17:17:50 by upolat           ###   ########.fr        #
+#    Updated: 2025/01/22 19:40:11 by upolat           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,6 +17,7 @@ TOKENIZER_DIR =			$(SRC_DIR)/01-tokenizer
 PARSER_DIR =			$(SRC_DIR)/02-parser
 SIGNALS_DIR =			$(SRC_DIR)/03-signals
 VISUALIZATION_DIR =		$(SRC_DIR)/04-visualization
+EXECUTION_DIR =			$(SRC_DIR)/05-execution
 
 SOURCES = 	$(SRC_DIR)/main.c \
 			\
@@ -34,13 +35,13 @@ SOURCES = 	$(SRC_DIR)/main.c \
 			$(VISUALIZATION_DIR)/print_ast.c $(VISUALIZATION_DIR)/print_tokens.c \
 			$(VISUALIZATION_DIR)/print_welcome.c \
 			\
-			$(SRC_DIR)/execution.c $(SRC_DIR)/path.c \
-			$(SRC_DIR)/execution_utils.c \
-			$(SRC_DIR)/builtins.c $(SRC_DIR)/env_export.c \
-		 	$(SRC_DIR)/ft_strdup2.c $(SRC_DIR)/errors.c \
-			$(SRC_DIR)/ft_atol.c  $(SRC_DIR)/files.c $(SRC_DIR)/functions.c \
-			$(SRC_DIR)/heredoc.c $(SRC_DIR)/exec_builtin.c $(SRC_DIR)/pipes.c \
-			$(SRC_DIR)/var.c $(SRC_DIR)/env.c $(SRC_DIR)/error_checks.c \
+			$(EXECUTION_DIR)/execution.c $(EXECUTION_DIR)/path.c \
+			$(EXECUTION_DIR)/execution_utils.c \
+			$(EXECUTION_DIR)/builtins.c $(EXECUTION_DIR)/env_export.c \
+		 	$(EXECUTION_DIR)/ft_strdup2.c $(EXECUTION_DIR)/errors.c \
+			$(EXECUTION_DIR)/ft_atol.c  $(EXECUTION_DIR)/files.c $(EXECUTION_DIR)/functions.c \
+			$(EXECUTION_DIR)/heredoc.c $(EXECUTION_DIR)/exec_builtin.c $(EXECUTION_DIR)/pipes.c \
+			$(EXECUTION_DIR)/var.c $(EXECUTION_DIR)/env.c $(EXECUTION_DIR)/error_checks.c \
 
 OBJECTS = $(SOURCES:.c=.o)
 

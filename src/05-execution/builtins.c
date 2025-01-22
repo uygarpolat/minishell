@@ -6,11 +6,11 @@
 /*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 17:23:27 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 19:40:54 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ast.h"
+#include "../../includes/ast.h"
 
 int	run_echo(char **cmd)
 {

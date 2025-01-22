@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   error_checks.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 12:11:42 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 12:12:39 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:41:10 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ast.h"
+#include "../../includes/ast.h"
 
 void	error_not_path(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 {
