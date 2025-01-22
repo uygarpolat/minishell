@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/21 21:36:03 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 11:05:17 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,62 +82,6 @@ char	**rm_envp(char **envp, char *str)
 	return (envp);
 }
 
-int	var_exists(char **envp, char *str)
-{
-	int		i;
-	int		j;
-	char	*temp;
-
-	i = -1;
-	while (str[++i])
-	{
-		if (str[i] == '=')
-		{
-			i++;
-			break ;
-		}
-	}
-	temp = malloc(sizeof(char) * (i + 1));
-	j = -1;
-	while (++j < i)
-		temp[j] = str[j];
-	temp[j] = '\0';
-	if (get_var(envp, temp) == NULL)
-	{
-		free(temp);
-		return (0);
-	}
-	free(temp);
-	return (1);
-}
-
-char	**ch_var(char **envp, char *str)
-{
-	int	i;
-	int	len;
-
-	len = -1;
-	while (str[++len])
-	{
-		if (str[len] == '=')
-		{
-			len++;
-			break ;
-		}
-	}
-	i = -1;
-	while (envp[++i])
-	{
-		if (!ft_strncmp(envp[i], str, len))
-		{
-			free(envp[i]);
-			envp[i] = ft_strdup(str);
-			break ;
-		}
-	}
-	return (envp);
-}
-
 int	get_envp_size(char **envp)
 {
 	int	i;
@@ -153,8 +97,6 @@ char	**add_env(char **envp, char *str)
 	char	**new_envp;
 	int		i;
 
-	//check with get_var if the variable already exists
-	//str: var=abc, we need to separate the var= from str
 	if (!var_exists(envp, str))
 	{
 		new_envp = malloc(sizeof(char *) * (get_envp_size(envp) + 2));
@@ -167,7 +109,9 @@ char	**add_env(char **envp, char *str)
 			if (!new_envp[i])
 				return (free_2d_array((void ***)&new_envp), NULL);
 		}
-		new_envp[i] = ft_strdup(str); // Note from Uygar: needs malloc protection
+		new_envp[i] = ft_strdup(str);
+		if (!new_envp[i])
+			return (free_2d_array((void ***)&envp), NULL);
 		new_envp[++i] = NULL;
 		free_2d_array((void ***)&envp);
 		return (new_envp);

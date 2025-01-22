@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:52:03 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/21 08:02:49 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 10:25:36 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,9 @@ char	*get_path(char **cmd, char **envp)
 	char	*full_path;
 	char	*result;
 
-	//check_cmd(cmd, minishell, envp);
 	if (!cmd[0])
 		return (NULL);
 	i = 0;
-	//split error??
 	all_paths = paths(envp);
 	while (all_paths && all_paths[i])
 	{
@@ -62,6 +60,4 @@ char	*get_path(char **cmd, char **envp)
 	if ((access(cmd[0], X_OK) == 0 && ft_strchr(cmd[0], '/')))
 		return (cmd[0]);
 	return (NULL);
-	//free_2d_array((void ***)&envp);
-	//exit(path_error(cmd, all_paths, minishell));
 }

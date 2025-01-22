@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/21 20:19:16 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 11:38:27 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,27 +37,17 @@ int	run_echo(char **cmd)
 	return (1);
 }
 
-char	*get_var(char **envp, char *key)
-{
-	while (*envp)
-	{
-		if (!ft_strncmp(*envp, key, ft_strlen(key)))
-			return (*envp + ft_strlen(key));
-		envp++;
-	}
-	return (NULL);
-}
-
 int	get_pwd(t_minishell *minishell)
 {
 	char	*pwd;
 
 	pwd = ft_strjoin("PWD=", minishell->pwd);
-	// Note from Uygar, needs malloc protection
+	if (!pwd)
+		return (ft_putstr_fd("malloc fail\n", 2), 0);
 	*minishell->envp = ch_var(*minishell->envp, pwd);
 	free(pwd);
 	if (!minishell->envp)
-		return (0);
+		return (ft_putstr_fd("malloc fail\n", 2), 0);
 	return (1);
 }
 

@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/21 20:37:33 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 11:50:18 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,11 @@ int	ft_pipe(t_pipes *p, int n)
 {
 	if (n % 2 == 0 && n < p->count && p->count > 0)
 	{
+		if (n > 0)
+		{
+			close(p->pipes[0][0]);
+			close(p->pipes[0][1]);
+		}
 		if (pipe(p->pipes[0]) < 0)
 		{
 			ft_putstr_fd("Pipe failed\n", 2);
@@ -35,12 +40,15 @@ int	ft_pipe(t_pipes *p, int n)
 			return (0);
 		}
 		if (n > 0)
-		{
 			close(p->pipes[1][1]);
-		}
 	}
 	else if (n < p->count && p->count > 0)
 	{
+		if (n > 1)
+		{
+			close(p->pipes[1][0]);
+			close(p->pipes[1][1]);
+		}
 		if (pipe(p->pipes[1]) < 0)
 			return (pipe_fail(p), 0);
 		close(p->pipes[0][1]);
@@ -63,7 +71,7 @@ void	execute(t_ast *s, t_minishell *minishell, int n, t_put *cmd)
 	char	*path;
 
 	if (!ft_pipe(&minishell->p, n))
-		return ; //pipe error
+		return ;//pipe error
 	minishell->p.pids[n] = fork();
 	if (minishell->p.pids[n] != 0)
 		return ;
@@ -71,7 +79,7 @@ void	execute(t_ast *s, t_minishell *minishell, int n, t_put *cmd)
 	get_in_out(s, cmd, minishell);
 	if (minishell->p.pipes || cmd->infile || cmd->outfile)
 		dupping(minishell, &minishell->p, cmd, n);
-	if (minishell->p.count)
+	if (minishell->p.count > 0)
 		close_pipes(minishell, n);
 	if (is_builtin(s->words))
 		run_builtin(s, minishell, n, cmd);
