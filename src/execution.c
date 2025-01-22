@@ -3,40 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 16:40:52 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/22 17:16:48 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ast.h"
 #include "../includes/signals.h"
 
-void	pipe_fail(t_pipes *p)
-{
-	ft_putstr_fd("Pipe failed\n", 2);
-	close(p->pipes[0][0]);
-	close(p->pipes[0][1]);
-}
-
 int	ft_pipe(t_pipes *p, int n)
 {
 	if (n % 2 == 0 && n < p->count && p->count > 0)
 	{
 		if (n > 0)
-		{
-			close(p->pipes[0][0]);
-			close(p->pipes[0][1]);
-		}
+			pipe_close(p, 0, 0);
 		if (pipe(p->pipes[0]) < 0)
 		{
 			ft_putstr_fd("Pipe failed\n", 2);
 			if (p->count > 1)
-			{
-				close(p->pipes[1][0]);
-				close(p->pipes[1][1]);
-			}
+				pipe_close(p, 1, 0);
 			return (0);
 		}
 		if (n > 0)
@@ -45,25 +32,12 @@ int	ft_pipe(t_pipes *p, int n)
 	else if (n < p->count && p->count > 0)
 	{
 		if (n > 1)
-		{
-			close(p->pipes[1][0]);
-			close(p->pipes[1][1]);
-		}
+			pipe_close(p, 1, 0);
 		if (pipe(p->pipes[1]) < 0)
-			return (pipe_fail(p), 0);
+			return (pipe_close(p, 0, 1), 0);
 		close(p->pipes[0][1]);
 	}
 	return (1);
-}
-
-void	no_words(t_ast *s, t_minishell *minishell, t_put *cmd)
-{
-	if (!*s->words)
-	{
-		error(minishell, cmd);
-		free_ast(&minishell->ast);
-		exit(0);
-	}
 }
 
 void	execute(t_ast *s, t_minishell *minishell, int n, t_put *cmd)
@@ -132,7 +106,6 @@ void	initialize(t_put *cmd, t_minishell *minishell,
 
 int	execution(t_ast *s, t_token_info *token_info, t_minishell *minishell)
 {
-	//t_minishell	minishell;
 	int			i;
 	t_put		cmd;
 

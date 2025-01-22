@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
+#    By: upolat <upolat@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2025/01/22 12:13:35 by hpirkola         ###   ########.fr        #
+#    Updated: 2025/01/22 17:17:50 by upolat           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,6 +35,7 @@ SOURCES = 	$(SRC_DIR)/main.c \
 			$(VISUALIZATION_DIR)/print_welcome.c \
 			\
 			$(SRC_DIR)/execution.c $(SRC_DIR)/path.c \
+			$(SRC_DIR)/execution_utils.c \
 			$(SRC_DIR)/builtins.c $(SRC_DIR)/env_export.c \
 		 	$(SRC_DIR)/ft_strdup2.c $(SRC_DIR)/errors.c \
 			$(SRC_DIR)/ft_atol.c  $(SRC_DIR)/files.c $(SRC_DIR)/functions.c \

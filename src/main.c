@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/22 16:35:04 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/22 17:05:38 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,8 @@ void	format_tokens(t_tokens **tokens, t_capacity *capacity)
 		free_void((void **)tokens, NULL);
 }
 
-int	execute_shell(char *input, int *code, char ***new_envp, t_minishell *minishell)
+int	execute_shell(char *input, int *code,
+		char ***new_envp, t_minishell *minishell)
 {
 	t_tokens		*tokens;
 	t_capacity		capacity;
@@ -130,10 +131,10 @@ void	set_pwd(t_minishell *minishell, char **envp)
 
 int	main(int argc, char **argv, char **envp)
 {
-	char	*input;
-	char	**new_envp;
-	int		code;
-	int		input_res;
+	char		*input;
+	char		**new_envp;
+	int			code;
+	int			input_res;
 	t_minishell	minishell;
 
 	code = 0;
