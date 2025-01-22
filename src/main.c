@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/22 17:05:38 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 17:21:30 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,17 +116,6 @@ int	preliminary_input_check(char **input)
 	if (**input)
 		add_history(*input);
 	return (0);
-}
-
-void	set_pwd(t_minishell *minishell, char **envp)
-{
-	if (getcwd(minishell->pwd, PATH_MAX) == NULL)
-	{
-		if (!get_var(envp, "PWD="))
-			ft_strlcpy(minishell->pwd, "null", PATH_MAX);
-		else
-			ft_strlcpy(minishell->pwd, get_var(envp, "PWD="), PATH_MAX);
-	}
 }
 
 int	main(int argc, char **argv, char **envp)

@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 17:16:21 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/22 17:19:13 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 17:20:56 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,4 +28,15 @@ void	pipe_close(t_pipes *p, int pipe_no, int flag)
 		ft_putstr_fd("Pipe failed\n", 2);
 	close(p->pipes[pipe_no][0]);
 	close(p->pipes[pipe_no][1]);
+}
+
+void	set_pwd(t_minishell *minishell, char **envp)
+{
+	if (getcwd(minishell->pwd, PATH_MAX) == NULL)
+	{
+		if (!get_var(envp, "PWD="))
+			ft_strlcpy(minishell->pwd, "null", PATH_MAX);
+		else
+			ft_strlcpy(minishell->pwd, get_var(envp, "PWD="), PATH_MAX);
+	}
 }

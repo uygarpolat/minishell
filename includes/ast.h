@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 17:18:38 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/22 17:21:09 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,7 @@ void		dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
 //execution_utils.c
 void		no_words(t_ast *s, t_minishell *minishell, t_put *cmd);
 void		pipe_close(t_pipes *p, int pipe_no, int flag);
+void		set_pwd(t_minishell *minishell, char **envp);
 
 //path.c
 char		*get_path(char **cmd, char **envp);
