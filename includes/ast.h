@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ast.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 16:34:16 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/22 17:24:00 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,11 +101,18 @@ typedef struct s_token_info
 }				t_token_info;
 
 //execution.c
-int			execution(t_ast *s, t_token_info *token_info, t_minishell *minishell);
+int			execution(t_ast *s, t_token_info *token_info,
+				t_minishell *minishell);
 void		close_and_free(t_pipes *p, t_put *cmd);
 void		get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell);
 int			open_files(t_put *cmd);
 void		dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
+
+//execution_utils.c
+void		no_words(t_ast *s, t_minishell *minishell, t_put *cmd);
+void		pipe_close(t_pipes *p, int pipe_no, int flag);
+void		set_pwd(t_minishell *minishell, char **envp);
+int			check_newlines(char **cmd);
 
 //path.c
 char		*get_path(char **cmd, char **envp);
@@ -198,5 +205,5 @@ void		here_loop(t_ast *s, t_ast *ast);
 int			here(t_tokens *token, t_ast *ast);
 
 //var.c
-int	var_exists(char **envp, char *str);
+int			var_exists(char **envp, char *str);
 #endif

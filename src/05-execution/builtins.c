@@ -3,39 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 15:11:36 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:40:54 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ast.h"
-
-int	check_newlines(char **cmd)
-{
-	int	i;
-	int	n;
-	int	flag;
-
-	i = 0;
-	while (cmd[++i][0] == '-')
-	{
-		flag = 1;
-		n = 0;
-		while (cmd[i][++n])
-		{
-			if (cmd[i][n] != 'n')
-			{
-				flag = 0;
-				break ;
-			}
-		}
-		if (!flag)
-			break ;
-	}
-	return (i);
-}
+#include "../../includes/ast.h"
 
 int	run_echo(char **cmd)
 {

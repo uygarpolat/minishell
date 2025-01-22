@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/22 16:35:04 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/22 17:21:30 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,8 @@ void	format_tokens(t_tokens **tokens, t_capacity *capacity)
 		free_void((void **)tokens, NULL);
 }
 
-int	execute_shell(char *input, int *code, char ***new_envp, t_minishell *minishell)
+int	execute_shell(char *input, int *code,
+		char ***new_envp, t_minishell *minishell)
 {
 	t_tokens		*tokens;
 	t_capacity		capacity;
@@ -117,23 +118,12 @@ int	preliminary_input_check(char **input)
 	return (0);
 }
 
-void	set_pwd(t_minishell *minishell, char **envp)
-{
-	if (getcwd(minishell->pwd, PATH_MAX) == NULL)
-	{
-		if (!get_var(envp, "PWD="))
-			ft_strlcpy(minishell->pwd, "null", PATH_MAX);
-		else
-			ft_strlcpy(minishell->pwd, get_var(envp, "PWD="), PATH_MAX);
-	}
-}
-
 int	main(int argc, char **argv, char **envp)
 {
-	char	*input;
-	char	**new_envp;
-	int		code;
-	int		input_res;
+	char		*input;
+	char		**new_envp;
+	int			code;
+	int			input_res;
 	t_minishell	minishell;
 
 	code = 0;

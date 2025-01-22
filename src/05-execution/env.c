@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 12:00:43 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 12:05:39 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/22 19:41:06 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/ast.h"
+#include "../../includes/ast.h"
 
 char	**ch_envp(char **envp, char *new_dir)
 {
@@ -41,20 +41,26 @@ char	**ch_envp(char **envp, char *new_dir)
 	return (new_envp);
 }
 
-char	**rm_envp(char **envp, char *str)
+static int	get_size(char **arr)
 {
-	char	**new_envp;
+	int	i;
+
+	i = 0;
+	while (arr[i])
+		i++;
+	return (i);
+}
+
+static char	**create_new_envp(char **envp, char *str, int *flag)
+{
 	int		i;
 	int		j;
 	int		len;
-	int		flag;
+	char	**new_envp;
 
-	len = 0;
-	flag = 0;
-	while (envp[len])
-		len++;
-	new_envp = ft_calloc((size_t) len, sizeof(char *));
-	if (new_envp == NULL)
+	len = get_size(envp);
+	new_envp = ft_calloc((size_t)len, sizeof(char *));
+	if (!new_envp)
 		return (NULL);
 	i = -1;
 	j = 0;
@@ -62,7 +68,7 @@ char	**rm_envp(char **envp, char *str)
 	{
 		if (!ft_strncmp(str, envp[i], ft_strlen(str)))
 		{
-			flag = 1;
+			*flag = 1;
 			continue ;
 		}
 		new_envp[j] = ft_strdup(envp[i]);
@@ -70,17 +76,72 @@ char	**rm_envp(char **envp, char *str)
 			return (free_2d_array((void ***)&new_envp), NULL);
 		j++;
 	}
+	new_envp[j] = NULL;
+	return (new_envp);
+}
+
+char	**rm_envp(char **envp, char *str)
+{
+	char	**new_envp;
+	int		flag;
+	int		size;
+
+	flag = 0;
+	new_envp = create_new_envp(envp, str, &flag);
+	if (!new_envp)
+		return (NULL);
+	size = get_size(new_envp);
 	if (flag)
 	{
-		new_envp[j] = NULL;
 		free_2d_array((void ***)&envp);
 		return (new_envp);
 	}
-	free(new_envp[j - 1]);
-	new_envp[j - 1] = NULL;
+	free(new_envp[size - 1]);
+	new_envp[size - 1] = NULL;
 	free_2d_array((void ***)&new_envp);
 	return (envp);
 }
+
+// char	**rm_envp(char **envp, char *str)
+// {
+// 	char	**new_envp;
+// 	int		i;
+// 	int		j;
+// 	int		len;
+// 	int		flag;
+
+// 	len = 0;
+// 	flag = 0;
+// 	while (envp[len])
+// 		len++;
+// 	new_envp = ft_calloc((size_t) len, sizeof(char *));
+// 	if (new_envp == NULL)
+// 		return (NULL);
+// 	i = -1;
+// 	j = 0;
+// 	while (envp[++i] && j < len)
+// 	{
+// 		if (!ft_strncmp(str, envp[i], ft_strlen(str)))
+// 		{
+// 			flag = 1;
+// 			continue ;
+// 		}
+// 		new_envp[j] = ft_strdup(envp[i]);
+// 		if (!new_envp[j])
+// 			return (free_2d_array((void ***)&new_envp), NULL);
+// 		j++;
+// 	}
+// 	if (flag)
+// 	{
+// 		new_envp[j] = NULL;
+// 		free_2d_array((void ***)&envp);
+// 		return (new_envp);
+// 	}
+// 	free(new_envp[j - 1]);
+// 	new_envp[j - 1] = NULL;
+// 	free_2d_array((void ***)&new_envp);
+// 	return (envp);
+// }
 
 char	**add_env(char **envp, char *str)
 {
