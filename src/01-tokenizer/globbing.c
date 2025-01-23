@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/26 00:45:16 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/22 21:36:48 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/23 10:07:28 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ static int	count_matching_entries(t_tokens **tokens, int *int_array,
 
 	counter = 0;
 	if (check_asterisk(int_array))
-		return (counter);
+		return (closedir(g->dir), counter);
 	while (ft_strchrnul((char *)int_array, '*') && g->entry != NULL
 		&& (g->loc == 0 || (*tokens)[g->loc - 1].type != TOKEN_HEREDOC))
 	{
