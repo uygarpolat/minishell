@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/23 12:09:01 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/23 17:48:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int	get_pwd(t_minishell *minishell)
 {
 	char	*pwd;
 	char	*old_pwd;
-	
+
 	old_pwd = ft_strjoin("OLDPWD=", minishell->pwd);
 	if (!old_pwd)
 		return (ft_putstr_fd("malloc fail\n", 2), 0);
@@ -68,7 +68,8 @@ int	run_cd(char **cmd, t_minishell *minishell)
 			|| chdir(get_var(*minishell->envp, "HOME=")) != 0)
 			return (ft_putstr_fd("minishell: cd: HOME not set\n", 2), 0);
 		if (!get_pwd(minishell))
-			return (ft_putstr_fd("couldn't retrieve current working directory\n", 2), 0);
+			return (ft_putstr_fd("couldn't retrieve" \
+				"current working directory\n", 2), 0);
 		return (1);
 	}
 	if (cmd[2])
@@ -93,7 +94,7 @@ void	graceful_exit(t_minishell *minishell, t_put *file,
 	free(minishell->p.pids);
 	if (flag)
 		free_tokens(&minishell->tokens, &minishell->capacity);
-	close_and_free(&minishell->p, file);
+	close_and_free(&minishell->p, file, 0);
 	exit(i);
 }
 
@@ -118,7 +119,6 @@ int	run_exit(t_ast *s, t_minishell *minishell, t_put *file)
 		ft_putstr_fd("minishell: exit: numeric argument required\n", 2);
 		error(minishell, file);
 		free_ast(&minishell->ast);
-		//free_2d_array((void ***)envp);
 		exit(2);
 	}
 	else

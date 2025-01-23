@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:39:14 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 21:40:34 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/23 17:35:46 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,13 @@ void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 		error2(minishell, "dup2 error\n", cmd);
 	if (in >= 0 && dup2(in, 0) == -1)
 		error2(minishell, "dup2 error\n", cmd);
+	if (p->count == 0)
+	{
+		if (cmd->infile)
+			close(in);
+		if (cmd->outfile)
+			close(out);
+	}
 }
 
 int	open_files(t_put *cmd)
@@ -70,7 +77,7 @@ int	open_files(t_put *cmd)
 	return (1);
 }
 
-void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell)
+void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell, int n)
 {
 	t_ast	*temp;
 
@@ -86,7 +93,7 @@ void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell)
 		else if (temp->type == AST_REDIR_APPEND)
 			cmd->outfile = temp->token->value;
 		else if (temp->type == AST_HEREDOC)
-			cmd->infile = ".heredoc";
+			cmd->infile = cmd->heredocs[cmd->cmd_fd[n]];
 		if (!open_files(cmd))
 		{
 			file_error(minishell, cmd);
@@ -98,7 +105,7 @@ void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell)
 
 void	check_in_out(t_ast *s, t_minishell *minishell, t_put *file, int n)
 {
-	get_in_out(s, file, minishell);
+	get_in_out(s, file, minishell, n);
 	if (file->infile || file->outfile)
 	{
 		if (file->infile)

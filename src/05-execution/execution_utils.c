@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 17:16:21 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/23 12:13:51 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/23 19:08:11 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,11 @@ void	no_words(t_ast *s, t_minishell *minishell, t_put *cmd)
 	if (!*s->words)
 	{
 		error(minishell, cmd);
+		if (minishell->p.count == 0)
+		{
+			free_heredocs(cmd);
+			free(cmd->cmd_fd);
+		}
 		free_ast(&minishell->ast);
 		exit(0);
 	}

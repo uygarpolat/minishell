@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 21:36:04 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/23 17:45:32 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,6 @@ typedef struct s_pipe
 	int	**pipes;
 	int	*pids;
 	int	count;
-	int	o_count;
 	int	i;
 	int	o;
 }		t_pipes;
@@ -81,6 +80,9 @@ typedef struct s_put
 	int		out;
 	int		stdin2;
 	int		stdout2;
+	int		*cmd_fd;
+	int		fd_here[16];
+	char	*heredocs[16];
 }			t_put;
 
 typedef struct s_minishell
@@ -103,10 +105,9 @@ typedef struct s_token_info
 //execution.c
 int			execution(t_ast *s, t_token_info *token_info,
 				t_minishell *minishell);
-void		close_and_free(t_pipes *p, t_put *cmd);
-void		get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell);
 int			open_files(t_put *cmd);
 void		dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
+void		unlink_here(t_put *cmd);
 
 //execution_utils.c
 void		no_words(t_ast *s, t_minishell *minishell, t_put *cmd);
@@ -144,20 +145,20 @@ int			get_envp_size(char **envp);
 //files.c
 void		dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
 int			open_files(t_put *cmd);
-void		get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell);
+void		get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell, int n);
 void		check_in_out(t_ast *s, t_minishell *minishell, t_put *file, int n);
 
 //pipes.c
 void		close_pipes(t_minishell *minishell, int n);
 int			count_pipes(t_ast *s);
 int			count_operators(t_ast *s);
-//int		pipeing(t_pipes *p);
 int			mallocing(t_pipes *p);
 
 //functions.c
 int			waiting(int pid);
-void		close_and_free(t_pipes *p, t_put *cmd);
+void		close_and_free(t_pipes *p, t_put *cmd, int n);
 int			print_and_return(char *str, char *cmd, char *str2);
+void		free_heredocs(t_put *cmd);
 
 // ft_strdup2.c
 char		**ft_strdup2(char **str);
@@ -200,9 +201,9 @@ void		print_ast(t_ast *node, int level, int flag);
 long long	ft_atol(const char *str);
 
 //heredoc.c
-void		check_here(t_ast *s);
-void		here_loop(t_ast *s, t_ast *ast);
-int			here(t_tokens *token, t_ast *ast);
+void		check_here(t_minishell *minishell, t_put *cmd);
+void		here_loop(t_ast *s, t_ast *ast, t_put *cmd, int *i);
+int			here(t_tokens *token, t_ast *ast, t_put *cmd, int *i);
 
 //var.c
 int			var_exists(char **envp, char *str);

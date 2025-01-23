@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 11:05:16 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 21:39:58 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/23 16:40:27 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	error(t_minishell *minishell, t_put *cmd)
 {
 	free_2d_array((void ***)minishell->envp);
 	if (minishell->p.pipes)
-		close_and_free(&minishell->p, cmd);
+		close_and_free(&minishell->p, cmd, 0);
 	if (minishell->p.pids)
 		free(minishell->p.pids);
 	if (minishell->tokens)
@@ -27,7 +27,7 @@ void	file_error(t_minishell *minishell, t_put *cmd)
 {
 	free_2d_array((void ***)minishell->envp);
 	if (minishell->p.pipes)
-		close_and_free(&minishell->p, cmd);
+		close_and_free(&minishell->p, cmd, 0);
 	if (minishell->p.pids)
 		free(minishell->p.pids);
 	if (minishell->ast)
@@ -41,7 +41,7 @@ void	error2(t_minishell *minishell, char *str, t_put *cmd)
 	ft_putchar_fd(' ', 2);
 	ft_putstr_fd(str, 2);
 	if (minishell->p.pipes)
-		close_and_free(&minishell->p, cmd);
+		close_and_free(&minishell->p, cmd, 0);
 	if (minishell->p.pids)
 		free(minishell->p.pids);
 	if (minishell->ast)
