@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 21:40:27 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/23 11:04:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,10 +53,12 @@ void	execute(t_ast *s, t_minishell *minishell, int n, t_put *cmd)
 	get_in_out(s, cmd, minishell);
 	if (minishell->p.pipes || cmd->infile || cmd->outfile)
 		dupping(minishell, &minishell->p, cmd, n);
-	if (minishell->p.count > 0)
-		close_pipes(minishell, n);
+	//if (minishell->p.count > 0)
+		//close_pipes(minishell, n);
 	if (is_builtin(s->words))
 		run_builtin(s, minishell, n, cmd);
+	if (minishell->p.count > 0)
+		close_pipes(minishell, n);
 	no_words(s, minishell, cmd);
 	path = get_path(s->words, *minishell->envp);
 	error_check(path, s, minishell, cmd);

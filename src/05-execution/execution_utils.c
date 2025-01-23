@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 17:16:21 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/22 21:40:19 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/23 12:13:51 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ int	check_newlines(char **cmd)
 	int	flag;
 
 	i = 0;
-	while (cmd[++i][0] == '-')
+	while (cmd[++i] && cmd[i][0] == '-')
 	{
 		flag = 1;
 		n = 0;

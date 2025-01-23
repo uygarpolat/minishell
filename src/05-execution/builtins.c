@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 21:39:18 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/23 12:09:01 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	run_echo(char **cmd)
 
 	if (!cmd[1])
 	{
-		printf("\n");
+		ft_putstr_fd("\n", 1);
 		return (1);
 	}
 	i = check_newlines(cmd);
@@ -27,19 +27,29 @@ int	run_echo(char **cmd)
 	while (cmd[i])
 	{
 		if (i > n)
-			printf(" ");
-		printf("%s", cmd[i]);
+			ft_putstr_fd(" ", 1);
+		ft_putstr_fd(cmd[i], 1);
 		i++;
 	}
 	if (n == 1)
-		printf("\n");
+		ft_putstr_fd("\n", 1);
 	return (1);
 }
 
 int	get_pwd(t_minishell *minishell)
 {
 	char	*pwd;
-
+	char	*old_pwd;
+	
+	old_pwd = ft_strjoin("OLDPWD=", minishell->pwd);
+	if (!old_pwd)
+		return (ft_putstr_fd("malloc fail\n", 2), 0);
+	*minishell->envp = ch_var(*minishell->envp, old_pwd);
+	free(old_pwd);
+	if (!minishell->envp)
+		return (ft_putstr_fd("malloc fail\n", 2), 0);
+	if (getcwd(minishell->pwd, sizeof(minishell->pwd)) == NULL)
+		return (ft_putstr_fd("getcwd error\n", 2), 0);
 	pwd = ft_strjoin("PWD=", minishell->pwd);
 	if (!pwd)
 		return (ft_putstr_fd("malloc fail\n", 2), 0);
@@ -57,6 +67,8 @@ int	run_cd(char **cmd, t_minishell *minishell)
 		if (!get_var(*minishell->envp, "HOME=")
 			|| chdir(get_var(*minishell->envp, "HOME=")) != 0)
 			return (ft_putstr_fd("minishell: cd: HOME not set\n", 2), 0);
+		if (!get_pwd(minishell))
+			return (ft_putstr_fd("couldn't retrieve current working directory\n", 2), 0);
 		return (1);
 	}
 	if (cmd[2])
@@ -68,8 +80,6 @@ int	run_cd(char **cmd, t_minishell *minishell)
 		return (print_and_return("minishell: cd: ", cmd[1],
 				": No such file or directory\n"));
 	}
-	if (getcwd(minishell->pwd, sizeof(minishell->pwd)) == NULL)
-		return (ft_putstr_fd("getcwd error\n", 2), 0);
 	if (!get_pwd(minishell))
 		return (0);
 	return (1);
