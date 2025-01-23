@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 12:00:43 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 21:39:25 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/23 12:06:57 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,18 @@ static int	get_size(char **arr)
 	return (i);
 }
 
+char	**null_termination(char **new_envp, int flag, int j)
+{
+	if (flag)
+		new_envp[j] = NULL;
+	else
+	{
+		free(new_envp[j - 1]);
+		new_envp[j - 1] = NULL;
+	}
+	return (new_envp);
+}
+
 static char	**create_new_envp(char **envp, char *str, int *flag)
 {
 	int		i;
@@ -76,28 +88,23 @@ static char	**create_new_envp(char **envp, char *str, int *flag)
 			return (free_2d_array((void ***)&new_envp), NULL);
 		j++;
 	}
-	new_envp[j] = NULL;
-	return (new_envp);
+	return (null_termination(new_envp, *flag, j));
 }
 
 char	**rm_envp(char **envp, char *str)
 {
 	char	**new_envp;
 	int		flag;
-	int		size;
 
 	flag = 0;
 	new_envp = create_new_envp(envp, str, &flag);
 	if (!new_envp)
 		return (NULL);
-	size = get_size(new_envp);
 	if (flag)
 	{
 		free_2d_array((void ***)&envp);
 		return (new_envp);
 	}
-	free(new_envp[size - 1]);
-	new_envp[size - 1] = NULL;
 	free_2d_array((void ***)&new_envp);
 	return (envp);
 }

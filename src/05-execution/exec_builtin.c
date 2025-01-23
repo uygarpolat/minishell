@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 21:40:13 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/23 12:16:16 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,9 @@ void	run_builtin(t_ast *s, t_minishell *minishell, int n, t_put *cmd)
 	close_and_free(&minishell->p, cmd);
 	free_tokens(&minishell->tokens, &minishell->capacity);
 	minishell->tokens = NULL;
+	//close(0);
+	//close(1);
+	//close(2);
 	exit(0);
 }
 
