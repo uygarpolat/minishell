@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 11:05:16 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/23 16:40:27 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/23 19:29:42 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,11 @@ void	error(t_minishell *minishell, t_put *cmd)
 	free_2d_array((void ***)minishell->envp);
 	if (minishell->p.pipes)
 		close_and_free(&minishell->p, cmd, 0);
+	else
+	{
+		free_heredocs(cmd);
+		free(cmd->cmd_fd);
+	}
 	if (minishell->p.pids)
 		free(minishell->p.pids);
 	if (minishell->tokens)
@@ -28,6 +33,11 @@ void	file_error(t_minishell *minishell, t_put *cmd)
 	free_2d_array((void ***)minishell->envp);
 	if (minishell->p.pipes)
 		close_and_free(&minishell->p, cmd, 0);
+	else
+	{
+		free_heredocs(cmd);
+		free(cmd->cmd_fd);
+	}
 	if (minishell->p.pids)
 		free(minishell->p.pids);
 	if (minishell->ast)
