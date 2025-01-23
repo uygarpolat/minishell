@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:48:00 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 21:40:54 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/23 16:51:09 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,16 @@ void	close_loop(t_pipes *p)
 	}
 }
 
-void	close_and_free(t_pipes *p, t_put *cmd)
+void	free_heredocs(t_put *cmd)
+{
+	int	i;
+
+	i = -1;
+	while (++i < 16)
+		free(cmd->heredocs[i]);
+}
+
+void	close_and_free(t_pipes *p, t_put *cmd, int n)
 {
 	if (p->pipes)
 	{
@@ -47,6 +56,9 @@ void	close_and_free(t_pipes *p, t_put *cmd)
 		close(cmd->in);
 	if (cmd->outfile && cmd->out >= 0)
 		close(cmd->out);
+	if (!n)
+		free_heredocs(cmd);
+	free(cmd->cmd_fd);
 }
 
 int	waiting(int pid)

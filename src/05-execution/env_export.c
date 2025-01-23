@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/23 11:31:05 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/23 12:59:39 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,11 +75,9 @@ int	run_export(char **cmd, char ***envp)
 			return (env_not_valid_identifier(cmd[j], NULL), 0);
 		i = -1;
 		while (str[0][++i])
-		{
 			if (str[0][i] != '_' && !ft_isalpha(str[0][i]) && \
 					!ft_isdigit(str[0][i]))
 				return (env_not_valid_identifier(str[0], &str), 0);
-		}
 		free_2d_array((void ***)&str);
 		*envp = add_env(*envp, cmd[j]);
 		if (!envp)

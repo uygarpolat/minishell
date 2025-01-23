@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 12:11:42 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 21:39:50 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/23 16:41:08 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	stat_zero(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 		free_2d_array((void ***)minishell->envp);
 		free(minishell->p.pids);
 		if (minishell->p.pipes)
-			close_and_free(&minishell->p, cmd);
+			close_and_free(&minishell->p, cmd, 0);
 		if (path)
 			free(path);
 		print_and_exit(s->words[0], "command not found\n", 127, minishell);
@@ -54,7 +54,7 @@ void	stat_zero(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 		free_2d_array((void ***)minishell->envp);
 		free(minishell->p.pids);
 		if (minishell->p.pipes)
-			close_and_free(&minishell->p, cmd);
+			close_and_free(&minishell->p, cmd, 0);
 		if (path)
 			free(path);
 		ft_putstr_fd("minishell: ", 2);
@@ -76,7 +76,7 @@ void	error_check(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 			free_2d_array((void ***)minishell->envp);
 			free(minishell->p.pids);
 			if (minishell->p.pipes)
-				close_and_free(&minishell->p, cmd);
+				close_and_free(&minishell->p, cmd, 0);
 			print_and_exit(s->words[0], "Is a directory\n", 126, minishell);
 		}
 		if (access(path, X_OK) != 0)
@@ -84,7 +84,7 @@ void	error_check(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 			free_2d_array((void ***)minishell->envp);
 			free(minishell->p.pids);
 			if (minishell->p.pipes)
-				close_and_free(&minishell->p, cmd);
+				close_and_free(&minishell->p, cmd, 0);
 			if (path)
 				free(path);
 			print_and_exit(s->words[0], "Permission denied\n", 127, minishell);

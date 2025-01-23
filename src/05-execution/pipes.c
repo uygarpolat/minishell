@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:43:30 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 21:41:20 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/23 16:07:07 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ int	mallocing(t_pipes *p)
 				break ;
 		}
 	}
-	p->pids = malloc(sizeof(int) * (p->count + p->o_count + 1));
+	p->pids = malloc(sizeof(int) * (p->count + 1));
 	if (!p->pids)
 		return (0);
 	return (1);
