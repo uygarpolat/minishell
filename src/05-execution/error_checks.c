@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 12:11:42 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/23 16:41:08 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/23 19:32:24 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,16 +21,22 @@ void	error_not_path(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 		if (!ft_strchr(s->words[0], '/'))
 		{
 			error(minishell, cmd);
+			//free_heredocs(cmd);
+			//free(cmd->cmd_fd);
 			print_and_exit(s->words[0], "command not found\n", 127, minishell);
 		}
 		else if (stat(s->words[0], &buf) == 0 && access(s->words[0], X_OK) != 0)
 		{
 			error(minishell, cmd);
+			//free_heredocs(cmd);
+			//free(cmd->cmd_fd);
 			print_and_exit(s->words[0], "Permission denied\n", 126, minishell);
 		}
 		else if (ft_strchr(s->words[0], '/'))
 		{
 			error(minishell, cmd);
+			//free_heredocs(cmd);
+			//free(cmd->cmd_fd);
 			print_and_exit(s->words[0],
 				"No such file or directory\n", 127, minishell);
 		}
@@ -45,6 +51,11 @@ void	stat_zero(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 		free(minishell->p.pids);
 		if (minishell->p.pipes)
 			close_and_free(&minishell->p, cmd, 0);
+		else
+		{
+			free_heredocs(cmd);
+			free(cmd->cmd_fd);
+		}
 		if (path)
 			free(path);
 		print_and_exit(s->words[0], "command not found\n", 127, minishell);
@@ -55,6 +66,11 @@ void	stat_zero(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 		free(minishell->p.pids);
 		if (minishell->p.pipes)
 			close_and_free(&minishell->p, cmd, 0);
+		else
+		{
+			free_heredocs(cmd);
+			free(cmd->cmd_fd);
+		}
 		if (path)
 			free(path);
 		ft_putstr_fd("minishell: ", 2);
@@ -77,6 +93,11 @@ void	error_check(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 			free(minishell->p.pids);
 			if (minishell->p.pipes)
 				close_and_free(&minishell->p, cmd, 0);
+			else
+			{
+				free_heredocs(cmd);
+				free(cmd->cmd_fd);
+			}
 			print_and_exit(s->words[0], "Is a directory\n", 126, minishell);
 		}
 		if (access(path, X_OK) != 0)
@@ -85,6 +106,11 @@ void	error_check(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 			free(minishell->p.pids);
 			if (minishell->p.pipes)
 				close_and_free(&minishell->p, cmd, 0);
+			else
+			{
+				free_heredocs(cmd);
+				free(cmd->cmd_fd);
+			}
 			if (path)
 				free(path);
 			print_and_exit(s->words[0], "Permission denied\n", 127, minishell);

@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:29:27 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/23 18:55:10 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/23 19:35:50 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,6 @@ void	check_here(t_minishell *minishell, t_put *cmd)
 	{
 		error(minishell, cmd);
 		free_ast(&minishell->ast);
-		free_heredocs(cmd);
-		free(cmd->cmd_fd);
 		ft_putstr_fd("minishell: maximum here-document count exceeded\n", 2);
 		exit(2);
 	}
