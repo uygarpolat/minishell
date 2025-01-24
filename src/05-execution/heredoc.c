@@ -6,18 +6,16 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:29:27 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/23 19:35:50 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/24 13:31:08 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/ast.h"
 #include "../../includes/signals.h"
 
-//heredocs = ".heredoc0", ".heredoc1", ".heredoc2"......".heredoc15"
-
 int	count_docs(t_ast *ast)
 {
-	t_ast 	*temp;
+	t_ast	*temp;
 	t_ast	*temp2;
 	int		count;
 
@@ -40,9 +38,9 @@ int	count_docs(t_ast *ast)
 void	check_here(t_minishell *minishell, t_put *cmd)
 {
 	t_ast	*ast;
-	int	count;
-	int	i;
-	int	j;
+	int		count;
+	int		i;
+	int		j;
 
 	ast = minishell->ast;
 	i = 0;
@@ -70,7 +68,7 @@ void	here_loop(t_ast *s, t_ast *ast, t_put *cmd, int *i)
 {
 	t_ast	*temp;
 	int		flag;
-	
+
 	temp = ast->redir_target;
 	flag = 0;
 	while (temp)
