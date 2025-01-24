@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 13:20:01 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/24 13:29:07 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/24 14:09:49 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,4 +54,12 @@ char	**null_termination(char **new_envp, int flag, int j)
 		new_envp[j - 1] = NULL;
 	}
 	return (new_envp);
+}
+
+void	assign_out_fd(t_pipes *p, int n, int *out)
+{
+	if (n % 2 == 0)
+		*out = p->pipes[0][1];
+	else
+		*out = p->pipes[1][1];
 }

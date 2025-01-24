@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/24 13:27:28 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/24 14:10:08 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,7 @@ void		unlink_here(t_put *cmd);
 void		pipe_fail(t_pipes *p);
 int			ft_pipe(t_pipes *p, int n, t_minishell *minishell, t_put *cmd);
 char		**null_termination(char **new_envp, int flag, int j);
+void		assign_out_fd(t_pipes *p, int n, int *out);
 
 //path.c
 char		*get_path(char **cmd, char **envp);
