@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/23 17:45:32 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/24 14:10:08 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,13 @@ void		no_words(t_ast *s, t_minishell *minishell, t_put *cmd);
 void		pipe_close(t_pipes *p, int pipe_no, int flag);
 void		set_pwd(t_minishell *minishell, char **envp);
 int			check_newlines(char **cmd);
+void		unlink_here(t_put *cmd);
+
+//execution_utils_2.c
+void		pipe_fail(t_pipes *p);
+int			ft_pipe(t_pipes *p, int n, t_minishell *minishell, t_put *cmd);
+char		**null_termination(char **new_envp, int flag, int j);
+void		assign_out_fd(t_pipes *p, int n, int *out);
 
 //path.c
 char		*get_path(char **cmd, char **envp);
@@ -207,4 +214,5 @@ int			here(t_tokens *token, t_ast *ast, t_put *cmd, int *i);
 
 //var.c
 int			var_exists(char **envp, char *str);
+
 #endif

@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2025/01/22 21:41:44 by upolat           ###   ########.fr        #
+#    Updated: 2025/01/24 13:19:45 by upolat           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,7 +36,7 @@ SOURCES = 	$(SRC_DIR)/main.c \
 			$(VISUALIZATION_DIR)/print_welcome.c \
 			\
 			$(EXECUTION_DIR)/execution.c $(EXECUTION_DIR)/path.c \
-			$(EXECUTION_DIR)/execution_utils.c \
+			$(EXECUTION_DIR)/execution_utils.c $(EXECUTION_DIR)/execution_utils_2.c \
 			$(EXECUTION_DIR)/builtins.c $(EXECUTION_DIR)/env_export.c \
 		 	$(EXECUTION_DIR)/ft_strdup2.c $(EXECUTION_DIR)/errors.c \
 			$(EXECUTION_DIR)/ft_atol.c  $(EXECUTION_DIR)/files.c $(EXECUTION_DIR)/functions.c \

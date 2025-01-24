@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 17:16:21 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/23 19:32:49 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/24 13:29:16 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,4 +64,16 @@ int	check_newlines(char **cmd)
 			break ;
 	}
 	return (i);
+}
+
+void	unlink_here(t_put *cmd)
+{
+	int	i;
+
+	i = -1;
+	while (++i < 16)
+	{
+		if (access(cmd->heredocs[i], F_OK) == 0)
+			unlink(cmd->heredocs[i]);
+	}
 }

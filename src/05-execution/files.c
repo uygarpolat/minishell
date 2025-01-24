@@ -6,18 +6,21 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:39:14 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/23 17:35:46 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/24 14:09:45 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/ast.h"
 
-void	assign_out_fd(t_pipes *p, int n, int *out)
+void	handle_p_count(t_pipes *p, int in, int out, t_put *cmd)
 {
-	if (n % 2 == 0)
-		*out = p->pipes[0][1];
-	else
-		*out = p->pipes[1][1];
+	if (p->count == 0)
+	{
+		if (cmd->infile)
+			close(in);
+		if (cmd->outfile)
+			close(out);
+	}
 }
 
 void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
@@ -44,13 +47,7 @@ void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 		error2(minishell, "dup2 error\n", cmd);
 	if (in >= 0 && dup2(in, 0) == -1)
 		error2(minishell, "dup2 error\n", cmd);
-	if (p->count == 0)
-	{
-		if (cmd->infile)
-			close(in);
-		if (cmd->outfile)
-			close(out);
-	}
+	handle_p_count(p, in, out, cmd);
 }
 
 int	open_files(t_put *cmd)
