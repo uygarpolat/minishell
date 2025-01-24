@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 12:00:43 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/23 12:06:57 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/24 13:27:13 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,18 +49,6 @@ static int	get_size(char **arr)
 	while (arr[i])
 		i++;
 	return (i);
-}
-
-char	**null_termination(char **new_envp, int flag, int j)
-{
-	if (flag)
-		new_envp[j] = NULL;
-	else
-	{
-		free(new_envp[j - 1]);
-		new_envp[j - 1] = NULL;
-	}
-	return (new_envp);
 }
 
 static char	**create_new_envp(char **envp, char *str, int *flag)
