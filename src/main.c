@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/22 21:37:53 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/25 16:16:58 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 #include "../includes/tokenizer.h"
 #include "../includes/ast.h"
 #include "../includes/signals.h"
-
-void	display_welcome_message(int *code, char **new_envp, int flag);
 
 int	g_signal = 0;
 
@@ -133,7 +131,6 @@ int	main(int argc, char **argv, char **envp)
 		return (error_handler(NULL, NULL, &code, 1), code);
 	if (init_term_and_signal(argc, argv, &code))
 		return (free_2d_array((void ***)&new_envp), EXIT_FAILURE);
-	display_welcome_message(&code, new_envp, 0);
 	while (1)
 	{
 		input_res = preliminary_input_check(&input);
