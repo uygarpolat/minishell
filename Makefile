@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2025/01/24 13:19:45 by upolat           ###   ########.fr        #
+#    Updated: 2025/01/25 16:21:09 by upolat           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,7 +33,6 @@ SOURCES = 	$(SRC_DIR)/main.c \
 			$(SIGNALS_DIR)/signals.c $(SIGNALS_DIR)/signals_utils.c \
 			\
 			$(VISUALIZATION_DIR)/print_ast.c $(VISUALIZATION_DIR)/print_tokens.c \
-			$(VISUALIZATION_DIR)/print_welcome.c \
 			\
 			$(EXECUTION_DIR)/execution.c $(EXECUTION_DIR)/path.c \
 			$(EXECUTION_DIR)/execution_utils.c $(EXECUTION_DIR)/execution_utils_2.c \
