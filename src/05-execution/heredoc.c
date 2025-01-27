@@ -6,14 +6,14 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:29:27 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 11:11:21 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 14:04:36 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/ast.h"
 #include "../../includes/signals.h"
 
-int	count_docs(t_ast *ast)
+static int	count_docs(t_ast *ast)
 {
 	t_ast	*temp;
 	t_ast	*temp2;
@@ -35,6 +35,14 @@ int	count_docs(t_ast *ast)
 	return (count);
 }
 
+static void	too_many_docs(t_minishell *minishell, t_put *cmd)
+{
+	error(minishell, cmd);
+	free_ast(&minishell->ast);
+	ft_putstr_fd("minishell: maximum here-document count exceeded\n", 2);
+	exit(2);
+}
+
 void	check_here(t_minishell *minishell, t_put *cmd)
 {
 	t_ast	*ast;
@@ -47,12 +55,7 @@ void	check_here(t_minishell *minishell, t_put *cmd)
 	j = 0;
 	count = count_docs(minishell->ast);
 	if (count > 16)
-	{
-		error(minishell, cmd);
-		free_ast(&minishell->ast);
-		ft_putstr_fd("minishell: maximum here-document count exceeded\n", 2);
-		exit(2);
-	}
+		too_many_docs(minishell, cmd);
 	while (ast)
 	{
 		if (ast->type == AST_COMMAND)
@@ -97,7 +100,7 @@ int	here(t_tokens *token, t_ast *ast, t_put *cmd, int *i)
 
 	fd = open(cmd->heredocs[*i], O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (fd < 0)
-		return (0); //should we check for this???
+		return (0);
 	set_signals(ast->code_parser, SIGNAL_HEREDOC);
 	while (1)
 	{

@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:43:30 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 11:16:34 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 14:00:11 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,35 +51,7 @@ int	count_pipes(t_ast *s)
 	return (count);
 }
 
-/*
-int	count_operators(t_ast *s)
-{
-	t_ast	*temp;
-	t_ast	*i;
-	int		count;
-
-	i = s;
-	temp = s;
-	count = 0;
-	while (i->type != AST_COMMAND)
-	{
-		if (i->type == AST_AND || i->type == AST_OR)
-			temp = i;
-		else if (i->left->type == AST_AND || i->left->type == AST_OR)
-			temp = i->right;
-		else if (i->right->type == AST_AND || i->right->type == AST_OR)
-			temp = i->right;
-		while (temp->type == AST_AND || temp->type == AST_OR)
-		{
-			temp = temp->left;
-			count++;
-		}
-		i = i->right;
-	}
-	return (count);
-}*/
-
-int	malloc_check(t_pipes *p)
+static int	malloc_check(t_pipes *p)
 {
 	if (p->count == 1)
 		p->pipes = malloc(sizeof(int *) * 1);

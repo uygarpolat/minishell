@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 12:37:37 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 13:57:25 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	print_env(char **envp)
 	}
 }
 
-int	print_export(char **envp)
+static int	print_export(char **envp)
 {
 	int	i;
 
@@ -47,7 +47,7 @@ int	print_export(char **envp)
 	return (1);
 }
 
-void	env_not_valid_identifier(char *str, char ***str2)
+static void	env_not_valid_identifier(char *str, char ***str2)
 {
 	ft_putstr_fd("minishell: export: ", 2);
 	ft_putstr_fd(str, 2);

@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 11:05:16 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/23 19:29:42 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 13:20:13 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,8 @@ void	print_and_exit(char *cmd, char *str, int code, t_minishell *minishell)
 		ft_putstr_fd(cmd, 2);
 	ft_putstr_fd(": ", 2);
 	ft_putstr_fd(str, 2);
+	if (minishell->envp)
+		free_2d_array((void ***)minishell->envp);
 	if (minishell->ast)
 		free_ast(&minishell->ast);
 	if (minishell->tokens)

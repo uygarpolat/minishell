@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 12:10:49 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 13:48:22 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	run_echo(char **cmd)
 	return (1);
 }
 
-int	get_pwd(t_minishell *minishell)
+static int	get_pwd(t_minishell *minishell)
 {
 	char	*pwd;
 	char	*old_pwd;
@@ -86,7 +86,7 @@ int	run_cd(char **cmd, t_minishell *minishell)
 	return (1);
 }
 
-void	graceful_exit(t_minishell *minishell, t_put *file,
+static void	graceful_exit(t_minishell *minishell, t_put *file,
 			long long i, int flag)
 {
 	free_2d_array((void ***)minishell->envp);

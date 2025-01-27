@@ -6,13 +6,13 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:52:03 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 21:41:11 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/27 13:45:40 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/ast.h"
 
-char	**paths(char **envp)
+static char	**paths(char **envp)
 {
 	char	*paths;
 	char	**all_paths;

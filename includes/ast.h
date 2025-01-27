@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 12:37:16 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 14:05:46 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,66 +102,64 @@ typedef struct s_token_info
 	char		***envp;
 }				t_token_info;
 
-//execution.c
+// execution.c
 int			execution(t_ast *s, t_token_info *token_info,
 				t_minishell *minishell);
-int			open_files(t_put *cmd);
-void		dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
-void		unlink_here(t_put *cmd);
 
-//execution_utils.c
+// execution_utils.c
 void		no_words(t_ast *s, t_minishell *minishell, t_put *cmd);
 void		pipe_close(t_pipes *p, int pipe_no, int flag);
 void		set_pwd(t_minishell *minishell, char **envp);
 int			check_newlines(char **cmd);
 void		unlink_here(t_put *cmd);
 
-//execution_utils_2.c
+// execution_utils_2.c
 void		pipe_fail(t_pipes *p);
+void		free_pipes(t_pipes *p);
 int			ft_pipe(t_pipes *p, int n, t_minishell *minishell, t_put *cmd);
 char		**null_termination(char **new_envp, int flag, int j);
 void		assign_out_fd(t_pipes *p, int n, int *out);
 
-//path.c
-char		*get_path(char **cmd, char **envp);
-char		**paths(char **envp);
+// init.c
+int			initialize(t_put *cmd, t_minishell *minishell, \
+				t_ast *s, t_token_info *token_info);
+int			init_heredocs(t_put *cmd);
 
-//exec_builtin.c
+// path.c
+char		*get_path(char **cmd, char **envp);
+
+// exec_builtin.c
 int			only_builtin(t_minishell *minishell, t_put *cmd);
 void		run_builtin(t_ast *s, t_minishell *minishell, int n, t_put *cmd);
-
-//builtins.c
-int			execute_builtin(t_ast *s, t_minishell *minishell,
-				int n, t_put *file);
 int			is_builtin(char **cmd);
-char		*get_var(char **envp, char *key);
+
+// builtins.c
 int			run_exit(t_ast *s, t_minishell *minishell,
 				t_put *file);
 int			run_cd(char **cmd, t_minishell *minishell);
 int			run_echo(char **cmd);
 
-//env_export.c
+// env_export.c
+int			get_envp_size(char **envp);
 int			run_export(char **cmd, t_minishell *minishell);
+void		print_env(char **envp);
+
+// env.c
 char		**ch_envp(char **envp, char *cmd);
 char		**add_env(char **envp, char *cmd);
 char		**rm_envp(char **envp, char *cmd);
-void		print_env(char **envp);
-char		**ch_var(char **envp, char *str);
-int			get_envp_size(char **envp);
 
-//files.c
+// files.c
 void		dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
-int			open_files(t_put *cmd);
 void		get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell, int n);
 void		check_in_out(t_ast *s, t_minishell *minishell, t_put *file, int n);
 
-//pipes.c
+// pipes.c
 void		close_pipes(t_minishell *minishell, int n);
 int			count_pipes(t_ast *s);
-int			count_operators(t_ast *s);
 int			mallocing(t_pipes *p);
 
-//functions.c
+// functions.c
 int			waiting(int pid);
 void		close_and_free(t_pipes *p, t_put *cmd, int n);
 int			print_and_return(char *str, char *cmd, char *str2);
@@ -171,15 +169,18 @@ void		free_heredocs(t_put *cmd);
 char		**ft_strdup2(char **str);
 char		**ft_strdup3(char **str, char *dir);
 
-//errors.c
+// errors.c
 void		error(t_minishell *minishell, t_put *cmd);
 void		error2(t_minishell *minishell, char *str, t_put *cmd);
 void		print_and_exit(char *cmd, char *str, int code,
 				t_minishell *minishell);
 void		file_error(t_minishell *minishell, t_put *cmd);
 int			print_error(char *str);
+
+// error_checks.c
 void		error_check(char *path, t_ast *s,
 				t_minishell *minishell, t_put *cmd);
+void		exit_heredocs(t_put *p);
 
 // parser.c
 t_ast		*build_ast(t_tokens *tokens, int start, int end, int code);
@@ -204,15 +205,17 @@ int			populate_command_node(t_tokens *tokens,
 // print_ast.c
 void		print_ast(t_ast *node, int level, int flag);
 
-//ft_atol.c
+// ft_atol.c
 long long	ft_atol(const char *str);
 
-//heredoc.c
+// heredoc.c
 void		check_here(t_minishell *minishell, t_put *cmd);
 void		here_loop(t_ast *s, t_ast *ast, t_put *cmd, int *i);
 int			here(t_tokens *token, t_ast *ast, t_put *cmd, int *i);
 
-//var.c
+// var.c
+char		*get_var(char **envp, char *key);
 int			var_exists(char **envp, char *str);
+char		**ch_var(char **envp, char *str);
 
 #endif

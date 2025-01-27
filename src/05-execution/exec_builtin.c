@@ -6,13 +6,14 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 12:44:14 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 14:07:38 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/ast.h"
 
-int	execute_builtin(t_ast *s, t_minishell *minishell, int n, t_put *file)
+static int	execute_builtin(t_ast *s, t_minishell *minishell, \
+			int n, t_put *file)
 {
 	if (minishell->p.count == 0)
 		check_in_out(s, minishell, file, n);
