@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 13:43:51 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 16:50:30 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ static void	execute_tree(t_minishell *minishell, t_put *cmd)
 
 static int	interrupted(t_minishell *minishell, t_put *cmd)
 {
+	unlink_here(cmd);
 	exit_heredocs(cmd);
 	if (minishell->p.count > 0)
 		free_pipes(&minishell->p);
@@ -89,7 +90,8 @@ int	execution(t_ast *s, t_token_info *token_info, t_minishell *minishell)
 		s->code = waiting(minishell->p.pids[i++]);
 	if (minishell->p.pids)
 		free(minishell->p.pids);
-	unlink_here(&cmd);
+	if (minishell->here == 1)
+		unlink_here(&cmd);
 	free_heredocs(&cmd);
 	return (s->code);
 }

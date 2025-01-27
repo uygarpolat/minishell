@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/24 13:20:01 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/27 13:26:16 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 15:14:08 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	free_pipes(t_pipes *p)
 	int	i;
 
 	i = -1;
-	while (++i < p->count)
+	while (++i < 2)
 		free(p->pipes[i]);
 	free(p->pipes);
 }
