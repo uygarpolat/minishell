@@ -6,11 +6,28 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 14:07:38 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 15:26:21 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/ast.h"
+
+static int	run_unset(char ***envp, t_ast *s)
+{
+	int	i;
+
+	if (s->words[1])
+	{
+		i = 0;
+		while (s->words[++i])
+		{
+			*envp = rm_envp(*envp, s->words[i]);
+			if (!envp)
+				return (0);
+		}
+	}
+	return (1);
+}
 
 static int	execute_builtin(t_ast *s, t_minishell *minishell, \
 			int n, t_put *file)
@@ -26,12 +43,7 @@ static int	execute_builtin(t_ast *s, t_minishell *minishell, \
 	else if (!ft_strncmp(s->words[0], "export", 7))
 		return (run_export(s->words, minishell));
 	else if (!ft_strncmp(s->words[0], "unset", 6))
-	{
-		if (s->words[1])
-			*minishell->envp = rm_envp(*minishell->envp, s->words[1]);
-		if (!minishell->envp)
-			return (0);
-	}
+		return (run_unset(minishell->envp, s));
 	else if (!ft_strncmp(s->words[0], "env", 4))
 		print_env(*minishell->envp);
 	else if (!ft_strncmp(s->words[0], "exit", 5))

@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 12:00:43 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 13:11:14 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 15:43:31 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ static char	**create_new_envp(char **envp, char *str, int *flag)
 	j = 0;
 	while (envp[++i] && j < len)
 	{
-		if (!ft_strncmp(str, envp[i], ft_strlen(str)))
+		if (!ft_strncmp(str, envp[i], ft_strlen(str)) && (envp[i][ft_strlen(str)] == '=' || envp[i][ft_strlen(str)] == '\0'))
 		{
 			*flag = 1;
 			continue ;

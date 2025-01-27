@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 13:29:41 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 13:35:49 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 16:38:42 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ int	initialize(t_put *cmd, t_minishell *minishell,
 	minishell->tokens = token_info->tokens;
 	minishell->capacity = token_info->capacity;
 	minishell->envp = token_info->envp;
+	minishell->here = 0;
 	s->code = 0;
 	if (!init_heredocs(cmd))
 		return (0);

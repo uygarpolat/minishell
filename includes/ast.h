@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 14:05:46 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 16:39:32 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ typedef struct s_minishell
 	t_capacity	capacity;
 	char		***envp;
 	char		pwd[PATH_MAX];
+	int			here;
 }				t_minishell;
 
 typedef struct s_token_info
@@ -210,7 +211,7 @@ long long	ft_atol(const char *str);
 
 // heredoc.c
 void		check_here(t_minishell *minishell, t_put *cmd);
-void		here_loop(t_ast *s, t_ast *ast, t_put *cmd, int *i);
+void		here_loop(t_minishell *minishell, t_ast *ast, t_put *cmd, int *i);
 int			here(t_tokens *token, t_ast *ast, t_put *cmd, int *i);
 
 // var.c

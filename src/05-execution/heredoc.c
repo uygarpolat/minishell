@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:29:27 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 14:04:36 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 16:39:58 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,9 @@ void	check_here(t_minishell *minishell, t_put *cmd)
 	while (ast)
 	{
 		if (ast->type == AST_COMMAND)
-			here_loop(minishell->ast, ast, cmd, &i);
+			here_loop(minishell, ast, cmd, &i);
 		else if (ast->type == AST_PIPE)
-			here_loop(minishell->ast, ast->left, cmd, &i);
+			here_loop(minishell, ast->left, cmd, &i);
 		ast = ast->right;
 		cmd->cmd_fd[j++] = i - 1;
 		if (g_signal == 130)
@@ -69,7 +69,7 @@ void	check_here(t_minishell *minishell, t_put *cmd)
 	}
 }
 
-void	here_loop(t_ast *s, t_ast *ast, t_put *cmd, int *i)
+void	here_loop(t_minishell *minishell, t_ast *ast, t_put *cmd, int *i)
 {
 	t_ast	*temp;
 	int		flag;
@@ -80,9 +80,18 @@ void	here_loop(t_ast *s, t_ast *ast, t_put *cmd, int *i)
 	{
 		if (temp->type == AST_HEREDOC)
 		{
+			minishell->here = 1;
 			if (flag > 0)
 				unlink(cmd->heredocs[*i - 1]);
-			here(temp->token, s, cmd, i);
+			if (here(temp->token, minishell->ast, cmd, i) == -1)
+			{
+				ft_putstr_fd("minishell: warning: here-document at" \
+					"line 1 delimited by end-of-file", 2);
+				ft_putstr_fd(" (wanted ", 2);
+				ft_putstr_fd("`", 2);
+				ft_putstr_fd(temp->token->value, 2);
+				ft_putstr_fd("')\n", 2);
+			}
 			*i += 1;
 			flag++;
 		}
@@ -105,7 +114,12 @@ int	here(t_tokens *token, t_ast *ast, t_put *cmd, int *i)
 	while (1)
 	{
 		buf = readline("> ");
-		if (g_signal == 130 || !buf)
+		if (!buf)
+		{
+			close(fd);
+			return (-1);
+		}
+		if (g_signal == 130)
 		{
 			*ast->code_parser = 130;
 			break ;
