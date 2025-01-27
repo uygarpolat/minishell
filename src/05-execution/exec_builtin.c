@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/23 17:49:46 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 11:34:23 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ int	only_builtin(t_minishell *minishell, t_put *cmd)
 {
 	if (!execute_builtin(minishell->ast, minishell, 0, cmd))
 	{
+		free_heredocs(cmd);
+		free(cmd->cmd_fd);
 		free(minishell->p.pids);
 		return (1);
 	}

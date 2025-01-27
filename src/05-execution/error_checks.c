@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 12:11:42 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/24 14:04:43 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/27 12:09:05 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	error_not_path(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 
 	if (!path)
 	{
-		if (!ft_strchr(s->words[0], '/'))
+		if (!ft_strchr(s->words[0], '/') && get_var(*minishell->envp, "PATH="))
 		{
 			error(minishell, cmd);
 			// exit_heredocs(cmd);
@@ -36,7 +36,7 @@ void	error_not_path(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 			// exit_heredocs(cmd);
 			print_and_exit(s->words[0], "Permission denied\n", 126, minishell);
 		}
-		else if (ft_strchr(s->words[0], '/'))
+		else if (ft_strchr(s->words[0], '/') || !get_var(*minishell->envp, "PATH="))
 		{
 			error(minishell, cmd);
 			// exit_heredocs(cmd);
@@ -50,14 +50,20 @@ void	stat_zero(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 {
 	if (!ft_strncmp(s->words[0], "..", 3) || !ft_strncmp(s->words[0], "\0", 2))
 	{
-		free_2d_array((void ***)minishell->envp);
+		//free_2d_array((void ***)minishell->envp);
 		free(minishell->p.pids);
 		if (minishell->p.pipes)
 			close_and_free(&minishell->p, cmd, 0);
 		else
 			exit_heredocs(cmd);
 		free_void((void **)&path, NULL);
-		print_and_exit(s->words[0], "command not found\n", 127, minishell);
+		if (get_var(*minishell->envp, "PATH="))
+		{
+			free_2d_array((void ***)minishell->envp);
+			print_and_exit(s->words[0], "command not found\n", 127, minishell);
+		}
+		free_2d_array((void ***)minishell->envp);
+		print_and_exit(s->words[0], "Is a directory\n", 126, minishell);
 	}
 	if (!ft_strncmp(s->words[0], ".", 2))
 	{
@@ -88,10 +94,11 @@ void	error_check(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 {
 	struct stat	buf;
 
+	stat_zero(path, s, minishell, cmd);
 	error_not_path(path, s, minishell, cmd);
 	if (stat(path, &buf) == 0)
 	{
-		stat_zero(path, s, minishell, cmd);
+		//stat_zero(path, s, minishell, cmd);
 		if (S_ISDIR(buf.st_mode))
 		{
 			handle_exception(minishell, cmd);

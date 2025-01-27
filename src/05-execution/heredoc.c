@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:29:27 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/24 13:31:08 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/27 11:11:21 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,8 @@ void	check_here(t_minishell *minishell, t_put *cmd)
 			here_loop(minishell->ast, ast->left, cmd, &i);
 		ast = ast->right;
 		cmd->cmd_fd[j++] = i - 1;
+		if (g_signal == 130)
+			break ;
 	}
 }
 
@@ -81,6 +83,8 @@ void	here_loop(t_ast *s, t_ast *ast, t_put *cmd, int *i)
 			*i += 1;
 			flag++;
 		}
+		if (*ast->code_parser == 130)
+			break ;
 		temp = temp->redir_target;
 	}
 }

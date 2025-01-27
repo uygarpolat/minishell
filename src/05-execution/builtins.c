@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/23 17:48:09 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 12:10:49 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,12 +104,12 @@ int	run_exit(t_ast *s, t_minishell *minishell, t_put *file)
 
 	if (!s->words[1])
 		return (1);
-	printf("exit\n");
+	ft_putstr_fd("exit\n", 1);
 	if (s->words[2])
 	{
 		ft_putstr_fd("minishell: exit: too many arguments\n", 2);
 		if (!ft_isdigit(*s->words[1]) && ft_isdigit(*s->words[2]))
-			graceful_exit(minishell, file, 2, 0);
+			graceful_exit(minishell, file, 2, 1);
 		return (0);
 	}
 	i = ft_atol(s->words[1]);
