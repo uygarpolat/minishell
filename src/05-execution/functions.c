@@ -6,13 +6,13 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:48:00 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/23 16:51:09 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 14:00:38 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/ast.h"
 
-void	close_loop(t_pipes *p)
+static void	close_loop(t_pipes *p)
 {
 	int	i;
 

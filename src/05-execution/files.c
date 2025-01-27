@@ -6,13 +6,13 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:39:14 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/24 14:09:45 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/27 13:58:40 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/ast.h"
 
-void	handle_p_count(t_pipes *p, int in, int out, t_put *cmd)
+static void	handle_p_count(t_pipes *p, int in, int out, t_put *cmd)
 {
 	if (p->count == 0)
 	{
@@ -50,7 +50,7 @@ void	dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n)
 	handle_p_count(p, in, out, cmd);
 }
 
-int	open_files(t_put *cmd)
+static int	open_files(t_put *cmd)
 {
 	if (cmd->infile)
 	{
