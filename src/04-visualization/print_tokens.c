@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:32:25 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/27 22:03:25 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/27 23:21:19 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ void	print_tokens(t_tokens *tokens, t_capacity *capacity, int flag)
 	i = 0;
 	while (i < capacity->current_size)
 	{
-		printf("token %d: %-20s type: %s (flag: %d)\n",
-			i, tokens[i].value, token_type_str[tokens[i].type], tokens[i].flag);
+		printf("token %d: %-20s type: %s\n",
+			i, tokens[i].value, token_type_str[tokens[i].type]);
 		i++;
 	}
 	printf("----------\n");

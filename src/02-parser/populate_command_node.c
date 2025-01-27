@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 11:46:21 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/27 22:49:25 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/27 23:31:26 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,11 +69,10 @@ static int	populate_command_node_malloc_counter(t_tokens *tokens,
 				malloc_counter++;
 		}
 		else if (tokens[j].flag)
-			malloc_counter += get_size_split(tokens, tokens[j].value);
+			malloc_counter += get_size_split(tokens, tokens[j].value); // Need malloc check
 		else
 			malloc_counter++;
 	}
-	printf("malloc_counter: %d\n", malloc_counter);
 	(*root)->words = ft_calloc(malloc_counter + 1, sizeof(char *));
 	if ((*root)->words == NULL)
 		return (error_handler(NULL, NULL, tokens->code, 1), -1);
@@ -114,13 +113,13 @@ static int	populate_command_node_empty_check(t_tokens *tokens,
 	}
 	else
 	{
+		// handle everything better
 		split = ft_split(tokens[i].value, ' ');
 		if (split == NULL)
 			return (error_handler(NULL, NULL, tokens->code, 1), -1);
 		int i = 0;
 		while (split[i])
 		{
-			printf("%s\n", split[i]);
 			*root->words = ft_strdup(split[i]);
 			if (*root->words == NULL)
 			{

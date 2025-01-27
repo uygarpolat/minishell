@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/27 22:07:30 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/27 23:20:54 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ int	execute_shell(char *input, int *code,
 		ast = build_ast(tokens, 0, capacity.current_size - 1, 0);
 		if (ast)
 		{
-			print_ast(ast, 0, 1);
+			print_ast(ast, 0, 0);
 			g_signal = 0;
 			token_info.tokens = tokens;
 			token_info.capacity = capacity;
