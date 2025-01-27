@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/24 14:10:08 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/27 12:37:16 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,7 @@ int			run_cd(char **cmd, t_minishell *minishell);
 int			run_echo(char **cmd);
 
 //env_export.c
-int			run_export(char **cmd, char ***envp);
+int			run_export(char **cmd, t_minishell *minishell);
 char		**ch_envp(char **envp, char *cmd);
 char		**add_env(char **envp, char *cmd);
 char		**rm_envp(char **envp, char *cmd);

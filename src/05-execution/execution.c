@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 11:27:58 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 12:16:22 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ int	initialize(t_put *cmd, t_minishell *minishell,
 void	free_pipes(t_pipes *p)
 {
 	int	i;
-	
+
 	i = -1;
 	while (++i < p->count)
 		free(p->pipes[i]);
