@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/24 13:20:50 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/27 11:27:58 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +106,16 @@ int	initialize(t_put *cmd, t_minishell *minishell,
 	return (1);
 }
 
+void	free_pipes(t_pipes *p)
+{
+	int	i;
+	
+	i = -1;
+	while (++i < p->count)
+		free(p->pipes[i]);
+	free(p->pipes);
+}
+
 int	execution(t_ast *s, t_token_info *token_info, t_minishell *minishell)
 {
 	int			i;
@@ -116,7 +126,13 @@ int	execution(t_ast *s, t_token_info *token_info, t_minishell *minishell)
 		return (error2(minishell, "malloc failed\n", &cmd), 1);
 	check_here(minishell, &cmd);
 	if (g_signal == 130)
+	{
+		free_heredocs(&cmd);
+		free(cmd.cmd_fd);
+		if (minishell->p.count > 0)
+			free_pipes(&minishell->p);
 		return (free(minishell->p.pids), 130);
+	}
 	if (minishell->p.count == 0 && is_builtin(s->words))
 		return (only_builtin(minishell, &cmd));
 	else

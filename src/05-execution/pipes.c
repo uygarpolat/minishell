@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:43:30 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/23 16:07:07 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 11:16:34 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ int	count_pipes(t_ast *s)
 	return (count);
 }
 
+/*
 int	count_operators(t_ast *s)
 {
 	t_ast	*temp;
@@ -76,7 +77,7 @@ int	count_operators(t_ast *s)
 		i = i->right;
 	}
 	return (count);
-}
+}*/
 
 int	malloc_check(t_pipes *p)
 {
