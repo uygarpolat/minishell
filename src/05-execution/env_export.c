@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/23 12:59:39 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 12:37:37 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,14 +57,14 @@ void	env_not_valid_identifier(char *str, char ***str2)
 		free_2d_array((void ***)str2);
 }
 
-int	run_export(char **cmd, char ***envp)
+int	run_export(char **cmd, t_minishell *minishell)
 {
 	int		i;
 	int		j;
 	char	**str;
 
 	if (!cmd[1])
-		return (print_export(*envp));
+		return (print_export(*minishell->envp));
 	if (cmd[1][0] != '_' && !ft_isalpha(cmd[1][0]))
 		return (env_not_valid_identifier(cmd[1], NULL), 0);
 	j = 0;
@@ -79,8 +79,8 @@ int	run_export(char **cmd, char ***envp)
 					!ft_isdigit(str[0][i]))
 				return (env_not_valid_identifier(str[0], &str), 0);
 		free_2d_array((void ***)&str);
-		*envp = add_env(*envp, cmd[j]);
-		if (!envp)
+		*minishell->envp = add_env(*minishell->envp, cmd[j]);
+		if (!minishell->envp)
 			return (0);
 	}
 	return (1);

@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 11:34:23 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/27 12:44:14 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int	execute_builtin(t_ast *s, t_minishell *minishell, int n, t_put *file)
 	else if (!ft_strncmp(s->words[0], "pwd", 4))
 		printf("%s\n", minishell->pwd);
 	else if (!ft_strncmp(s->words[0], "export", 7))
-		return (run_export(s->words, minishell->envp));
+		return (run_export(s->words, minishell));
 	else if (!ft_strncmp(s->words[0], "unset", 6))
 	{
 		if (s->words[1])
@@ -70,6 +70,7 @@ void	run_builtin(t_ast *s, t_minishell *minishell, int n, t_put *cmd)
 	if (!execute_builtin(s, minishell, n, cmd))
 	{
 		error(minishell, cmd);
+		free_ast(&minishell->ast);
 		exit(1);
 	}
 	free_2d_array((void ***)minishell->envp);
