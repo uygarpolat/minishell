@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 15:00:15 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/27 20:05:38 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/27 21:57:06 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ typedef struct s_tokens
 	char				*value;
 	char				**globbed;
 	int					*code;
+	int					flag;
 }						t_tokens;
 
 typedef struct s_capacity

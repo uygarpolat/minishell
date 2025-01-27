@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:25:49 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/27 20:03:48 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/27 22:00:36 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,7 @@ t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
 			new_tokens[i].globbed = NULL;
 			new_tokens[i].type = tokens[i].type;
 			new_tokens[i].code = tokens[i].code;
+			new_tokens[i].flag = tokens[i].flag;
 		}
 		else
 		{

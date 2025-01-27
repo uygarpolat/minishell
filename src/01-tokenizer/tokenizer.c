@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/30 11:16:11 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/15 17:10:03 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/27 22:01:23 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ static int	init_tokenizer(t_tokens **tokens, t_capacity *capacity, int *code)
 		return (error_handler(NULL, NULL, (*tokens)->code, 1), -1);
 	(*tokens)->globbed = NULL;
 	(*tokens)->code = code;
+	(*tokens)->flag = 0;
 	return (0);
 }
 
