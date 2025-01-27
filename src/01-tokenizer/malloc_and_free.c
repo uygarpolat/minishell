@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:25:49 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/22 21:35:11 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/27 23:20:06 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,13 @@ t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
 			new_tokens[i].globbed = NULL;
 			new_tokens[i].type = tokens[i].type;
 			new_tokens[i].code = tokens[i].code;
+			new_tokens[i].flag = tokens[i].flag;
 		}
 		else
 		{
 			new_tokens[i].value = NULL;
 			new_tokens[i].globbed = NULL;
+			new_tokens[i].flag = 0;
 		}
 	}
 	free_tokens(&tokens, capacity);
@@ -72,7 +74,7 @@ t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
 	return (new_tokens);
 }
 
-int	check_asterisk(int *int_array)
+int	check_char_in_intarray(int *int_array, char chr)
 {
 	int		i;
 	char	c;
@@ -81,7 +83,7 @@ int	check_asterisk(int *int_array)
 	while (int_array[i])
 	{
 		c = (char)int_array[i];
-		if (c == '*')
+		if (c == chr)
 			return (0);
 		i++;
 	}
