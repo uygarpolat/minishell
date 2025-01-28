@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/28 08:29:57 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/28 09:50:15 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,10 @@ void		free_pipes(t_pipes *p);
 int			ft_pipe(t_pipes *p, int n, t_minishell *minishell, t_put *cmd);
 char		**null_termination(char **new_envp, int flag, int j);
 void		assign_out_fd(t_pipes *p, int n, int *out);
+
+// execution_utils_3.c
+void		put_heredoc_ctrl_d(char *str);
+void		heredoc_echo(int fd, char *buf);
 
 // init.c
 int			initialize(t_put *cmd, t_minishell *minishell, \
