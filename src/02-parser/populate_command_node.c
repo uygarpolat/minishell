@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 11:46:21 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/27 23:31:26 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/28 08:12:38 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,11 +98,32 @@ static int	populate_command_node_globbing(t_tokens *tokens, t_ast *root, int i)
 	return (0);
 }
 
+int malloc_when_token_is_expanded(t_tokens *tokens, t_ast *root, int i)
+{
+	char	**split;
+	int		j;
+	
+	split = ft_split(tokens[i].value, ' ');
+	if (split == NULL)
+		return(1);
+	j = 0;
+	while (split[j])
+	{
+		*root->words = ft_strdup(split[j]);
+		if (*root->words == NULL)
+		{
+			free_2d_array((void ***)&split);
+			return (1);
+		}
+		j++;
+		root->words++;
+	}
+	return (0);
+}
+
 static int	populate_command_node_empty_check(t_tokens *tokens,
 				t_ast *root, int i)
 {
-	char	**split;
-	
 	while (*root->words)
 		root->words++;
 	if (!tokens[i].flag)
@@ -113,29 +134,25 @@ static int	populate_command_node_empty_check(t_tokens *tokens,
 	}
 	else
 	{
-		// handle everything better
-		split = ft_split(tokens[i].value, ' ');
-		if (split == NULL)
+		// split = ft_split(tokens[i].value, ' ');
+		// if (split == NULL)
+		// 	return (error_handler(NULL, NULL, tokens->code, 1), -1);
+		// j = 0;
+		// while (split[j])
+		// {
+		// 	*root->words = ft_strdup(split[j]);
+		// 	if (*root->words == NULL)
+		// 	{
+		// 		free_2d_array((void ***)&split);
+		// 		return (error_handler(NULL, NULL, tokens->code, 1), -1);
+		// 	}
+		// 	j++;
+		// 	root->words++;
+		// }
+		// free_2d_array((void ***)&split);
+		if (malloc_when_token_is_expanded(tokens, root, i))
 			return (error_handler(NULL, NULL, tokens->code, 1), -1);
-		int i = 0;
-		while (split[i])
-		{
-			*root->words = ft_strdup(split[i]);
-			if (*root->words == NULL)
-			{
-				free_2d_array((void ***)&split);
-				return (error_handler(NULL, NULL, tokens->code, 1), -1);
-			}
-			i++;
-			root->words++;
-		}
-		free_2d_array((void ***)&split);
 	}
-	// if (*root->words == NULL)
-	// {
-	// 	printf("entering here\n");
-	// 	return (error_handler(NULL, NULL, tokens->code, 1), -1);
-	// }
 	return (0);
 }
 
