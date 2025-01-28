@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 12:00:43 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 15:43:31 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/28 09:04:30 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,27 +51,28 @@ static int	get_size(char **arr)
 	return (i);
 }
 
-static char	**create_new_envp(char **envp, char *str, int *flag)
+static char	**create_new_envp(char **en, char *str, int *flag)
 {
 	int		i;
 	int		j;
 	int		len;
 	char	**new_envp;
 
-	len = get_size(envp);
+	len = get_size(en);
 	new_envp = ft_calloc((size_t)len, sizeof(char *));
 	if (!new_envp)
 		return (NULL);
 	i = -1;
 	j = 0;
-	while (envp[++i] && j < len)
+	while (en[++i] && j < len)
 	{
-		if (!ft_strncmp(str, envp[i], ft_strlen(str)) && (envp[i][ft_strlen(str)] == '=' || envp[i][ft_strlen(str)] == '\0'))
+		if (!ft_strncmp(str, en[i], ft_strlen(str))
+			&& (en[i][ft_strlen(str)] == '=' || en[i][ft_strlen(str)] == '\0'))
 		{
 			*flag = 1;
 			continue ;
 		}
-		new_envp[j] = ft_strdup(envp[i]);
+		new_envp[j] = ft_strdup(en[i]);
 		if (!new_envp[j])
 			return (free_2d_array((void ***)&new_envp), NULL);
 		j++;
