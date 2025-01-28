@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 16:39:32 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/28 09:50:15 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,10 @@ int			ft_pipe(t_pipes *p, int n, t_minishell *minishell, t_put *cmd);
 char		**null_termination(char **new_envp, int flag, int j);
 void		assign_out_fd(t_pipes *p, int n, int *out);
 
+// execution_utils_3.c
+void		put_heredoc_ctrl_d(char *str);
+void		heredoc_echo(int fd, char *buf);
+
 // init.c
 int			initialize(t_put *cmd, t_minishell *minishell, \
 				t_ast *s, t_token_info *token_info);
@@ -202,6 +206,11 @@ void		syntax_error_near(t_tokens *tokens, int loc);
 // populate_command_node.c
 int			populate_command_node(t_tokens *tokens,
 				t_ast *root, int start, int *end);
+
+// populate_command_node_utils.c
+int			get_size_split(t_tokens *tokens, char *str);
+int			malloc_when_token_is_expanded(t_tokens *tokens,
+				t_ast *root, int i);
 
 // print_ast.c
 void		print_ast(t_ast *node, int level, int flag);

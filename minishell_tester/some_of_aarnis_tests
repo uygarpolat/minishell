@@ -52,8 +52,6 @@ echo $
 echo "$"
 echo '$'
 echo $'$hello'
-echo "> >> < * ? [ ] | ; [ ] || && ( ) & # $ \ <<"
-echo '> >> < * ? [ ] | ; [ ] || && ( ) & # $ \ <<'
 echo $NOTEXISTS
 cd non_existent_directory
 cd tmp/

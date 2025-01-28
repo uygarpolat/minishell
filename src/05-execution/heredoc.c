@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:29:27 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 16:39:58 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/28 09:49:41 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,14 +84,7 @@ void	here_loop(t_minishell *minishell, t_ast *ast, t_put *cmd, int *i)
 			if (flag > 0)
 				unlink(cmd->heredocs[*i - 1]);
 			if (here(temp->token, minishell->ast, cmd, i) == -1)
-			{
-				ft_putstr_fd("minishell: warning: here-document at" \
-					"line 1 delimited by end-of-file", 2);
-				ft_putstr_fd(" (wanted ", 2);
-				ft_putstr_fd("`", 2);
-				ft_putstr_fd(temp->token->value, 2);
-				ft_putstr_fd("')\n", 2);
-			}
+				put_heredoc_ctrl_d(temp->token->value);
 			*i += 1;
 			flag++;
 		}
@@ -115,10 +108,7 @@ int	here(t_tokens *token, t_ast *ast, t_put *cmd, int *i)
 	{
 		buf = readline("> ");
 		if (!buf)
-		{
-			close(fd);
-			return (-1);
-		}
+			return (close(fd), -1);
 		if (g_signal == 130)
 		{
 			*ast->code_parser = 130;
@@ -126,9 +116,7 @@ int	here(t_tokens *token, t_ast *ast, t_put *cmd, int *i)
 		}
 		if (!ft_strncmp(token->value, buf, len + 1))
 			break ;
-		write(fd, buf, ft_strlen(buf));
-		write(fd, "\n", 1);
-		free_void((void **)&buf, NULL);
+		heredoc_echo(fd, buf);
 	}
 	set_signals(ast->code_parser, SIGNAL_PARENT);
 	free_void((void **)&buf, NULL);

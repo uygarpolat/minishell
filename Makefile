@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2025/01/27 13:35:23 by hpirkola         ###   ########.fr        #
+#    Updated: 2025/01/28 09:51:02 by upolat           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,6 +29,7 @@ SOURCES = 	$(SRC_DIR)/main.c \
 			\
 			$(PARSER_DIR)/parser.c $(PARSER_DIR)/parser_utils.c \
 			$(PARSER_DIR)/populate_command_node.c $(PARSER_DIR)/memory_and_error.c \
+			$(PARSER_DIR)/populate_command_node_utils.c \
 			\
 			$(SIGNALS_DIR)/signals.c $(SIGNALS_DIR)/signals_utils.c \
 			\
@@ -36,6 +37,7 @@ SOURCES = 	$(SRC_DIR)/main.c \
 			\
 			$(EXECUTION_DIR)/execution.c $(EXECUTION_DIR)/path.c \
 			$(EXECUTION_DIR)/execution_utils.c $(EXECUTION_DIR)/execution_utils_2.c \
+			$(EXECUTION_DIR)/execution_utils_3.c \
 			$(EXECUTION_DIR)/builtins.c $(EXECUTION_DIR)/env_export.c \
 		 	$(EXECUTION_DIR)/ft_strdup2.c $(EXECUTION_DIR)/errors.c \
 			$(EXECUTION_DIR)/ft_atol.c  $(EXECUTION_DIR)/files.c $(EXECUTION_DIR)/functions.c \
