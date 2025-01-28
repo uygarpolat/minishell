@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:07:15 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/27 22:16:03 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/28 16:54:53 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,8 @@ int	tokens_error_checker(t_tokens *tokens, t_capacity *capacity, int i, int k)
 	k = 0;
 	while (i < capacity->current_size)
 	{
+		if (tokens[i].type == TOKEN_AND || tokens[i].type == TOKEN_OR)
+			return (syntax_error_near(tokens, i), -1);
 		if (tokens[i].type == TOKEN_OPEN_PAREN
 			|| tokens[i].type == TOKEN_CLOSE_PAREN)
 			k = find_matching_paren(tokens, i, capacity->current_size - 1);
