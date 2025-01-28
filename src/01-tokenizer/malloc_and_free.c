@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:25:49 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/27 23:20:06 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/28 07:49:25 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,13 @@ static void	realloc_error(t_tokens *tokens, t_tokens *new_tokens,
 	}
 }
 
+void	init_new_tokens(t_tokens *new_tokens, int i)
+{
+	new_tokens[i].value = NULL;
+	new_tokens[i].globbed = NULL;
+	new_tokens[i].flag = 0;
+}
+
 t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
 		t_capacity *capacity, int i)
 {
@@ -63,11 +70,7 @@ t_tokens	*realloc_tokens_when_full(t_tokens *tokens,
 			new_tokens[i].flag = tokens[i].flag;
 		}
 		else
-		{
-			new_tokens[i].value = NULL;
-			new_tokens[i].globbed = NULL;
-			new_tokens[i].flag = 0;
-		}
+			init_new_tokens(new_tokens, i);
 	}
 	free_tokens(&tokens, capacity);
 	capacity->max_size *= 2;
