@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 11:46:21 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/28 08:12:38 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/28 08:15:35 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,6 +118,7 @@ int malloc_when_token_is_expanded(t_tokens *tokens, t_ast *root, int i)
 		j++;
 		root->words++;
 	}
+	free_2d_array((void ***)&split);
 	return (0);
 }
 
