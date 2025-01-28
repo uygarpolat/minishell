@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:10:10 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/28 10:19:56 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/28 23:34:37 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,8 @@ int	handle_expansion_and_wildcard_utils(t_tokens *tokens, t_arrays *a, int i)
 	}
 	if (!check_char_in_intarray(a->int_array_new, ' ')
 		&& ft_strchr(tokens[i].value, '$')
-		&& tokens[i].value[0] != '"'
-		&& tokens[i].value[0] != '\'')
+		&& !ft_strchr(tokens[i].value, '"')
+		&& !ft_strchr(tokens[i].value, '\''))
 		tokens[i].flag = 1;
 	free_void((void **)&tokens[i].value, NULL);
 	return (0);
