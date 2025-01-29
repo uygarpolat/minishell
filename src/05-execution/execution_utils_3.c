@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution_utils_3.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
+/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 09:49:12 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/29 15:29:19 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/29 17:52:22 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,11 @@ int	is_numeric(t_ast *s, int j)
 	while (s->words[j] && s->words[j][++i])
 	{
 		if (!ft_isdigit(s->words[j][i]))
+		{
+			if (i == 0 && (s->words[j][i] == '+' || s->words[j][i] == '-'))
+				continue ;
 			return (0);
+		}
 	}
 	return (1);
 }
