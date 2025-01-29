@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 11:17:35 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/29 16:37:18 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/29 16:48:59 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,9 +126,9 @@ int	main(int argc, char **argv, char **envp)
 
 	code = 0;
 	new_envp = ft_strdup2(envp);
-	set_pwd(&minishell, new_envp);
 	if (!new_envp)
 		return (error_handler(NULL, NULL, &code, 1), code);
+	set_pwd(&minishell, new_envp);
 	if (init_term_and_signal(argc, argv, &code))
 		return (free_2d_array((void ***)&new_envp), code);
 	while (1)
