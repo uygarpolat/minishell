@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:47:57 by upolat            #+#    #+#             */
-/*   Updated: 2024/11/17 18:58:04 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/29 14:14:50 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ static int	handle_ambi_redir_in_dollar(t_arrays *a, char **str,
 	c = *(a->int_array_old - ft_strlen(*str) - 1);
 	if (type == TOKEN_HEREDOC)
 		return (0);
-	if (var == NULL || ft_strchr(var, ' '))
+	if (var == NULL || ft_strchr(var, ' ') || var[0] == '\0')
 	{
 		if (identify_token(type))
 		{
