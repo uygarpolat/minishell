@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 15:26:21 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/29 10:51:25 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,10 @@ static int	execute_builtin(t_ast *s, t_minishell *minishell, \
 			int n, t_put *file)
 {
 	if (minishell->p.count == 0)
-		check_in_out(s, minishell, file, n);
+	{
+		if (!check_in_out(s, minishell, file, n))
+			return (0);
+	}
 	if (!ft_strncmp(s->words[0], "echo", 5))
 		return (run_echo(s->words));
 	else if (!ft_strncmp(s->words[0], "cd", 3))
