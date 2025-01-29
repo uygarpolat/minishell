@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:35:18 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/22 21:37:33 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/29 16:35:49 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,11 @@ int	init_term_and_signal(int argc, char **argv, int *exit_code)
 {
 	struct termios	term;
 
-	(void)argc;
+	if (argc > 1)
+	{
+		*exit_code = 127;
+		return (ft_putstr_fd("Usage: ./minishell\n", 2), 1);
+	}
 	(void)argv;
 	if (isatty(STDIN_FILENO))
 	{
