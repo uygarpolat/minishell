@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/29 14:54:43 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/29 15:28:57 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,14 +112,15 @@ int	run_exit(t_ast *s, t_minishell *minishell, t_put *file)
 	ft_putstr_fd("exit\n", 1);
 	if (s->words[2])
 	{
-		ft_putstr_fd("minishell: exit: too many arguments\n", 2);
-		if (!ft_isdigit(*s->words[1]) && ft_isdigit(*s->words[2]))
+		error_message(s);
+		if (!is_numeric(s, 1) && is_numeric(s, 2))
 			graceful_exit(minishell, file, 2, 1);
 		return (0);
 	}
 	i = ft_atol(s->words[1]);
-	if (i == 0 && ft_strncmp(s->words[1], "0", 2) && \
-		ft_strncmp(s->words[1], "+0", 3) && ft_strncmp(s->words[1], "-0", 3))
+	if ((i == 0 && ft_strncmp(s->words[1], "0", 2) && \
+		ft_strncmp(s->words[1], "+0", 3) && ft_strncmp(s->words[1], "-0", 3)) \
+			|| !is_numeric(s, 1))
 	{
 		ft_putstr_fd("minishell: exit: numeric argument required\n", 2);
 		error(minishell, file);

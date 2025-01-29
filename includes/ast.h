@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/29 14:55:46 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/29 15:21:05 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,11 +120,13 @@ void		pipe_fail(t_pipes *p);
 int			ft_pipe(t_pipes *p, int n, t_minishell *minishell, t_put *cmd);
 char		**null_termination(char **new_envp, int flag, int j);
 void		assign_out_fd(t_pipes *p, int n, int *out);
-int	failed_getcwd(t_minishell *minishell, char *old);
+int			failed_getcwd(t_minishell *minishell, char *old);
 
 // execution_utils_3.c
 void		put_heredoc_ctrl_d(char *str);
 void		heredoc_echo(int fd, char *buf);
+void		error_message(t_ast *s);
+int			is_numeric(t_ast *s, int j);
 
 // init.c
 int			initialize(t_put *cmd, t_minishell *minishell, \
