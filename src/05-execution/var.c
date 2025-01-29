@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 10:52:48 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 21:41:26 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/29 12:19:10 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,7 @@ int	var_exists(char **envp, char *str)
 	while (str[++i])
 	{
 		if (str[i] == '=')
-		{
-			i++;
 			break ;
-		}
 	}
 	temp = malloc(sizeof(char) * (i + 1));
 	j = -1;
@@ -52,20 +49,35 @@ int	var_exists(char **envp, char *str)
 	return (1);
 }
 
+static int	count_len(char *str)
+{
+	int	len;
+	int	flag;
+
+	len = -1;
+	flag = 0;
+	while (str[++len])
+	{
+		if (str[len] == '=')
+		{
+			flag = 1;
+			len++;
+			break ;
+		}
+	}
+	if (flag)
+		return (len);
+	return (-1);
+}
+
 char	**ch_var(char **envp, char *str)
 {
 	int	i;
 	int	len;
 
-	len = -1;
-	while (str[++len])
-	{
-		if (str[len] == '=')
-		{
-			len++;
-			break ;
-		}
-	}
+	len = count_len(str);
+	if (len == -1)
+		return (envp);
 	i = -1;
 	while (envp[++i])
 	{
