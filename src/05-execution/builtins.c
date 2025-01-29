@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 13:48:22 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/29 11:37:49 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ static int	get_pwd(t_minishell *minishell)
 
 int	run_cd(char **cmd, t_minishell *minishell)
 {
-	if (!cmd[1])
+	if (!cmd[1] || !ft_strncmp(cmd[1], "--", 3) || !ft_strncmp(cmd[1], "~", 2))
 	{
 		if (!get_var(*minishell->envp, "HOME=")
 			|| chdir(get_var(*minishell->envp, "HOME=")) != 0)
