@@ -6,16 +6,16 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/25 17:31:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/22 21:40:39 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/29 12:47:29 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/ast.h"
 
-static long long	to_int(const char *str, int neg)
+static unsigned long long	to_int(const char *str, int neg)
 {
-	int			i;
-	long long	result;
+	int					i;
+	unsigned long long	result;
 
 	i = 0;
 	result = 0;
@@ -51,5 +51,5 @@ long long	ft_atol(const char *str)
 		str++;
 	}
 	result = to_int(str, neg);
-	return (result);
+	return ((long long) result);
 }

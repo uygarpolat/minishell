@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:39:14 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/29 11:24:54 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/29 12:45:12 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,8 @@ int	get_in_out(t_ast *s, t_minishell *minishell, int n, int child)
 		else if (temp->type == AST_REDIR_APPEND)
 			minishell->cmd->outfile = temp->token->value;
 		else if (temp->type == AST_HEREDOC)
-			minishell->cmd->infile = minishell->cmd->heredocs[minishell->cmd->cmd_fd[n]];
+			minishell->cmd->infile = \
+				minishell->cmd->heredocs[minishell->cmd->cmd_fd[n]];
 		if (!open_files(minishell->cmd))
 		{
 			if (child)
