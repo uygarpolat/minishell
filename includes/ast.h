@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/28 09:50:15 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/29 11:25:38 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ typedef struct s_minishell
 	char		***envp;
 	char		pwd[PATH_MAX];
 	int			here;
+	t_put		*cmd;
 }				t_minishell;
 
 typedef struct s_token_info
@@ -156,8 +157,8 @@ char		**rm_envp(char **envp, char *cmd);
 
 // files.c
 void		dupping(t_minishell *minishell, t_pipes *p, t_put *cmd, int n);
-void		get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell, int n);
-void		check_in_out(t_ast *s, t_minishell *minishell, t_put *file, int n);
+int			get_in_out(t_ast *s, t_minishell *minishell, int n, int child);
+int			check_in_out(t_ast *s, t_minishell *minishell, t_put *file, int n);
 
 // pipes.c
 void		close_pipes(t_minishell *minishell, int n);

@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 16:50:30 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/29 11:25:19 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ static void	execute(t_ast *s, t_minishell *minishell, int n, t_put *cmd)
 	if (minishell->p.pids[n] != 0)
 		return ;
 	set_signals(s->code_parser, SIGNAL_CHILD);
-	get_in_out(s, cmd, minishell, n);
+	if (!get_in_out(s, minishell, n, 1))
+		exit (1);
 	if (minishell->p.pipes || cmd->infile || cmd->outfile)
 		dupping(minishell, &minishell->p, cmd, n);
 	if (is_builtin(s->words))

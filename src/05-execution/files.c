@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:39:14 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 13:58:40 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/29 11:24:54 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,35 +74,38 @@ static int	open_files(t_put *cmd)
 	return (1);
 }
 
-void	get_in_out(t_ast *s, t_put *cmd, t_minishell *minishell, int n)
+int	get_in_out(t_ast *s, t_minishell *minishell, int n, int child)
 {
 	t_ast	*temp;
 
 	temp = s->redir_target;
 	while (temp)
 	{
-		cmd->o_type = (temp->type == AST_REDIR_OUT) * 'o' \
+		minishell->cmd->o_type = (temp->type == AST_REDIR_OUT) * 'o' \
 				+ (temp->type == AST_REDIR_APPEND) * 'a';
 		if (temp->type == AST_REDIR_IN)
-			cmd->infile = temp->token->value;
+			minishell->cmd->infile = temp->token->value;
 		else if (temp->type == AST_REDIR_OUT)
-			cmd->outfile = temp->token->value;
+			minishell->cmd->outfile = temp->token->value;
 		else if (temp->type == AST_REDIR_APPEND)
-			cmd->outfile = temp->token->value;
+			minishell->cmd->outfile = temp->token->value;
 		else if (temp->type == AST_HEREDOC)
-			cmd->infile = cmd->heredocs[cmd->cmd_fd[n]];
-		if (!open_files(cmd))
+			minishell->cmd->infile = minishell->cmd->heredocs[minishell->cmd->cmd_fd[n]];
+		if (!open_files(minishell->cmd))
 		{
-			file_error(minishell, cmd);
-			exit (1);
+			if (child)
+				file_error(minishell, minishell->cmd);
+			return (0);
 		}
 		temp = temp->redir_target;
 	}
+	return (1);
 }
 
-void	check_in_out(t_ast *s, t_minishell *minishell, t_put *file, int n)
+int	check_in_out(t_ast *s, t_minishell *minishell, t_put *file, int n)
 {
-	get_in_out(s, file, minishell, n);
+	if (!get_in_out(s, minishell, n, 0))
+		return (0);
 	if (file->infile || file->outfile)
 	{
 		if (file->infile)
@@ -115,4 +118,5 @@ void	check_in_out(t_ast *s, t_minishell *minishell, t_put *file, int n)
 		close(file->in);
 	if (file->outfile && file->out >= 0)
 		close(file->out);
+	return (1);
 }

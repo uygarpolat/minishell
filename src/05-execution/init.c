@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 13:29:41 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 16:38:42 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/29 11:17:33 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ int	initialize(t_put *cmd, t_minishell *minishell,
 	cmd->out = -1;
 	cmd->stdin2 = -1;
 	cmd->stdout2 = -1;
+	minishell->cmd = cmd;
 	i = -1;
 	while (++i < 16)
 		cmd->fd_here[i] = -1;
