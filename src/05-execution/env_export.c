@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/29 12:10:59 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/29 16:39:58 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ static int	print_export(char **envp)
 				break ;
 			}
 			ft_putchar_fd(envp[i][j], 1);
-		}	
+		}
 		ft_putstr_fd("\n", 1);
 	}
 	return (1);
