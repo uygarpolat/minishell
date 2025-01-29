@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 13:57:25 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/29 12:10:59 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,12 +37,27 @@ void	print_env(char **envp)
 static int	print_export(char **envp)
 {
 	int	i;
+	int	j;
 
 	i = -1;
 	while (envp && envp[++i])
 	{
-		printf("declare -x ");
-		printf("%s\n", envp[i]);
+		ft_putstr_fd("declare -x ", 1);
+		j = -1;
+		while (envp[i][++j])
+		{
+			if (envp[i][j] == '=')
+			{
+				ft_putchar_fd(envp[i][j], 1);
+				ft_putchar_fd('"', 1);
+				while (envp[i][++j])
+					ft_putchar_fd(envp[i][j], 1);
+				ft_putchar_fd('"', 1);
+				break ;
+			}
+			ft_putchar_fd(envp[i][j], 1);
+		}	
+		ft_putstr_fd("\n", 1);
 	}
 	return (1);
 }
