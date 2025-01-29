@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/29 11:25:38 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/29 14:55:46 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,10 +117,10 @@ void		unlink_here(t_put *cmd);
 
 // execution_utils_2.c
 void		pipe_fail(t_pipes *p);
-void		free_pipes(t_pipes *p);
 int			ft_pipe(t_pipes *p, int n, t_minishell *minishell, t_put *cmd);
 char		**null_termination(char **new_envp, int flag, int j);
 void		assign_out_fd(t_pipes *p, int n, int *out);
+int	failed_getcwd(t_minishell *minishell, char *old);
 
 // execution_utils_3.c
 void		put_heredoc_ctrl_d(char *str);
@@ -164,6 +164,7 @@ int			check_in_out(t_ast *s, t_minishell *minishell, t_put *file, int n);
 void		close_pipes(t_minishell *minishell, int n);
 int			count_pipes(t_ast *s);
 int			mallocing(t_pipes *p);
+void		free_pipes(t_pipes *p);
 
 // functions.c
 int			waiting(int pid);

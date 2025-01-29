@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/29 11:37:49 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/29 14:54:43 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ static int	get_pwd(t_minishell *minishell)
 {
 	char	*pwd;
 	char	*old_pwd;
+	char	*old;
 
 	old_pwd = ft_strjoin("OLDPWD=", minishell->pwd);
 	if (!old_pwd)
@@ -48,8 +49,12 @@ static int	get_pwd(t_minishell *minishell)
 	free(old_pwd);
 	if (!minishell->envp)
 		return (ft_putstr_fd("malloc fail\n", 2), 0);
+	old = ft_strdup(minishell->pwd);
+	if (!old)
+		return (ft_putstr_fd("malloc fail\n", 2), 0);
 	if (getcwd(minishell->pwd, sizeof(minishell->pwd)) == NULL)
-		return (ft_putstr_fd("getcwd error\n", 2), 0);
+		return (failed_getcwd(minishell, old));
+	free(old);
 	pwd = ft_strjoin("PWD=", minishell->pwd);
 	if (!pwd)
 		return (ft_putstr_fd("malloc fail\n", 2), 0);
