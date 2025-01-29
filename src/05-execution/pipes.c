@@ -6,11 +6,26 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:43:30 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 14:00:11 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/29 14:53:25 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/ast.h"
+
+void	free_pipes(t_pipes *p)
+{
+	int	i;
+
+	i = -1;
+	if (p->count == 1)
+		free(p->pipes[0]);
+	else
+	{
+		while (++i < 2)
+			free(p->pipes[i]);
+	}
+	free(p->pipes);
+}
 
 void	close_pipes(t_minishell *minishell, int n)
 {
