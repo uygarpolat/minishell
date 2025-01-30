@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:29:27 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/30 17:03:21 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/30 19:02:44 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	check_here(t_minishell *minishell, t_put *cmd)
 		ast = ast->right;
 		cmd->cmd_fd[j++] = i - 1;
 		if (g_signal == SIGINT || g_signal == SIGQUIT)
-			break ;
+			break;
 	}
 }
 
