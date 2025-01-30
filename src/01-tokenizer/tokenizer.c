@@ -36,7 +36,7 @@ t_tokens	*ft_tokenizer(char *input, t_capacity *capacity,
 		return (NULL);
 	while (*input)
 	{
-		while (ft_strchr(" \t\n", *input) && *input)
+		while (ft_strchr(" \t\n\r\v\f", *input) && *input)
 			input++;
 		if (capacity->max_size <= capacity->current_size)
 			tokens = realloc_tokens_when_full(tokens, capacity, -1);
