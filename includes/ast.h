@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 15:08:56 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/30 10:07:50 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/30 15:59:48 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,7 @@ void		put_heredoc_ctrl_d(char *str);
 void		heredoc_echo(int fd, char *buf);
 void		error_message(t_ast *s);
 int			is_numeric(t_ast *s, int j);
+void	too_many_args(t_ast *s, t_minishell *minishell, t_put *file);
 
 // init.c
 int			initialize(t_put *cmd, t_minishell *minishell, \
@@ -146,6 +147,7 @@ int			run_exit(t_ast *s, t_minishell *minishell,
 				t_put *file);
 int			run_cd(char **cmd, t_minishell *minishell);
 int			run_echo(char **cmd);
+void	graceful_exit(t_minishell *minishell, t_put *file, long long i, int flag);
 
 // env_export.c
 int			get_envp_size(char **envp);

@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/29 17:58:59 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/30 15:58:35 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ int	run_cd(char **cmd, t_minishell *minishell)
 	return (1);
 }
 
-static void	graceful_exit(t_minishell *minishell, t_put *file,
+void	graceful_exit(t_minishell *minishell, t_put *file,
 			long long i, int flag)
 {
 	free_2d_array((void ***)minishell->envp);
@@ -111,12 +111,7 @@ int	run_exit(t_ast *s, t_minishell *minishell, t_put *file)
 		return (1);
 	ft_putstr_fd("exit\n", 1);
 	if (s->words[2])
-	{
-		error_message(s);
-		if (!is_numeric(s, 1) && is_numeric(s, 2))
-			graceful_exit(minishell, file, 2, 1);
-		return (0);
-	}
+		return (too_many_args(s, minishell, file), 0);
 	i = ft_atol(s->words[1]);
 	if ((i == 0 && ft_strncmp(s->words[1], "0", 2) && \
 		ft_strncmp(s->words[1], "+0", 3) && ft_strncmp(s->words[1], "-0", 3)) \
