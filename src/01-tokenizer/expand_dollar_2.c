@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:47:57 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/29 14:14:50 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/30 21:14:27 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ int	str_combined(t_arrays *a, t_token_type type, int *len, int flag)
 	else
 		var = get_var(str, a->envp);
 	if (handle_ambi_redir_in_dollar(a, &str, var, type) == -1)
-		return (-1);
+		return (free_void((void **)&str, NULL), -1);
 	if (var == NULL)
 		return (free_void((void **)&str, NULL), 0);
 	if (flag)
