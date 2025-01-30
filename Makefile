@@ -6,7 +6,7 @@
 #    By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/12 16:42:23 by upolat            #+#    #+#              #
-#    Updated: 2025/01/28 09:51:02 by upolat           ###   ########.fr        #
+#    Updated: 2025/01/30 06:34:52 by upolat           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,7 +52,7 @@ CFLAGS = -Wall -Wextra -Werror -g
 libft_dir := library/libft
 libft := $(libft_dir)/libft.a
 
-READLINE_DIR := $(shell brew --prefix readline)
+READLINE_DIR := $(shell brew --prefix readline 2>/dev/null || echo "/usr")
 
 INCLUDES = -I./include -I$(libft_dir) -I$(READLINE_DIR)/include
 
