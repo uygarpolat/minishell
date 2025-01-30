@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:29:27 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/28 09:49:41 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/30 17:03:21 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void	check_here(t_minishell *minishell, t_put *cmd)
 			here_loop(minishell, ast->left, cmd, &i);
 		ast = ast->right;
 		cmd->cmd_fd[j++] = i - 1;
-		if (g_signal == 130)
+		if (g_signal == SIGINT || g_signal == SIGQUIT)
 			break ;
 	}
 }
@@ -109,9 +109,9 @@ int	here(t_tokens *token, t_ast *ast, t_put *cmd, int *i)
 		buf = readline("> ");
 		if (!buf)
 			return (close(fd), -1);
-		if (g_signal == 130)
+		if (g_signal == SIGINT || g_signal == SIGQUIT)
 		{
-			*ast->code_parser = 130;
+			*ast->code_parser = 128 + g_signal;
 			break ;
 		}
 		if (!ft_strncmp(token->value, buf, len + 1))

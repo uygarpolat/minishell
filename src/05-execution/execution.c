@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 14:14:33 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/29 11:25:19 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/30 17:04:46 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ static void	execute(t_ast *s, t_minishell *minishell, int n, t_put *cmd)
 	no_words(s, minishell, cmd);
 	path = get_path(s->words, *minishell->envp);
 	error_check(path, s, minishell, cmd);
-	if (g_signal == 130)
-		exit(130);
+	if (g_signal == SIGINT || g_signal == SIGQUIT)
+		exit(128 + g_signal);
 	execve(path, s->words, *minishell->envp);
 	error(minishell, cmd);
 	print_and_exit(s->words[0], strerror(errno), errno, minishell);
@@ -67,7 +67,7 @@ static int	interrupted(t_minishell *minishell, t_put *cmd)
 	if (minishell->p.count > 0)
 		free_pipes(&minishell->p);
 	free(minishell->p.pids);
-	return (130);
+	return (128 + g_signal);
 }
 
 int	execution(t_ast *s, t_token_info *token_info, t_minishell *minishell)
@@ -79,7 +79,7 @@ int	execution(t_ast *s, t_token_info *token_info, t_minishell *minishell)
 			!mallocing(&minishell->p))
 		return (error2(minishell, "malloc failed\n", &cmd), 1);
 	check_here(minishell, &cmd);
-	if (g_signal == 130)
+	if (g_signal == SIGINT || g_signal == SIGQUIT)
 		return (interrupted(minishell, &cmd));
 	if (minishell->p.count == 0 && is_builtin(s->words))
 		return (only_builtin(minishell, &cmd));

@@ -6,13 +6,13 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/02 00:39:48 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/22 21:37:25 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/30 16:53:23 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../includes/signals.h"
 
-static void	set_signal_exit(int *exit_code)
+static void	set_signal_exit(int *exit_code, int sig)
 {
 	static int	*exit_code_ptr;
 
@@ -23,7 +23,7 @@ static void	set_signal_exit(int *exit_code)
 	else
 	{
 		*exit_code_ptr = 130;
-		g_signal = 130;
+		g_signal = sig;
 	}
 }
 
@@ -35,7 +35,7 @@ static void	sig_handler_heredoc(int signo)
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_done = 1;
-		set_signal_exit(NULL);
+		set_signal_exit(NULL, signo);
 	}
 }
 
@@ -46,7 +46,7 @@ static void	sig_parent_handler(int signo)
 		ft_putstr_fd("\n", STDOUT_FILENO);
 		if (!isatty(STDIN_FILENO) || errno != EINTR)
 			return ;
-		set_signal_exit(NULL);
+		set_signal_exit(NULL, signo);
 		rl_on_new_line();
 		rl_replace_line("", 0);
 		rl_redisplay();
@@ -71,7 +71,7 @@ static int	set_parent(void)
 
 int	set_signals(int *exit_code, int type)
 {
-	set_signal_exit(exit_code);
+	set_signal_exit(exit_code, 0);
 	if (type == SIGNAL_PARENT)
 	{
 		if (!set_parent())
