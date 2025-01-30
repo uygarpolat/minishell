@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/29 16:39:58 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/30 10:14:36 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,25 @@ int	get_envp_size(char **envp)
 	return (i);
 }
 
-void	print_env(char **envp)
+int	print_env(char **envp, char **words)
 {
 	int	i;
 
 	i = -1;
+	if (words[1])
+	{
+		ft_putstr_fd("env: ‘kfdjhk’: No such file or directory\n", 2);
+		return (0);
+	}
 	while (envp && envp[++i])
 	{
 		if (ft_strchr(envp[i], '='))
-			printf("%s\n", envp[i]);
+		{
+			ft_putstr_fd(envp[i], 1);
+			ft_putstr_fd("\n", 1);
+		}
 	}
+	return (1);
 }
 
 static int	print_export(char **envp)

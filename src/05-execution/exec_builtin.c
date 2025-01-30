@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/29 10:51:25 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/30 10:13:35 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ static int	execute_builtin(t_ast *s, t_minishell *minishell, \
 	else if (!ft_strncmp(s->words[0], "unset", 6))
 		return (run_unset(minishell->envp, s));
 	else if (!ft_strncmp(s->words[0], "env", 4))
-		print_env(*minishell->envp);
+		return (print_env(*minishell->envp, s->words));
 	else if (!ft_strncmp(s->words[0], "exit", 5))
 		return (run_exit(s, minishell, file));
 	return (1);
@@ -61,6 +61,8 @@ int	only_builtin(t_minishell *minishell, t_put *cmd)
 		free_heredocs(cmd);
 		free(cmd->cmd_fd);
 		free(minishell->p.pids);
+		if (!ft_strncmp(minishell->ast->words[0], "env", 4))
+			return (127);
 		return (1);
 	}
 	if (cmd->infile)
@@ -83,10 +85,17 @@ int	only_builtin(t_minishell *minishell, t_put *cmd)
 
 void	run_builtin(t_ast *s, t_minishell *minishell, int n, t_put *cmd)
 {
+	int	flag;
+
+	flag = 0;
 	if (!execute_builtin(s, minishell, n, cmd))
 	{
+		if (!ft_strncmp(s->words[0], "env", 4))
+			flag = 1;
 		error(minishell, cmd);
 		free_ast(&minishell->ast);
+		if (flag)
+			exit (127);
 		exit(1);
 	}
 	free_2d_array((void ***)minishell->envp);
