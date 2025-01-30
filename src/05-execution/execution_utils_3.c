@@ -6,7 +6,7 @@
 /*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 09:49:12 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/29 17:52:22 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/30 15:57:49 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,4 +57,14 @@ void	error_message(t_ast *s)
 	}
 	else
 		ft_putstr_fd("too many arguments\n", 2);
+}
+
+void	too_many_args(t_ast *s, t_minishell *minishell, t_put *file)
+{
+	if (!ft_strncmp(s->words[2], "exit", 5))
+		ft_putstr_fd("minishell: exit: exit: numeric argument required\n", 2);
+	else
+		error_message(s);
+	if (!is_numeric(s, 1))
+		graceful_exit(minishell, file, 2, 2);
 }

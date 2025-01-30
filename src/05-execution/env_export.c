@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/16 14:54:44 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/30 10:14:36 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/01/30 15:37:44 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,9 @@ int	print_env(char **envp, char **words)
 	i = -1;
 	if (words[1])
 	{
-		ft_putstr_fd("env: ‘kfdjhk’: No such file or directory\n", 2);
+		ft_putstr_fd("env: ", 2);
+		ft_putstr_fd(words[1], 2);
+		ft_putstr_fd(": No such file or directory\n", 2);
 		return (0);
 	}
 	while (envp && envp[++i])
@@ -101,7 +103,7 @@ int	run_export(char **cmd, t_minishell *minishell)
 		while (str[0][++i])
 			if (str[0][i] != '_' && !ft_isalpha(str[0][i]) && \
 					!ft_isdigit(str[0][i]))
-				return (env_not_valid_identifier(str[0], &str), 0);
+				return (env_not_valid_identifier(cmd[j], &str), 0);
 		free_2d_array((void ***)&str);
 		*minishell->envp = add_env(*minishell->envp, cmd[j]);
 		if (!minishell->envp)
