@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/16 00:47:57 by upolat            #+#    #+#             */
-/*   Updated: 2025/01/29 14:14:50 by upolat           ###   ########.fr       */
+/*   Updated: 2025/01/30 22:23:24 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ static int	handle_ambi_redir_in_dollar(t_arrays *a, char **str,
 				*a->code = 1;
 				return (-1);
 			}
-			else if (var == NULL)
+			else if (var == NULL && *a->int_array_old == '\0')
 				return (error_handler("", "No such file or directory",
 						a->code, 1), -1);
 		}
@@ -90,7 +90,7 @@ int	str_combined(t_arrays *a, t_token_type type, int *len, int flag)
 	else
 		var = get_var(str, a->envp);
 	if (handle_ambi_redir_in_dollar(a, &str, var, type) == -1)
-		return (-1);
+		return (free_void((void **)&str, NULL), -1);
 	if (var == NULL)
 		return (free_void((void **)&str, NULL), 0);
 	if (flag)
