@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 12:11:42 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/27 14:08:06 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/02/03 10:34:02 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ static void	stat_zero(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 			print_and_exit(s->words[0], "command not found\n", 127, minishell);
 		print_and_exit(s->words[0], "Is a directory\n", 126, minishell);
 	}
-	if (!ft_strncmp(s->words[0], ".", 2))
+	if (!ft_strncmp(s->words[0], ".", 2) && !s->words[1])
 	{
 		free_2d_array((void ***)minishell->envp);
 		free(minishell->p.pids);
@@ -95,6 +95,7 @@ void	error_check(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 		if (S_ISDIR(buf.st_mode))
 		{
 			handle_exception(minishell, cmd);
+			free_void((void **)&path, NULL);
 			print_and_exit(s->words[0], "Is a directory\n", 126, minishell);
 		}
 		if (access(path, X_OK) != 0)
