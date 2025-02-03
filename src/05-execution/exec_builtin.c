@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 14:34:26 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/01/30 10:13:35 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/02/03 10:19:04 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ static int	run_unset(char ***envp, t_ast *s)
 {
 	int	i;
 
-	if (s->words[1])
+	if (envp && *envp && **envp && s->words[1])
 	{
 		i = 0;
 		while (s->words[++i])
