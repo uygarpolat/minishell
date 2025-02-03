@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 12:11:42 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/02/03 10:34:02 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/02/03 11:25:20 by hpirkola         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ static void	error_not_path(char *path, t_ast *s, \
 		if (!ft_strchr(s->words[0], '/') && get_var(*minishell->envp, "PATH="))
 		{
 			error(minishell, cmd);
+			if (!ft_strncmp(s->words[0], "~", 2))
+				print_and_exit(s->words[0], "Is a directory\n", 126, minishell);
 			print_and_exit(s->words[0], "command not found\n", 127, minishell);
 		}
 		else if (stat(s->words[0], &buf) == 0 && access(s->words[0], X_OK) != 0)
@@ -95,7 +97,8 @@ void	error_check(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 		if (S_ISDIR(buf.st_mode))
 		{
 			handle_exception(minishell, cmd);
-			free_void((void **)&path, NULL);
+			if (ft_strncmp(s->words[0], path, ft_strlen(path) + 1))
+				free_void((void **)&path, NULL);
 			print_and_exit(s->words[0], "Is a directory\n", 126, minishell);
 		}
 		if (access(path, X_OK) != 0)
