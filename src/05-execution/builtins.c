@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hpirkola <hpirkola@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 14:02:47 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/02/03 10:26:09 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/02/03 11:48:47 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,8 @@ static int	get_pwd(t_minishell *minishell)
 
 int	run_cd(char **cmd, t_minishell *minishell)
 {
-	if (!cmd[1] || !ft_strncmp(cmd[1], "--", 3) || !ft_strncmp(cmd[1], "-", 2) || !ft_strncmp(cmd[1], "~", 2))
+	if (!cmd[1] || !ft_strncmp(cmd[1], "--", 3)
+		|| !ft_strncmp(cmd[1], "-", 2) || !ft_strncmp(cmd[1], "~", 2))
 	{
 		if (!get_var(*minishell->envp, "HOME=")
 			|| chdir(get_var(*minishell->envp, "HOME=")) != 0)
