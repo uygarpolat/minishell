@@ -1,9 +1,0 @@
-.
-..
-notexist_cmd
-unset PATH
-notexist_cmd
-.
-..
-cd infiles
-noaccess
