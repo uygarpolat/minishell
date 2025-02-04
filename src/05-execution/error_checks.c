@@ -6,7 +6,7 @@
 /*   By: upolat <upolat@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 12:11:42 by hpirkola          #+#    #+#             */
-/*   Updated: 2025/02/03 11:39:00 by hpirkola         ###   ########.fr       */
+/*   Updated: 2025/02/04 09:59:20 by upolat           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ void	error_check(char *path, t_ast *s, t_minishell *minishell, t_put *cmd)
 		{
 			handle_exception(minishell, cmd);
 			if (ft_strncmp(s->words[0], path, ft_strlen(path) + 1))
-			{	
+			{
 				free_void((void **)&path, NULL);
 				print_and_exit(s->words[0], "is a directory\n", 1, minishell);
 			}
