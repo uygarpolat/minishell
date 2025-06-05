@@ -1,6 +1,6 @@
 # Minishell
 
-Welcome to Minishell, a custom-built shell inspired by Bash, developed entirely in C by Uygar Polat ([@uygarpolat](https://github.com/uygarpolat/)) and Helmi Pirkola ([@hpirkola](https://github.com/hpirkola/)) as part of [Hive Helsinki](https://www.hive.fi/en/) (42) curriculum.
+Welcome to Minishell, a custom-built shell inspired by Bash, developed entirely in C by [Uygar Polat](https://github.com/uygarpolat/) and [Helmi Pirkola](https://github.com/hpirkola/) as part of [Hive Helsinki](https://www.hive.fi/en/) (42) curriculum.
 
 ## What's in the Box?
 
@@ -13,18 +13,20 @@ Minishell packs all the core features you'd expect from a modern shell, includin
 - **Wildcard Expansion**: Simplify file handling with `*` to match patterns in the current directory.
 - **Signal Handling**: Minishell gracefully handles signals like `Ctrl+C` (to interrupt), `Ctrl+D` (to exit), and `Ctrl+\` (to ignore in interactive mode).
 
-## How to Get Started
+## How to run
 
-Clone the repo and build Minishell using the included `Makefile`:
 
-```bash
-git clone https://github.com/uygarpolat/minishell.git
-cd minishell
-make
-```
 
-Once compiled, launch it with:
+1. Clone the repo and move into the project directory:
 
-```
-./minishell
-```
+- `git clone https://github.com/uygarpolat/minishell.git && cd minishell`
+
+2. To get started, make sure [Docker](https://www.docker.com/get-started) is installed on your system. If you don't have Docker or rather not use it, you can also compile the code directly on your machine via `make` command. If so, you can skip to step 4 after simply running `make`. Otherwise, build the Docker image with:
+
+- `docker build -t minishell .`
+ 
+3. Run the Minishell via:
+
+- `docker run -it --rm minishell`
+
+4. This will drop you directly into the Minishell prompt and you are ready to use it. Go crazy testing/using it! You can type `exit`, or press Ctrl+D, any time to quit.
