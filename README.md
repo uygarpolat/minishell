@@ -15,13 +15,11 @@ Minishell packs all the core features you'd expect from a modern shell, includin
 
 ## How to run
 
-
-
 1. Clone the repo and move into the project directory:
 
 - `git clone https://github.com/uygarpolat/minishell.git && cd minishell`
 
-2. To get started, make sure [Docker](https://www.docker.com/get-started) is installed on your system. If you don't have Docker or rather not use it, you can also compile the code directly on your machine via `make` command. If so, you can skip to step 4 after simply running `make`. Otherwise, build the Docker image with:
+2. To get started, make sure [Docker](https://www.docker.com/get-started) is installed on your system. If you don't have Docker or rather not use it, you can also compile the code directly on your machine via `make` command. If so, you can skip to step 4 after simply running `make` and then `./minishell`. Otherwise, build the Docker image with:
 
 - `docker build -t minishell .`
  
